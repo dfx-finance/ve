@@ -24,14 +24,22 @@ $ pip install -r requirements.txt
 $ npm install ganache
 ```
 
-3. Run tests at block num 14957500
+3. Add ganache local private key to brownie
 
 ```bash
-(terminal 1) $ npm ganache-cli -d --fork <ETH_RPC_URL>@14957500
+$ brownie accounts new <account-name>
+# Enter private key
+# Enter account password (blank)
+```
+
+4. Run tests at block num 14957500
+
+```bash
+(terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@14957500
 (terminal 2) $ brownie test
 ```
 
-4. Run deploy script
+5. Run deploy script
 
 ```bash
 $ brownie run deploy_gaugecontroller.py
