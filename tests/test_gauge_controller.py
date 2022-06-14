@@ -16,7 +16,7 @@ gas_strategy = LinearScalingStrategy('40 gwei', '150 gwei', 1.3)
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
-def setup(gauge_controller, voting_escrow, dfx, master_account, user_accounts):
+def setup(dfx, gauge_controller, voting_escrow, master_account, user_accounts):
     master_account.transfer(addresses.DFX_OWNER, '10 ether',
                             gas_price=gas_strategy)
     dfx.mint(master_account, 10 * 10e18,
@@ -29,17 +29,16 @@ def setup(gauge_controller, voting_escrow, dfx, master_account, user_accounts):
                     {'from': acct, 'gas_price': gas_strategy})
 
 
-# def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow):
-#     '''
-#     Test that gauge weights correctly adjust over time.
-#     '''
-#     t0 = chain.time()
-#     t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
+def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, user_accounts):
+    '''
+    Test that gauge weights correctly adjust over time.
+    '''
+    t0 = chain.time()
+    t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
 
-#     # dfx.
-
-#     # Deposit for voting
-#     voting_escrow.create_lock(1e18, t1, {'gas_price': gas_strategy})
+    # Deposit for voting
+    voting_escrow.create_lock(
+        1 * 1e18, t1, {'from': user_accounts[0], 'gas_price': gas_strategy})
 
 
 def test_transfer_ownership(gauge_controller):
