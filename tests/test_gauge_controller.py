@@ -16,15 +16,15 @@ gas_strategy = LinearScalingStrategy('40 gwei', '150 gwei', 1.3)
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
-def setup(gauge_controller, voting_escrow, accounts, dfx):
-    accounts[0].transfer(addresses.DFX_OWNER, '10 ether',
-                         gas_price=gas_strategy)
-    dfx.mint(accounts[0], 10 * 10e18,
+def setup(gauge_controller, voting_escrow, dfx, master_account, user_accounts):
+    master_account.transfer(addresses.DFX_OWNER, '10 ether',
+                            gas_price=gas_strategy)
+    dfx.mint(master_account, 10 * 10e18,
              {'from': addresses.DFX_OWNER, 'gas_price': gas_strategy})
 
-    for acct in accounts[1:4]:
+    for acct in user_accounts:
         dfx.transfer(acct, 1 * 10e18,
-                     {'from': accounts[0], 'gas_price': gas_strategy})
+                     {'from': master_account, 'gas_price': gas_strategy})
         dfx.approve(voting_escrow, 10e24,
                     {'from': acct, 'gas_price': gas_strategy})
 
