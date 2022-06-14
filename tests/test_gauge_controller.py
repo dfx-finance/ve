@@ -41,10 +41,5 @@ def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, user_accounts):
         1 * 1e18, t1, {'from': user_accounts[0], 'gas_price': gas_strategy})
 
 
-def test_transfer_ownership(gauge_controller):
-    # new_admin_addr = 0x0000000000000000000000000
-    # gauge_controller.commit_transfer_ownership(
-    #     new_admin_addr, {'gas_price': gas_strategy})
-    # gauge_controller.apply_transfer_ownership(
-    #     new_admin_addr, {'gas_price': gas_strategy})
-    pass
+def test_create_gauges(three_gauges):
+    print(three_gauges)
