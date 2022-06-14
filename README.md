@@ -35,8 +35,8 @@ $ brownie accounts new <account-name>
 4. Run tests at block num 14957500
 
 ```bash
-(terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@14957500
-(terminal 2) $ brownie test
+(terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@14957500 --unlock 0x27E843260c71443b4CC8cB6bF226C3f77b9695AF
+(terminal 2) $ brownie test --network mainnet-fork
 ```
 
 5. Run deploy script
