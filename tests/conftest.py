@@ -72,5 +72,4 @@ def three_gauges(RewardsOnlyGauge, mock_lp_token, master_account):
                                 'from': master_account, 'gas_price': gas_strategy})
         for _ in range(3)
     ]
-    print('Gauge:', contracts)
     yield contracts
