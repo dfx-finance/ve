@@ -42,5 +42,5 @@ $ brownie accounts new <account-name>
 5. Run deploy script
 
 ```bash
-$ brownie run deploy_gaugecontroller.py
+$ brownie run deploy_gaugecontroller.py --network mainnet-fork
 ```
