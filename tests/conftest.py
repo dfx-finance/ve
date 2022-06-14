@@ -1,4 +1,3 @@
-from os import access
 from brownie import Contract
 from brownie.network.gas.strategies import LinearScalingStrategy
 import json
@@ -43,16 +42,15 @@ def dfx():
 
 
 @pytest.fixture(scope='module')
-def mock_lp_token(ERC20LP, master_account):
-    yield ERC20LP.deploy('Curve LP Token', 'usdCrv', 18, 10 ** 9, {'from': master_account, 'gas_price': gas_strategy})
+def voting_escrow(VotingEscrow, accounts, dfx):
+    # Load existing DFX ERC20 from mainnet fork
+    abi = json.load(open('./tests/abis/veDfx.json'))
+    yield Contract.from_abi('veDFX', addresses.veDFX, abi)
 
 
 @pytest.fixture(scope='module')
-def voting_escrow(VotingEscrow, accounts, dfx):
-    yield VotingEscrow.deploy(
-        dfx, 'Voting-escrowed DFX', 'veDFX', 'veCRV_0.99', {
-            'from': accounts[0], 'gas_price': gas_strategy}
-    )
+def mock_lp_token(ERC20LP, master_account):
+    yield ERC20LP.deploy('Curve LP Token', 'usdCrv', 18, 10 ** 9, {'from': master_account, 'gas_price': gas_strategy})
 
 
 @pytest.fixture(scope='module')
