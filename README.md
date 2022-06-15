@@ -39,6 +39,12 @@ $ brownie accounts new <account-name>
 (terminal 2) $ brownie test --network mainnet-fork
 ```
 
+Or to run a single test with debug messages:
+
+```bash
+(terminal 2) $ brownie test tests/<test_script_name>.py --network mainnet-fork -s
+```
+
 5. Run deploy script
 
 ```bash
