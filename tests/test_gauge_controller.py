@@ -23,7 +23,7 @@ def setup(dfx, gauge_controller, voting_escrow, three_gauges, master_account, us
     default_gauge_weight = 0
 
     gauge_controller.add_type(
-        'Liquidity', 10 ** 18, {'from': master_account, 'gas_price': gas_strategy})
+        'Liquidity', 1e18, {'from': master_account, 'gas_price': gas_strategy})
     for gauge in three_gauges:
         gauge_controller.add_gauge(
             gauge, default_gauge_weight, {'from': master_account, 'gas_price': gas_strategy})
@@ -42,7 +42,7 @@ def setup(dfx, gauge_controller, voting_escrow, three_gauges, master_account, us
 
 
 # @given(
-#     st_deposits=strategy("uint256[3]", min_value=10 ** 21, max_value=10 ** 23),
+#     st_deposits=strategy("uint256[3]", min_value=1e21, max_value=1e23),
 #     st_length=strategy("uint256[3]", min_value=52, max_value=100),
 #     st_votes=strategy("uint[2][3]", min_value=0, max_value=5)
 # )
