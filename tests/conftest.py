@@ -42,7 +42,7 @@ def dfx():
 
 
 @pytest.fixture(scope='module')
-def voting_escrow(VotingEscrow, accounts, dfx):
+def voting_escrow():
     # Load existing DFX ERC20 from mainnet fork
     abi = json.load(open('./tests/abis/veDfx.json'))
     yield Contract.from_abi('veDFX', addresses.veDFX, abi)
@@ -50,7 +50,8 @@ def voting_escrow(VotingEscrow, accounts, dfx):
 
 @pytest.fixture(scope='module')
 def mock_lp_token(ERC20LP, master_account):
-    yield ERC20LP.deploy('Curve LP Token', 'usdCrv', 18, 10 ** 9, {'from': master_account, 'gas_price': gas_strategy})
+    # NOTE: Why does Curve.fi use 1e9 here?
+    yield ERC20LP.deploy('Curve LP Token', 'usdCrv', 18, 1e9, {'from': master_account, 'gas_price': gas_strategy})
 
 
 @pytest.fixture(scope='module')

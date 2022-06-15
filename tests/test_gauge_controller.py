@@ -13,7 +13,7 @@ YEAR = 86400 * 365
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('80 gwei', '250 gwei', 4.3)
+gas_strategy = LinearScalingStrategy('80 gwei', '250 gwei', 2.0)
 
 
 # handle setup logic required for each unit test
@@ -104,8 +104,9 @@ def test_gauge_weight_vote(gauge_controller, voting_escrow, three_gauges, user_a
     for i, acct in enumerate(user_accounts):
         initial_bias = voting_escrow.get_last_user_slope(
             acct) * (voting_escrow.locked(acct)[1] - timestamp)
-        duration = (timestamp + 8 * WEEK) // WEEK * \
-            WEEK  # endtime rounded down to whole weeks
+        duration = (
+            timestamp + st_length[i] * WEEK
+        ) // WEEK * WEEK - timestamp  # <- endtime rounded to whole weeks
         slope_data.append((initial_bias, duration))
 
     max_duration = max(duration for _, duration in slope_data)
@@ -118,39 +119,49 @@ def test_gauge_weight_vote(gauge_controller, voting_escrow, three_gauges, user_a
     chain.sleep(WEEK * 4)
     # chain.mine()  # breaks ganache-cli with infinite "eth_getTransactionCount" calls
 
-    # while history[-1].timestamp < timestamp + 1.5 * max_duration:
-    for i in range(3):
-        gauge_controller.checkpoint_gauge(
-            three_gauges[i], {'from': user_accounts[2], 'gas_price': gas_strategy})
-
-    # % of duration into lock (rounded down to latest epoch week) / max. lock duration
-    relative_time = (history[-1].timestamp // WEEK *
-                     WEEK - timestamp) / max_duration
-    print('Relative time:', relative_time)
-
-    weights = [gauge_controller.gauge_relative_weight(
-        three_gauges[i]) / 1e18 for i in range(3)]
-    if relative_time < 1:
-        theoretical_weights = [
-            sum((votes[i][0] / 10000) * models(i, relative_time)
-                for i in range(3)),
-            sum((votes[i][1] / 10000) * models(i, relative_time)
-                for i in range(3)),
-            sum((votes[i][2] / 10000) * models(i, relative_time)
-                for i in range(3)),
-        ]
-        theoretical_weights = [
-            w and (w / sum(theoretical_weights)) for w in theoretical_weights
-        ]
-    else:
-        theoretical_weights = [0] * 3
-
-    print(relative_time, weights, theoretical_weights)
-    if relative_time != 1:
+    while history[-1].timestamp < timestamp + 1.5 * max_duration:
         for i in range(3):
-            assert(
-                abs(weights[i] - theoretical_weights[i])
-                <= (history[-1].timestamp - timestamp) / WEEK + 1
-            )
+            gauge_controller.checkpoint_gauge(
+                three_gauges[i], {'from': user_accounts[2], 'gas_price': gas_strategy})
 
-    chain.sleep(WEEK * 4)
+        # % of duration into lock (rounded down to latest epoch week) / max. lock duration
+        relative_time = (history[-1].timestamp // WEEK *
+                         WEEK - timestamp) / max_duration
+
+        weights = [gauge_controller.gauge_relative_weight(
+            three_gauges[i]) / 1e18 for i in range(3)]
+        if relative_time < 1:
+            theoretical_weights = [
+                sum((votes[i][0] / 10000) * models(i, relative_time)
+                    for i in range(3)),
+                sum((votes[i][1] / 10000) * models(i, relative_time)
+                    for i in range(3)),
+                sum((votes[i][2] / 10000) * models(i, relative_time)
+                    for i in range(3)),
+            ]
+            theoretical_weights = [
+                w and (w / sum(theoretical_weights)) for w in theoretical_weights
+            ]
+        else:
+            theoretical_weights = [0] * 3
+
+        print((
+            f'Relative time: {relative_time}'
+            f'\n\tWeights:\t\t{weights}'
+            f'\n\tTheoretical Weights:\t{theoretical_weights}'
+        ))
+        if relative_time != 1:
+            for i in range(3):
+                assert(
+                    abs(weights[i] - theoretical_weights[i])
+                    <= (history[-1].timestamp - timestamp) / WEEK + 1
+                )  # 1 s per week?
+
+        chain.sleep(WEEK * 4)
+        chain.mine()
+
+    # Withdraw all tokens from lock
+    print("Withdrawing...")
+    for i, acct in enumerate(user_accounts):
+        print(f"Withdraw {i} - {acct}")
+        voting_escrow.withdraw({'from': acct, 'gas_price': gas_strategy})
