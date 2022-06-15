@@ -9,7 +9,7 @@ import pytest
 import addresses
 
 WEEK = 86400 * 7
-YEAR = 86400 * 365
+DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
@@ -20,13 +20,11 @@ gas_strategy = LinearScalingStrategy('80 gwei', '250 gwei', 2.0)
 @pytest.fixture(scope='module', autouse=True)
 def setup(dfx, gauge_controller, voting_escrow, three_gauges, master_account, user_accounts):
     # Setup gauges
-    default_gauge_weight = 0
-
     gauge_controller.add_type(
         'Liquidity', 1e18, {'from': master_account, 'gas_price': gas_strategy})
     for gauge in three_gauges:
         gauge_controller.add_gauge(
-            gauge, default_gauge_weight, {'from': master_account, 'gas_price': gas_strategy})
+            gauge, DEFAULT_GAUGE_TYPE, {'from': master_account, 'gas_price': gas_strategy})
 
     # Distribute coins
     master_account.transfer(addresses.DFX_OWNER, '10 ether',

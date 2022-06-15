@@ -24,6 +24,20 @@ $ pip install -r requirements.txt
 $ npm install ganache
 ```
 
+OpenZeppelin@4.5.0 for StakingRewards.sol
+
+```
+$ brownie pm install OpenZeppelin/openzeppelin-contracts@4.5.0
+```
+
+Add remappings to VSCode's `settings.json` file for Solidity:
+
+```
+"solidity.remappingsUnix": [
+  "@openzeppelin/=/Users/kyle/.brownie/packages/OpenZeppelin/openzeppelin-contracts@4.5.0"
+]
+```
+
 3. Add ganache local private key to brownie
 
 ```bash
