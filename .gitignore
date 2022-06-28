@@ -5,3 +5,4 @@ __pycache__
 build/
 reports/
 ve-venv
+scripts/*.json

@@ -2,7 +2,7 @@
 
 """
 @title Gauge Controller
-@author Curve Finance
+@author Curve Finance, DFX Finance
 @license MIT
 @notice Controls liquidity gauges and the issuance of coins through the gauges
 """
