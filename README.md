@@ -62,5 +62,6 @@ Or to run a single test with debug messages:
 5. Run deploy script
 
 ```bash
+$ brownie run deploy_gauges.py --network mainnet-fork
 $ brownie run deploy_gaugecontroller.py --network mainnet-fork
 ```
