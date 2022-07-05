@@ -1,4 +1,5 @@
-from brownie import Contract
+from brownie import Contract, network
+import brownie
 from brownie.network.gas.strategies import LinearScalingStrategy
 import json
 import pytest
@@ -7,7 +8,7 @@ import addresses
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('60 gwei', '150 gwei', 1.3)
+gas_strategy = LinearScalingStrategy('40 gwei', '150 gwei', 1.3)
 
 '''
 Accounts
@@ -56,7 +57,13 @@ def mock_lp_token(ERC20LP, master_account):
 
 @pytest.fixture(scope='module')
 def gauge_controller(GaugeController, accounts, dfx, voting_escrow, master_account):
+    network.gas_limit('auto')
     yield GaugeController.deploy(dfx, voting_escrow, {'from': master_account, 'gas_price': gas_strategy})
+
+
+@pytest.fixture(scope='module')
+def staking_rewards(StakingRewards, dfx, voting_escrow, master_account):
+    yield StakingRewards.deploy(dfx, voting_escrow, {'from': master_account, 'gas_price': gas_strategy})
 
 
 '''
