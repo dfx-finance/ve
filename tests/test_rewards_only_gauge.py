@@ -14,7 +14,7 @@ gas_strategy = LinearScalingStrategy('30 gwei', '250 gwei', 1.3)
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
-def setup(dfx, gauge_controller, voting_escrow, three_gauges, staking_rewards, master_account, user_accounts):
+def setup(dfx, gauge_controller, voting_escrow, three_gauges, three_staking_rewards, master_account, user_accounts):
     # Setup gauges
     gauge_controller.add_type(
         'Liquidity', 1e18, {'from': master_account, 'gas_price': gas_strategy})
@@ -22,9 +22,10 @@ def setup(dfx, gauge_controller, voting_escrow, three_gauges, staking_rewards, m
         gauge_controller.add_gauge(
             gauge, DEFAULT_GAUGE_TYPE, {'from': master_account, 'gas_price': gas_strategy})
 
-    # Set rewards contract
+    # Set rewards contract on gauge
     # https://curve.readthedocs.io/dao-gauges.html#setting-the-rewards-contract
-    for gauge in three_gauges:
+    for i, gauge in enumerate(three_gauges):
+        staking_rewards = three_staking_rewards[i]
         sigs = [staking_rewards.signatures['stake'],
                 staking_rewards.signatures['withdraw'],
                 staking_rewards.signatures['getReward']]
@@ -33,11 +34,28 @@ def setup(dfx, gauge_controller, voting_escrow, three_gauges, staking_rewards, m
         gauge.set_rewards(staking_rewards, sigs, [
                           dfx] + [ZERO_ADDRESS] * 7, {'from': master_account, 'gas_price': gas_strategy})
 
-    # # Distribute coins
-    # master_account.transfer(addresses.DFX_OWNER, '10 ether',
-    #                         gas_price=gas_strategy)
-    # dfx.mint(master_account, 10 * 10e24,
-    #          {'from': addresses.DFX_OWNER, 'gas_price': gas_strategy})
+    # Mint some rewards
+    rewards_per_gauge = 20000
+    rewards_total = rewards_per_gauge * len(three_staking_rewards) * 1e18
+    print("Master account DFX balance (pre-mint):",
+          dfx.balanceOf(master_account) / 1e18)
+    master_account.transfer(addresses.DFX_OWNER,
+                            '10 ether',
+                            gas_price=gas_strategy)
+    dfx.mint(master_account, rewards_total,
+             {'from': addresses.DFX_OWNER, 'gas_price': gas_strategy})
+    print("Master account DFX balance (post-mint):",
+          dfx.balanceOf(master_account) / 1e18)
+
+    # Distribute rewards to each staking contract
+    for staking_rewards in three_staking_rewards:
+        print("hello")
+        dfx.transfer(staking_rewards, rewards_per_gauge, {
+                     'from': master_account, 'gas_price': gas_strategy})
+        staking_rewards.notifyRewardAmount(
+            rewards_per_gauge, {'from': master_account, 'gas_price': gas_strategy})
+    print("Master account DFX balance (post-topup):",
+          dfx.balanceOf(master_account) / 1e18)
 
     # # Init 10 s before the week change
     # t0 = chain.time()

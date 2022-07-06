@@ -56,26 +56,46 @@ def mock_lp_token(ERC20LP, master_account):
 
 
 @pytest.fixture(scope='module')
+def mock_lp_tokens(ERC20LP, master_account):
+    test_lps = [
+        ('DFX CADC-USDC LP Token', 'cadcUsdc'),
+        ('DFX EURS-USDC LP Token', 'eursUsdc'),
+        ('DFX XSGD-USDC LP Token', 'xsgdUsdc'),
+    ]
+    lp_tokens = [
+        ERC20LP.deploy(name, symbol, 18, 1e9, {
+                       'from': master_account, 'gas_price': gas_strategy})
+        for name, symbol in test_lps
+    ]
+    return lp_tokens
+
+
+@pytest.fixture(scope='module')
 def gauge_controller(GaugeController, accounts, dfx, voting_escrow, master_account):
     network.gas_limit('auto')
     yield GaugeController.deploy(dfx, voting_escrow, {'from': master_account, 'gas_price': gas_strategy})
 
 
-@pytest.fixture(scope='module')
-def staking_rewards(StakingRewards, dfx, voting_escrow, master_account):
-    yield StakingRewards.deploy(dfx, voting_escrow, {'from': master_account, 'gas_price': gas_strategy})
-
-
 '''
-Gauges
+Rewards & Gauges
 '''
 
 
 @pytest.fixture(scope='module')
-def three_gauges(RewardsOnlyGauge, mock_lp_token, master_account):
+def three_staking_rewards(StakingRewards, dfx, mock_lp_tokens, master_account):
     contracts = [
-        RewardsOnlyGauge.deploy(master_account, mock_lp_token, {
+        StakingRewards.deploy(
+            dfx, lp_token, {'from': master_account, 'gas_price': gas_strategy})
+        for lp_token in mock_lp_tokens
+    ]
+    yield contracts
+
+
+@pytest.fixture(scope='module')
+def three_gauges(RewardsOnlyGauge, mock_lp_tokens, master_account):
+    contracts = [
+        RewardsOnlyGauge.deploy(master_account, lp_token, {
                                 'from': master_account, 'gas_price': gas_strategy})
-        for _ in range(3)
+        for lp_token in mock_lp_tokens
     ]
     yield contracts

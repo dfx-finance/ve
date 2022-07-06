@@ -2,10 +2,16 @@
 
 """
 @title Gauge Controller
-@author Curve Finance, DFX Finance
+@author DFX Finance
 @license MIT
 @notice Controls liquidity gauges and the issuance of coins through the gauges
 """
+
+# Full fork from:
+# Angle Protocol's gauge controller
+# https://github.com/AngleProtocol/angle-core/blob/main/contracts/staking/GaugeController.vy
+# Curve Finance's gauge controller
+# https://github.com/curvefi/curve-dao-contracts/blob/master/contracts/GaugeController.vy
 
 # 7 * 86400 seconds - all future times are rounded by week
 WEEK: constant(uint256) = 604800
@@ -62,13 +68,15 @@ event NewGauge:
     gauge_type: int128
     weight: uint256
 
+event KilledGauge:
+    addr: address
 
 MULTIPLIER: constant(uint256) = 10 ** 18
 
 admin: public(address)  # Can and will be a smart contract
 future_admin: public(address)  # Can and will be a smart contract
 
-token: public(address)  # CRV token
+token: public(address)  # DFX token
 voting_escrow: public(address)  # Voting escrow
 
 # Gauge parameters
@@ -110,20 +118,21 @@ time_type_weight: public(uint256[1000000000])  # type_id -> last scheduled time 
 
 
 @external
-def __init__(_token: address, _voting_escrow: address):
+def __init__(_token: address, _voting_escrow: address, _admin: address):
     """
     @notice Contract constructor
-    @param _token `ERC20CRV` contract address
+    @param _token `ERC20DFX` contract address
     @param _voting_escrow `VotingEscrow` contract address
     """
     assert _token != ZERO_ADDRESS
     assert _voting_escrow != ZERO_ADDRESS
+    assert _admin != ZERO_ADDRESS
 
-    self.admin = msg.sender
+    self.admin = _admin
     self.token = _token
     self.voting_escrow = _voting_escrow
     self.time_total = block.timestamp / WEEK * WEEK
-
+    
 
 @external
 def commit_transfer_ownership(addr: address):
@@ -132,18 +141,19 @@ def commit_transfer_ownership(addr: address):
     @param addr Address to have ownership transferred to
     """
     assert msg.sender == self.admin  # dev: admin only
+    assert addr != ZERO_ADDRESS  # dev: future admin cannot be the 0 address
     self.future_admin = addr
     log CommitOwnership(addr)
 
 
 @external
-def apply_transfer_ownership():
+def accept_transfer_ownership():
     """
-    @notice Apply pending ownership transfer
+    @notice Accept a pending ownership transfer
     """
-    assert msg.sender == self.admin  # dev: admin only
     _admin: address = self.future_admin
-    assert _admin != ZERO_ADDRESS  # dev: admin not set
+    assert msg.sender == _admin  # dev: future admin only
+
     self.admin = _admin
     log ApplyOwnership(_admin)
 
@@ -594,3 +604,4 @@ def get_weights_sum_per_type(type_id: int128) -> uint256:
     @return Sum of gauge weights
     """
     return self.points_sum[type_id][self.time_sum[type_id]].bias
+    

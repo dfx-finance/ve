@@ -3,10 +3,13 @@
 This veDFX is an implementation of Curve's Vote Escrow + Gauge contracts in Vyper. These use Vyper
 for smart contract code and brownie + ganache for testing and deployments.
 
+Implementation working doc: https://docs.google.com/document/d/1myRhWylvpo4zqt-KAwN9SC36ZKW1L7T2tm7LwhxNzs8/
+
 #### References
 
 1. https://eth-brownie.readthedocs.io
-2. https://github.com/curvefi/curve-dao-contracts/
+2. https://developers.angle.money/governance-and-cross-module-contracts/governance-contracts/gauge-controller
+3. https://github.com/curvefi/curve-dao-contracts/
 
 ### Getting started:
 
