@@ -1,29 +1,32 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.4.24;
+// SPDX-License-Identifier: GPL-3.0
 
+pragma solidity ^0.8.7;
 
-// https://docs.synthetix.io/contracts/source/interfaces/istakingrewards
-interface IStakingRewards {
-    // Views
-    function lastTimeRewardApplicable() external view returns (uint256);
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-    function rewardPerToken() external view returns (uint256);
+// Full fork from:
+// Angle Protocol's IStakingRewards
+// https://github.com/AngleProtocol/angle-core/blob/main/contracts/interfaces/IStakingRewards.sol
 
-    function earned(address account) external view returns (uint256);
+/// @title IStakingRewardsFunctions
+/// @author Forked from contracts developed by Angle and adapted by DFX
+/// - IStakingRewards.sol (https://github.com/AngleProtocol/angle-core/blob/main/contracts/interfaces/IStakingRewards.sol)
+/// @notice Interface for the staking rewards contract that interact with the `RewardsDistributor` contract
+interface IStakingRewardsFunctions {
+    function notifyRewardAmount(uint256 reward) external;
 
-    function getRewardForDuration() external view returns (uint256);
+    function recoverERC20(
+        address tokenAddress,
+        address to,
+        uint256 tokenAmount
+    ) external;
 
-    function totalSupply() external view returns (uint256);
+    function setNewRewardsDistribution(address newRewardsDistribution) external;
+}
 
-    function balanceOf(address account) external view returns (uint256);
-
-    // Mutative
-
-    function stake(uint256 amount) external;
-
-    function withdraw(uint256 amount) external;
-
-    function getReward() external;
-
-    function exit() external;
+/// @title IStakingRewards
+/// @author Angle Core Team
+/// @notice Previous interface with additionnal getters for public variables
+interface IStakingRewards is IStakingRewardsFunctions {
+    function rewardToken() external view returns (IERC20);
 }
