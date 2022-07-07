@@ -18,11 +18,11 @@ gas_strategy = LinearScalingStrategy('80 gwei', '250 gwei', 2.0)
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
-def setup(dfx, gauge_controller, voting_escrow, three_gauges, master_account, user_accounts):
+def setup(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, master_account, user_accounts):
     # Setup gauges
     gauge_controller.add_type(
         'Liquidity', 1e18, {'from': master_account, 'gas_price': gas_strategy})
-    for gauge in three_gauges:
+    for gauge in three_liquidity_gauges_v4:
         gauge_controller.add_gauge(
             gauge, DEFAULT_GAUGE_TYPE, {'from': master_account, 'gas_price': gas_strategy})
 
@@ -46,7 +46,7 @@ def setup(dfx, gauge_controller, voting_escrow, three_gauges, master_account, us
 # )
 # # strategy will run this test 50(?) times by default, at least 3 is necessary to generate non-0 values
 # @settings(max_examples=3)
-def test_gauge_weight_vote(gauge_controller, voting_escrow, three_gauges, user_accounts):
+def test_gauge_weight_vote(gauge_controller, voting_escrow, three_liquidity_gauges_v4, user_accounts):
     '''
     Test that gauge weights correctly adjust over time.
 
@@ -91,7 +91,7 @@ def test_gauge_weight_vote(gauge_controller, voting_escrow, three_gauges, user_a
 
         for x in range(3):
             gauge_controller.vote_for_gauge_weights(
-                three_gauges[x], votes[-1][x], {'from': acct, 'gas_price': gas_strategy})
+                three_liquidity_gauges_v4[x], votes[-1][x], {'from': acct, 'gas_price': gas_strategy})
 
     # Vote power assertions - everyone used all voting power
     for acct in user_accounts:
@@ -120,14 +120,14 @@ def test_gauge_weight_vote(gauge_controller, voting_escrow, three_gauges, user_a
     while history[-1].timestamp < timestamp + 1.5 * max_duration:
         for i in range(3):
             gauge_controller.checkpoint_gauge(
-                three_gauges[i], {'from': user_accounts[2], 'gas_price': gas_strategy})
+                three_liquidity_gauges_v4[i], {'from': user_accounts[2], 'gas_price': gas_strategy})
 
         # % of duration into lock (rounded down to latest epoch week) / max. lock duration
         relative_time = (history[-1].timestamp // WEEK *
                          WEEK - timestamp) / max_duration
 
         weights = [gauge_controller.gauge_relative_weight(
-            three_gauges[i]) / 1e18 for i in range(3)]
+            three_liquidity_gauges_v4[i]) / 1e18 for i in range(3)]
         if relative_time < 1:
             theoretical_weights = [
                 sum((votes[i][0] / 10000) * models(i, relative_time)
