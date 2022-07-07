@@ -6,5 +6,5 @@ build/
 reports/
 ve-venv
 scripts/*.json
-node_modules
+node_modules/
 
