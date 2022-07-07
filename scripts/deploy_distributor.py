@@ -15,21 +15,23 @@ def main():
     print('--- Deploying Distributor contract to Ethereum mainnet ---')
     dfx_distributor = DfxDistributor.deploy({'from': acct, 'gas_price': gas_strategy})
 
-    distributor_initializer_calldata = encode_function_data(
-        initializer=dfx_distributor.initialize,
-        args=[
-            addresses.DFX,
-            addresses.DFX, # gauge controller addresss
-            1,
-            100,
-            addresses.DFX_MULTISIG, # should consider using another multisig to deal with access control
-            addresses.DFX_MULTISIG, 
-            addresses.DFX_MULTISIG
-        ]
+    # distributor_initializer_calldata = encode_function_data(
+    #     initializer=dfx_distributor.initialize,
+    # )
+
+    distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
+        addresses.DFX,
+        addresses.DFX,
+        1,
+        100,
+        addresses.DFX_MULTISIG, # should consider using another multisig to deal with access control
+        addresses.DFX_MULTISIG, 
+        addresses.DFX_MULTISIG
     )
 
     dfx_upgradable_proxy = DfxUpgradableProxy.deploy(
         dfx_distributor.address,
         addresses.DFX_MULTISIG,
-        distributor_initializer_calldata
+        distributor_initializer_calldata,
+        {"from": acct, "gas_price": gas_strategy},
     )
