@@ -16,13 +16,16 @@ def main():
     dfx_distributor = DfxDistributor.deploy({'from': acct, 'gas_price': gas_strategy})
 
     distributor_initializer_calldata = encode_function_data(
-        addresses.DFX,
-        addresses.DFX, # gauge controller addresss
-        1,
-        100,
-        addresses.DFX_MULTISIG, # should consider using another multisig to deal with access control
-        addresses.DFX_MULTISIG, 
-        addresses.DFX_MULTISIG
+        initializer=dfx_distributor.initialize,
+        args=[
+            addresses.DFX,
+            addresses.DFX, # gauge controller addresss
+            1,
+            100,
+            addresses.DFX_MULTISIG, # should consider using another multisig to deal with access control
+            addresses.DFX_MULTISIG, 
+            addresses.DFX_MULTISIG
+        ]
     )
 
     dfx_upgradable_proxy = DfxUpgradableProxy.deploy(
