@@ -1,7 +1,14 @@
-from brownie import network, accounts, config
-import eth_utils
+#!/usr/bin/env python
+from functools import reduce
+import json
+import operator
+import os
 
-NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["hardhat", "development", "ganache"]
+from brownie import network, accounts, config
+
+
+NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = [
+    "hardhat", "development", "ganache"]
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
     "mainnet-fork",
     "binance-fork",
@@ -31,9 +38,11 @@ def encode_function_data(initializer=None, *args):
     Returns:
         [bytes]: Return the encoded bytes.
     """
-    if not len(args): args = b''
+    if not len(args):
+        args = b''
 
-    if initializer: return initializer.encode_input(*args)
+    if initializer:
+        return initializer.encode_input(*args)
 
     return b''
 
@@ -64,8 +73,20 @@ def upgrade(
         if initializer:
             encoded_function_call = encode_function_data(initializer, *args)
             transaction = proxy.upgradeToAndCall(
-                newimplementation_address, encoded_function_call, {"from": account}
+                newimplementation_address, encoded_function_call, {
+                    "from": account}
             )
         else:
-            transaction = proxy.upgradeTo(newimplementation_address, {"from": account})
+            transaction = proxy.upgradeTo(
+                newimplementation_address, {"from": account})
     return transaction
+
+
+# Return value from json file (by filename predicate) via a list of keys to drill down
+def get_json_address(fn_predicate, keys):
+    addresses_fn = [fn for fn in sorted(os.listdir('./scripts'))
+                    if fn.startswith(fn_predicate) and fn.endswith('.json')][-1]
+    if addresses_fn:
+        with open(os.path.join('./scripts', addresses_fn), 'r') as json_f:
+            json_data = json.load(json_f)
+            return reduce(operator.getitem, keys, json_data)

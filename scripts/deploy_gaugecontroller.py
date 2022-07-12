@@ -1,6 +1,6 @@
 import json
 import os
-from brownie import GaugeController, accounts
+from brownie import ZERO_ADDRESS, GaugeController, VeBoostProxy, accounts
 from brownie.network import gas_price
 from brownie.network.gas.strategies import LinearScalingStrategy
 import time
@@ -24,37 +24,32 @@ gas_strategy = LinearScalingStrategy('60 gwei', '150 gwei', 1.3)
 gas_price(gas_strategy)
 
 
-def _load_gauge_addresses():
-    gauge_addresses = []
-    gauge_fn = [fn for fn in os.listdir('./scripts')
-                if fn.startswith('deployed_gauges_') and fn.endswith('.json')][-1]
-    if gauge_fn:
-        with open(os.path.join('./scripts', gauge_fn), 'r') as json_f:
-            gauges_data = json.load(json_f)
-            for label, gauge_addr in gauges_data['gauges']['amm'].items():
-                gauge_addresses.append((label, gauge_addr))
-    return gauge_addresses
+output_data = {'veBoostProxy': None, 'gaugeController': None}
 
 
 def main():
+    print((
+        'Script 1 of 4:\n\n'
+        'NOTE: This script expects configuration for:\n'
+        '\t1. VotingEscrow (VeDFX) contract address'
+    ))
+
     acct = accounts.load('anvil')
+
+    print('--- Deploying VeBoostProxy contract to Ethereum mainnet')
+    # (votingEscrow address, delegation address, admin address)
+    ve_boost_proxy = VeBoostProxy.deploy(addresses.VOTE_ESCROW, ZERO_ADDRESS, acct, {
+        'from': acct, 'gas_price': gas_strategy})
+    output_data['veBoostProxy'] = ve_boost_proxy.address
 
     print('--- Deploying Gauge Controller contract to Ethereum mainnet ---')
     gauge_controller = GaugeController.deploy(
-        addresses.DFX, addresses.VOTE_ESCROW, {'from': acct, 'gas_price': gas_strategy})
+        addresses.DFX, addresses.VOTE_ESCROW, acct, {'from': acct, 'gas_price': gas_strategy})
 
     print('----- Configure Gauge Controller with "Liquidity" type')
     gauge_controller.add_type(
-        DEFAULT_GAUGE_TYPE_NAME, 1e18, {'from': acct, 'gas_price': gas_strategy})
+        DEFAULT_GAUGE_TYPE_NAME, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
 
-    print('--- Adding DFX AMM gauges ---')
-    gauge_addresses = _load_gauge_addresses() \
-        if USE_LATEST_JSON else DEPLOYED_GAUGE_ADDRESSES
-
-    for _, addr in gauge_addresses:
-        gauge_controller.add_gauge(
-            addr, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
-
-    output_data = {'gaugeController': gauge_controller.address}
-    with open(f'./scripts/deployed_gaugecontroller_{time.time()}.json', 'w') as output_f:
+    output_data['gaugeController'] = gauge_controller.address
+    with open(f'./scripts/deployed_gaugecontroller_{int(time.time())}.json', 'w') as output_f:
         json.dump(output_data, output_f, indent=4)

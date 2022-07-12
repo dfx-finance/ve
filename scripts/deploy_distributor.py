@@ -1,37 +1,64 @@
-from brownie import DfxDistributor, DfxUpgradableProxy, accounts
-from brownie.network import gas_price
-from brownie.network.gas.strategies import LinearScalingStrategy
-import scripts.addresses as addresses
+#!/usr/bin/env python
+import json
+import time
 
-from scripts.helper import encode_function_data
+from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy, accounts
+from brownie.network.gas.strategies import LinearScalingStrategy
+
+from scripts import addresses, helper
+
+
+LIFETIME_REWARDS_RATE = 15e4  # 150,000 DFX over 4 years
+DISTRIBUTED_REWARDS = 0
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('80 gwei', '250 gwei', 2.0)
+gas_strategy = LinearScalingStrategy("80 gwei", "250 gwei", 2.0)
+
+
+output_data = {"distributor": {"logic": None, "proxy": None}}
+
 
 def main():
-    acct = accounts[0]
+    print((
+        "Script 2 of 4:\n\n"
+        "NOTE: This script expects configuration for:\n"
+        "\t1. GaugeController address\n"
+        "\t2. Total lifetime rewards of DFX token as `rate`\n"
+        "\t3. Total amount of previously distributed rewards\n"
+        "\t4. Governor and Guardian addresses"
+    ))
+    acct = accounts.load("anvil")
 
-    print('--- Deploying Distributor contract to Ethereum mainnet ---')
-    dfx_distributor = DfxDistributor.deploy({'from': acct, 'gas_price': gas_strategy})
+    gauge_controller_address = helper.get_json_address(
+        "deployed_gaugecontroller", ["gaugeController"])
+    if not gauge_controller_address:
+        return FileNotFoundError("No GaugeController deployments found")
 
-    # distributor_initializer_calldata = encode_function_data(
-    #     initializer=dfx_distributor.initialize,
-    # )
+    print("--- Deploying Distributor contract to Ethereum mainnet ---")
+    dfx_distributor = DfxDistributor.deploy(
+        {"from": acct, "gas_price": gas_strategy})
+    output_data["distributor"]["logic"] = dfx_distributor.address
 
     distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
         addresses.DFX,
-        addresses.DFX,
-        1,
-        100,
-        addresses.DFX_MULTISIG, # should consider using another multisig to deal with access control
-        addresses.DFX_MULTISIG, 
-        addresses.DFX_MULTISIG
+        gauge_controller_address,
+        LIFETIME_REWARDS_RATE,
+        DISTRIBUTED_REWARDS,
+        # should consider using another multisig to deal with access control
+        addresses.DFX_MULTISIG,  # governor
+        addresses.DFX_MULTISIG,  # guardian
+        ZERO_ADDRESS   # delegate gauge for pulling type 2 gauge rewards
     )
 
-    dfx_upgradable_proxy = DfxUpgradableProxy.deploy(
+    dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
         addresses.DFX_MULTISIG,
         distributor_initializer_calldata,
         {"from": acct, "gas_price": gas_strategy},
     )
+    output_data["distributor"]["proxy"] = dfx_upgradable_proxy.address
+
+    # Write output to file
+    with open(f"./scripts/deployed_distributor_{int(time.time())}.json", "w") as output_f:
+        json.dump(output_data, output_f, indent=4)
