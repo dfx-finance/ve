@@ -2,6 +2,7 @@
 
 This veDFX is an implementation of Curve's Vote Escrow + Gauge contracts in Vyper. These use Vyper
 for smart contract code and brownie + ganache for testing and deployments.
+![veDFX](https://user-images.githubusercontent.com/25423613/178617916-680ef134-c076-4e9b-a946-c26b557d27f5.png)
 
 #### References
 
