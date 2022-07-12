@@ -214,7 +214,7 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     /// @notice Updates mining rate and supply at the start of the epoch
     /// @dev Any modifying mining call must also call this
     /// @dev It is possible that more than one week past between two calls of this function, and for this reason
-    /// this function has been slightly modified from Curve implementation by DFX Team
+    /// this function has been slightly modified from Curve implementation by Angle Core Team
     function _updateMiningParameters() internal {
         // When entering this function, we always have: `(block.timestamp - startEpochTime) / RATE_REDUCTION_TIME >= 1`
         uint256 epochDelta = (block.timestamp - startEpochTime) / RATE_REDUCTION_TIME;

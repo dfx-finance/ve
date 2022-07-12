@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
-contract DfxUpgradableProxy is TransparentUpgradeableProxy {
+contract DfxUpgradeableProxy is TransparentUpgradeableProxy {
     constructor(
         address _logic,
         address _admin,

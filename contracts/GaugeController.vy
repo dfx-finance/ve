@@ -405,8 +405,6 @@ def gauge_relative_weight_write(addr: address, time: uint256 = block.timestamp) 
     return self._gauge_relative_weight(addr, time)
 
 
-
-
 @internal
 def _change_type_weight(type_id: int128, weight: uint256):
     """
