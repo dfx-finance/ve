@@ -77,33 +77,34 @@ def gauge_controller(GaugeController, dfx, voting_escrow, master_account):
 
 
 @pytest.fixture(scope='module')
-def distributor(DfxDistributor, DfxUpgradeableProxy, gauge_controller, master_account, new_master_account):
+def distributor(dfx, DfxDistributor, DfxUpgradeableProxy, gauge_controller, master_account, new_master_account):
     # Deploy DfxDistributor logic
-    dfx_distributor = DfxDistributor.deploy(
-        {'from': master_account, 'gas_price': gas_strategy})
+    initial_rate = 16e4
+    start_epoch_supply = 0
+
+    distributor_logic = DfxDistributor.deploy({'from': master_account, 'gas_price': gas_strategy})
 
     # Deploy DfxDistributor proxy
-    distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
-        addresses.DFX,
+    distributor_initializer_calldata = distributor_logic.initialize.encode_input(
+        dfx,
         gauge_controller,
-        16e4,
-        0,
+        initial_rate,
+        start_epoch_supply,
         # should consider using another multisig to deal with access control
         new_master_account,
         addresses.DFX_MULTISIG,
         ZERO_ADDRESS
     )
-    proxy = DfxUpgradeableProxy.deploy(
-        dfx_distributor.address,
+
+    distributor_proxy = DfxUpgradeableProxy.deploy(
+        distributor_logic.address,
         addresses.DFX_MULTISIG,
         distributor_initializer_calldata,
         {"from": master_account, "gas_price": gas_strategy},
     )
 
     # Load Distributor ABI on proxy address
-    dfx_distributor_proxy = Contract.from_abi(
-        "DfxDistributor", proxy.address, DfxDistributor.abi)
-
+    dfx_distributor_proxy = Contract.from_abi("DfxDistributor", distributor_proxy.address, DfxDistributor.abi)
     yield dfx_distributor_proxy
 
 
@@ -126,20 +127,21 @@ def three_liquidity_gauges_v4(LiquidityGaugeV4, DfxUpgradeableProxy, dfx, voting
             {'from': master_account, 'gas_price': gas_strategy})
 
         # deploy gauge behind proxy
-        # NOTE: do we also want this for DFX? Why?
+        # NOTE: do we also want this for DFX? Why? just so that the contracts are also upgradeable
         gauge_initializer_calldata = gauge.initialize.encode_input(
             lp_token,
             addresses.DFX_MULTISIG,
-            addresses.DFX,
-            addresses.veDFX,
+            dfx,
+            voting_escrow,
             veboost_proxy,
             distributor,
         )
+        
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
             addresses.DFX_MULTISIG,
             gauge_initializer_calldata,
             {"from": master_account, "gas_price": gas_strategy},
         )
-        contracts.append(dfx_upgradeable_proxy)
+        contracts.append(Contract.from_abi("LiquidityGaugeV4", dfx_upgradeable_proxy.address, LiquidityGaugeV4.abi))
     yield contracts
