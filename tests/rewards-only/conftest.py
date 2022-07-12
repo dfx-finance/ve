@@ -4,7 +4,7 @@ from brownie.network.gas.strategies import LinearScalingStrategy
 import json
 import pytest
 
-import addresses
+from tests import addresses
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
@@ -77,21 +77,26 @@ def gauge_controller(GaugeController, dfx, voting_escrow, master_account):
 
 
 @pytest.fixture(scope='module')
-def distributor(DfxDistributor, dfx, gauge_controller, master_account):
-    initial_rate = 1
-    # set to number of DFX already distributed via liquidity mining (just ve?)
-    start_epoch_supply = 0
-    distributor = DfxDistributor.deploy(
+def distributor(DfxDistributor, DfxUpgradeableProxy, dfx, gauge_controller, master_account):
+    dfx_distributor = DfxDistributor.deploy(
         {'from': master_account, 'gas_price': gas_strategy})
-    distributor.initialize(dfx,
-                           gauge_controller,
-                           initial_rate,
-                           start_epoch_supply,
-                           master_account,
-                           master_account,
-                           ZERO_ADDRESS,
-                           {'from': master_account, 'gas_price': gas_strategy})
-    yield distributor
+    distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
+        addresses.DFX,
+        addresses.DFX,
+        1,
+        100,
+        # should consider using another multisig to deal with access control
+        addresses.DFX_MULTISIG,
+        addresses.DFX_MULTISIG,
+        addresses.DFX_MULTISIG
+    )
+    dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
+        dfx_distributor.address,
+        addresses.DFX_MULTISIG,
+        distributor_initializer_calldata,
+        {"from": master_account, "gas_price": gas_strategy},
+    )
+    yield dfx_distributor
 
 
 @pytest.fixture(scope='module')
@@ -125,14 +130,28 @@ def three_rewards_only_gauges(RewardsOnlyGauge, mock_lp_tokens, master_account):
 
 
 @pytest.fixture(scope='module')
-def three_liquidity_gauges_v4(LiquidityGaugeV4, dfx, voting_escrow, mock_lp_tokens, veboost_proxy, distributor, master_account):
-    contracts = [
-        LiquidityGaugeV4.deploy(
-            {'from': master_account, 'gas_price': gas_strategy})
-        for _ in mock_lp_tokens
-    ]
-
+def three_liquidity_gauges_v4(LiquidityGaugeV4, DfxUpgradeableProxy, dfx, voting_escrow, mock_lp_tokens, veboost_proxy, distributor, master_account):
+    contracts = []
     for lp_token in mock_lp_tokens:
-        lp_token.initialize(lp_token, master_account, dfx,
-                            voting_escrow, veboost_proxy, distributor)
+        # deploy gauge logic
+        gauge = LiquidityGaugeV4.deploy(
+            {'from': master_account, 'gas_price': gas_strategy})
+
+        # deploy gauge behind proxy
+        # NOTE: do we also want this for DFX? Why?
+        gauge_initializer_calldata = gauge.initialize.encode_input(
+            lp_token,
+            addresses.DFX_MULTISIG,
+            addresses.DFX,
+            addresses.veDFX,
+            veboost_proxy,
+            distributor,
+        )
+        dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
+            gauge.address,
+            addresses.DFX_MULTISIG,
+            gauge_initializer_calldata,
+            {"from": master_account, "gas_price": gas_strategy},
+        )
+        contracts.append(dfx_upgradeable_proxy)
     yield contracts

@@ -6,7 +6,7 @@ from brownie.test import given, strategy
 from hypothesis import settings
 import pytest
 
-import addresses
+from .. import addresses
 
 WEEK = 86400 * 7
 DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
@@ -27,10 +27,10 @@ def setup(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, maste
             gauge, DEFAULT_GAUGE_TYPE, {'from': master_account, 'gas_price': gas_strategy})
 
     # Distribute coins
-    master_account.transfer(addresses.DFX_OWNER, '10 ether',
+    master_account.transfer(addresses.DFX_MULTISIG, '10 ether',
                             gas_price=gas_strategy)
     dfx.mint(master_account, 10 * 10e24,
-             {'from': addresses.DFX_OWNER, 'gas_price': gas_strategy})
+             {'from': addresses.DFX_MULTISIG, 'gas_price': gas_strategy})
 
     for acct in user_accounts:
         dfx.transfer(acct, 10e23,

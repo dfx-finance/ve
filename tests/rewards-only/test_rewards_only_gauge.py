@@ -39,11 +39,11 @@ def setup(dfx, gauge_controller, voting_escrow, three_gauges, three_staking_rewa
     rewards_total = rewards_per_gauge * len(three_staking_rewards) * 1e18
     print("Master account DFX balance (pre-mint):",
           dfx.balanceOf(master_account) / 1e18)
-    master_account.transfer(addresses.DFX_OWNER,
+    master_account.transfer(addresses.DFX_MULTISIG,
                             '10 ether',
                             gas_price=gas_strategy)
     dfx.mint(master_account, rewards_total,
-             {'from': addresses.DFX_OWNER, 'gas_price': gas_strategy})
+             {'from': addresses.DFX_MULTISIG, 'gas_price': gas_strategy})
     print("Master account DFX balance (post-mint):",
           dfx.balanceOf(master_account) / 1e18)
 
