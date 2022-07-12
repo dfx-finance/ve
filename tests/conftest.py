@@ -1,3 +1,4 @@
+from doctest import master
 from brownie import ZERO_ADDRESS, Contract, network
 import brownie
 from brownie.network.gas.strategies import LinearScalingStrategy
@@ -75,25 +76,6 @@ def gauge_controller(GaugeController, dfx, voting_escrow, master_account):
     network.gas_limit('auto')
     yield GaugeController.deploy(dfx, voting_escrow, master_account, {'from': master_account, 'gas_price': gas_strategy})
 
-
-@pytest.fixture(scope='module')
-def distributor(DfxDistributor, dfx, gauge_controller, master_account):
-    initial_rate = 1
-    # set to number of DFX already distributed via liquidity mining (just ve?)
-    start_epoch_supply = 0
-    distributor = DfxDistributor.deploy(
-        {'from': master_account, 'gas_price': gas_strategy})
-    distributor.initialize(dfx,
-                           gauge_controller,
-                           initial_rate,
-                           start_epoch_supply,
-                           master_account,
-                           master_account,
-                           ZERO_ADDRESS,
-                           {'from': master_account, 'gas_price': gas_strategy})
-    yield distributor
-
-
 @pytest.fixture(scope='module')
 def veboost_proxy(VeBoostProxy, voting_escrow, master_account):
     yield VeBoostProxy.deploy(voting_escrow, ZERO_ADDRESS, master_account, {'from': master_account, 'gas_price': gas_strategy})
@@ -102,7 +84,6 @@ def veboost_proxy(VeBoostProxy, voting_escrow, master_account):
 '''
 Rewards & Gauges
 '''
-
 
 @pytest.fixture(scope='module')
 def three_staking_rewards(StakingRewards, dfx, mock_lp_tokens, master_account):
@@ -123,16 +104,55 @@ def three_rewards_only_gauges(RewardsOnlyGauge, mock_lp_tokens, master_account):
     ]
     yield contracts
 
+@pytest.fixture(scope='module')
+def three_liquidity_gauges_v4(LiquidityGaugeV4, DfxUpgradableProxy, dfx, voting_escrow, mock_lp_tokens, veboost_proxy, dfx_distributor, master_account):
+    contracts = []
+    for curr_mock_lp_token in mock_lp_tokens:
+        liquidity_gauges_logic = LiquidityGaugeV4.deploy({'from': master_account, 'gas_price': gas_strategy})
+
+        liquidity_initializer_calldata = liquidity_gauges_logic.initialize.encode_input(
+            curr_mock_lp_token,
+            master_account,
+            dfx,
+            voting_escrow,
+            veboost_proxy,
+            dfx_distributor
+        )   
+
+        liquidity_gauges_proxy = DfxUpgradableProxy.deploy(
+            liquidity_gauges_logic.address,
+            master_account,
+            liquidity_initializer_calldata,
+            {"from": master_account, "gas_price": gas_strategy}
+        )
+
+        contracts.append(Contract.from_abi("LiquidityGaugeV4", liquidity_gauges_proxy.address, LiquidityGaugeV4.abi))
+    yield contracts
 
 @pytest.fixture(scope='module')
-def three_liquidity_gauges_v4(LiquidityGaugeV4, dfx, voting_escrow, mock_lp_tokens, veboost_proxy, distributor, master_account):
-    contracts = [
-        LiquidityGaugeV4.deploy(
-            {'from': master_account, 'gas_price': gas_strategy})
-        for _ in mock_lp_tokens
-    ]
+def dfx_distributor(DfxDistributor, DfxUpgradableProxy, dfx, gauge_controller, master_account):
+    # deploy distributor first
+    initial_rate = 1
+    start_epoch_supply = 0
 
-    for lp_token in mock_lp_tokens:
-        lp_token.initialize(lp_token, master_account, dfx,
-                            voting_escrow, veboost_proxy, distributor)
-    yield contracts
+    distributor_logic = DfxDistributor.deploy({'from': master_account, 'gas_price': gas_strategy})
+
+    distributor_initializer_calldata = distributor_logic.initialize.encode_input(
+        dfx,
+        gauge_controller,
+        initial_rate,
+        start_epoch_supply,
+        master_account, # should consider using another multisig to deal with access control
+        master_account, 
+        ZERO_ADDRESS
+    )
+        
+    distributor_proxy = DfxUpgradableProxy.deploy(
+        distributor_logic.address,
+        master_account,
+        distributor_initializer_calldata,
+        {"from": master_account, "gas_price": gas_strategy}
+    )
+
+    distributor = Contract.from_abi("DfxDistributor", distributor_proxy.address, DfxDistributor.abi)
+    yield distributor
