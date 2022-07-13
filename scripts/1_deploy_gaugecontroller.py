@@ -20,7 +20,7 @@ DEPLOYED_GAUGE_ADDRESSES = [
     ('XIDR_USDC', None),
 ]
 # Type 0 for Ethereum stableswap pools (https://curve.readthedocs.io/dao-gauges.html#gauge-types)
-DEFAULT_GAUGE_TYPE = 0
+DEFAULT_GAUGE_WEIGHT = 0
 
 gas_strategy = LinearScalingStrategy('60 gwei', '150 gwei', 1.3)
 gas_price(gas_strategy)
@@ -50,7 +50,7 @@ def main():
 
     print('--- Configure Gauge Controller with "Liquidity" type ---')
     gauge_controller.add_type(
-        DEFAULT_GAUGE_TYPE_NAME, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
+        DEFAULT_GAUGE_TYPE_NAME, DEFAULT_GAUGE_WEIGHT, {'from': acct, 'gas_price': gas_strategy})
 
     output_data['gaugeController'] = gauge_controller.address
     with open(f'./scripts/deployed_gaugecontroller_{int(time.time())}.json', 'w') as output_f:

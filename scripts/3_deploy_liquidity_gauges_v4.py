@@ -26,6 +26,7 @@ def main():
     ))
 
     acct = accounts.load('anvil')
+    fake_multisig = accounts[1]
 
     ve_boost_proxy_address = helper.get_json_address(
         "deployed_gaugecontroller", ["veBoostProxy"])
@@ -33,6 +34,7 @@ def main():
         "deployed_gaugecontroller", ["gaugeController"])
     dfx_distributor_address = helper.get_json_address(
         "deployed_distributor", ["distributor", "proxy"])
+    print(dfx_distributor_address)
 
     gauge_controller = brownie.interface.IGaugeController(
         gauge_controller_address)
@@ -64,13 +66,13 @@ def main():
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
-            addresses.DFX_MULTISIG,
+            fake_multisig,
             gauge_initializer_calldata,
             {"from": acct, "gas_price": gas_strategy},
         )
 
         gauge_controller.add_gauge(
-            gauge, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
+            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
 
         output_data['gauges']['amm'][label] = {
             "logic": gauge.address,

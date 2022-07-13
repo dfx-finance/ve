@@ -29,6 +29,7 @@ def main():
         "\t4. Governor and Guardian addresses"
     ))
     acct = accounts.load("anvil")
+    fake_multisig = accounts[1]
 
     gauge_controller_address = helper.get_json_address(
         "deployed_gaugecontroller", ["gaugeController"])
@@ -53,7 +54,7 @@ def main():
 
     dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
-        addresses.DFX_MULTISIG,
+        fake_multisig,
         distributor_initializer_calldata,
         {"from": acct, "gas_price": gas_strategy},
     )
