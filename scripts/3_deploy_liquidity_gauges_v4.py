@@ -1,15 +1,19 @@
 #!/usr/bin/env python
-from brownie import DfxUpgradeableProxy, LiquidityGaugeV4, accounts
-from brownie.network import gas_price
-from brownie.network.gas.strategies import LinearScalingStrategy
 import json
 import time
+
+from brownie import Contract, DfxUpgradeableProxy, LiquidityGaugeV4, accounts, interface
+import brownie
+from brownie.network import gas_price
+from brownie.network.gas.strategies import LinearScalingStrategy
 
 from scripts import addresses, helper
 
 
 gas_strategy = LinearScalingStrategy('60 gwei', '150 gwei', 1.3)
 gas_price(gas_strategy)
+
+DEFAULT_GAUGE_TYPE = 0
 
 
 def main():
@@ -30,9 +34,10 @@ def main():
     dfx_distributor_address = helper.get_json_address(
         "deployed_distributor", ["distributor", "proxy"])
 
-    raise Exception("WIP")
+    gauge_controller = brownie.interface.IGaugeController(
+        gauge_controller_address)
 
-    print('--- Deploying Rewards-Only Gauges contract to Ethereum mainnet ---')
+    print('--- Deploying Liquidity Gauges (v4) contract to Ethereum mainnet ---')
     lp_addresses = [
         ('CADC_USDC', addresses.DFX_CADC_USDC_LP),
         ('EURS_USDC', addresses.DFX_EURS_USDC_LP),
@@ -43,9 +48,6 @@ def main():
     ]
     output_data = {'gauges': {'amm': {}}}
     for label, lp_addr in lp_addresses:
-        gauge = LiquidityGaugeV4.deploy(
-            acct, lp_addr, {'from': acct, 'gas_price': gas_strategy})
-
         # deploy gauge logic
         gauge = LiquidityGaugeV4.deploy(
             {'from': acct, 'gas_price': gas_strategy})
@@ -56,7 +58,7 @@ def main():
             lp_addr,
             addresses.DFX_MULTISIG,
             addresses.DFX,
-            addresses.veDFX,
+            addresses.VOTE_ESCROW,
             ve_boost_proxy_address,
             dfx_distributor_address,
         )
@@ -68,18 +70,12 @@ def main():
         )
 
         gauge_controller.add_gauge(
-            addr, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
+            gauge, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
 
         output_data['gauges']['amm'][label] = {
             "logic": gauge.address,
             "proxy": dfx_upgradeable_proxy.address,
         }
-
-        # print('--- Adding DFX AMM gauges ---')
-        # gauge_addresses = _load_gauge_addresses() \
-        #     if USE_LATEST_JSON else DEPLOYED_GAUGE_ADDRESSES
-
-        # for _, addr in gauge_addresses:
 
     with open(f'./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json', 'w') as output_f:
         json.dump(output_data, output_f, indent=4)

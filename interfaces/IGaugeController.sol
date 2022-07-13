@@ -11,4 +11,8 @@ interface IGaugeController {
 
     //solhint-disable-next-line
     function gauge_relative_weight(address addr, uint256 timestamp) external view returns (uint256);
+
+    function add_gauge(address addr, int128 gauge_type) external;
+
+    function add_gauge(address addr, int128 gauge_type, uint256 weight) external;
 }

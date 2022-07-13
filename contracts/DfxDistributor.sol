@@ -248,7 +248,7 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     // ================= Permissionless External Functions =========================
 
     /// @notice Distributes rewards to a staking contract (also called gauge)
-    /// @param gaugeAddr Address of the gauge to send tokens too
+    /// @param gaugeAddr Address of the gauge to send tokens to
     /// @return weeksElapsed Number of weeks elapsed since the last time rewards were distributed
     /// @return rewardTally Amount of tokens sent to the gauge
     /// @dev Anyone can call this function to distribute rewards to the different staking contracts
@@ -263,7 +263,7 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     }
 
     /// @notice Distributes rewards to multiple staking contracts
-    /// @param gauges Addresses of the gauge to send tokens too
+    /// @param gauges Addresses of the gauge to send tokens to
     /// @dev Anyone can call this function to distribute rewards to the different staking contracts
     /// @dev Compared with the `distributeReward` function, this function sends rewards to multiple
     /// contracts at the same time

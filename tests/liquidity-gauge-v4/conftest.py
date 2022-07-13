@@ -1,5 +1,4 @@
 from brownie import ZERO_ADDRESS, Contract, network
-import brownie
 from brownie.network.gas.strategies import LinearScalingStrategy
 import json
 import pytest

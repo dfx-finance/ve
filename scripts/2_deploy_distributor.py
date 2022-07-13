@@ -8,7 +8,7 @@ from brownie.network.gas.strategies import LinearScalingStrategy
 from scripts import addresses, helper
 
 
-LIFETIME_REWARDS_RATE = 15e4  # 150,000 DFX over 4 years
+LIFETIME_REWARDS_RATE = 1.5e5 * 1e18  # 150,000 DFX over 4 years
 DISTRIBUTED_REWARDS = 0
 
 # Setting gas price is always necessary for deploy
@@ -21,7 +21,7 @@ output_data = {"distributor": {"logic": None, "proxy": None}}
 
 def main():
     print((
-        "Script 2 of 4:\n\n"
+        "Script 2 of 3:\n\n"
         "NOTE: This script expects configuration for:\n"
         "\t1. GaugeController address\n"
         "\t2. Total lifetime rewards of DFX token as `rate`\n"
@@ -45,7 +45,7 @@ def main():
         gauge_controller_address,
         LIFETIME_REWARDS_RATE,
         DISTRIBUTED_REWARDS,
-        # should consider using another multisig to deal with access control
+        # needs another multisig to deal with access control behind proxy (ideally 2)
         addresses.DFX_MULTISIG,  # governor
         addresses.DFX_MULTISIG,  # guardian
         ZERO_ADDRESS   # delegate gauge for pulling type 2 gauge rewards

@@ -178,7 +178,7 @@ def _update_liquidity_limit(addr: address, l: uint256, L: uint256):
     """
     @notice Calculate limits which depend on the amount of DFX token per-user.
             Effectively it calculates working balances to apply amplification
-            of DFX production by DFX
+            of DFX production by
     @param addr User address
     @param l User's amount of liquidity (LP tokens)
     @param L Total amount of liquidity (LP tokens)
@@ -382,7 +382,7 @@ def kick(addr: address):
 def deposit(_value: uint256, _addr: address = msg.sender, _claim_rewards: bool = False):
     """
     @notice Deposit `_value` LP tokens
-    @dev Depositting also claims pending reward tokens
+    @dev Depositing also claims pending reward tokens
     @param _value Number of tokens to deposit
     @param _addr Address to deposit for
     """

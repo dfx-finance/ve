@@ -4,7 +4,6 @@ from brownie import chain, history
 from brownie.network.gas.strategies import LinearScalingStrategy
 import pytest
 
-import addresses
 import utils
 
 WEEK = 86400 * 7

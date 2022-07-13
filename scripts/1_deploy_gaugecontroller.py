@@ -1,5 +1,7 @@
+#!/usr/bin/env python
 import json
 import os
+
 from brownie import ZERO_ADDRESS, GaugeController, VeBoostProxy, accounts
 from brownie.network import gas_price
 from brownie.network.gas.strategies import LinearScalingStrategy
@@ -29,14 +31,14 @@ output_data = {'veBoostProxy': None, 'gaugeController': None}
 
 def main():
     print((
-        'Script 1 of 4:\n\n'
+        'Script 1 of 3:\n\n'
         'NOTE: This script expects configuration for:\n'
         '\t1. VotingEscrow (VeDFX) contract address'
     ))
 
     acct = accounts.load('anvil')
 
-    print('--- Deploying VeBoostProxy contract to Ethereum mainnet')
+    print('--- Deploying VeBoostProxy contract to Ethereum mainnet ---')
     # (votingEscrow address, delegation address, admin address)
     ve_boost_proxy = VeBoostProxy.deploy(addresses.VOTE_ESCROW, ZERO_ADDRESS, acct, {
         'from': acct, 'gas_price': gas_strategy})
@@ -46,7 +48,7 @@ def main():
     gauge_controller = GaugeController.deploy(
         addresses.DFX, addresses.VOTE_ESCROW, acct, {'from': acct, 'gas_price': gas_strategy})
 
-    print('----- Configure Gauge Controller with "Liquidity" type')
+    print('--- Configure Gauge Controller with "Liquidity" type ---')
     gauge_controller.add_type(
         DEFAULT_GAUGE_TYPE_NAME, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
 
