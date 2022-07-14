@@ -1,31 +1,26 @@
 # References:
 # 1. https://github.com/curvefi/curve-dao-contracts/blob/master/tests/integration/GaugeController/test_vote_weight.py
 from brownie import chain, history
-from brownie.network.gas.strategies import LinearScalingStrategy
 import pytest
 
-import utils
-
-WEEK = 86400 * 7
-
-# Setting gas price is always necessary for deploy
-# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('80 gwei', '250 gwei', 2.0)
+from utils import fund_multisig, mint_dfx, send_dfx, gas_strategy, WEEK
+from utils_gauges import setup_gauge_controller
+from utils_ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data
 
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
 def setup(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, master_account, user_accounts):
-    utils.fund_multisig(master_account)
-    utils.setup_gauge_controller(
+    fund_multisig(master_account)
+    setup_gauge_controller(
         gauge_controller, three_liquidity_gauges_v4, master_account)
 
     # Distribute coins
-    utils.mint_dfx(dfx, 1e24, master_account)
+    mint_dfx(dfx, 1e24, master_account)
 
     # Move 50k DFX to each user wallet and approve for spending by Voting Escrow
     for acct in user_accounts:
-        utils.send_dfx(dfx, 5e22, master_account, acct)
+        send_dfx(dfx, 5e22, master_account, acct)
         dfx.approve(voting_escrow, 5e22,
                     {'from': acct, 'gas_price': gas_strategy})
 
@@ -68,11 +63,11 @@ def test_gauge_weight_vote(gauge_controller, voting_escrow, three_liquidity_gaug
 
     # Deposit for voting
     timestamp = t1
-    utils.deposit_to_ve(voting_escrow, user_accounts,
-                        st_deposits, st_length, timestamp)
+    deposit_to_ve(voting_escrow, user_accounts,
+                  st_deposits, st_length, timestamp)
 
     # Place votes in bps (10000 = 100.00%)
-    votes = utils.submit_ve_votes(
+    votes = submit_ve_votes(
         gauge_controller, three_liquidity_gauges_v4, user_accounts, st_votes)
 
     # Vote power assertions - everyone used all voting power
@@ -80,7 +75,7 @@ def test_gauge_weight_vote(gauge_controller, voting_escrow, three_liquidity_gaug
         assert gauge_controller.vote_user_power(acct) == 10000
 
     # Calculate slope data, build model functions for calcuating max duration and theoretical weight
-    slope_data = utils.calculate_ve_slope_data(
+    slope_data = calculate_ve_slope_data(
         voting_escrow, user_accounts, st_length, timestamp)
 
     max_duration = max(duration for _, duration in slope_data)

@@ -1,51 +1,28 @@
 #!/usr/bin/env python
-from brownie.network.gas.strategies import LinearScalingStrategy
 import pytest
 
 import addresses
-import utils
-
-
-TOTAL_DFX_REWARDS = 1_000_000 * 1e18
-
-# Setting gas price is always necessary for deploy
-# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('30 gwei', '250 gwei', 1.3)
+from utils import fastforward_chain, fund_multisig, gas_strategy, WEEK
+from utils_gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
 def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_account, new_master_account):
-    utils.fund_multisig(master_account)
-    utils.setup_gauge_controller(
+    fund_multisig(master_account)
+
+    # setup gauges and distributor
+    setup_gauge_controller(
         gauge_controller, three_liquidity_gauges_v4, master_account)
 
-    # Supply distributor contract with rewards
-    utils.mint_dfx(dfx, TOTAL_DFX_REWARDS, master_account)
-
-    # Distribute rewards to the distributor contract
-    utils.send_dfx(dfx, TOTAL_DFX_REWARDS, master_account, distributor)
-
-    # Turn on distributions to gauges
-    distributor.toggleDistributions(
-        {'from': new_master_account, 'gas_price': gas_strategy})
-
-    # Set rate to distribute 1,000,000 rewards (see spreadsheet)
-    distributor.setRate(
-        1.2842402e16, {'from': new_master_account, 'gas_price': gas_strategy})
-
-
-def deposit_lp_tokens(lp_token, gauge, account):
-    # deposit LP token into gauge
-    amount = lp_token.balanceOf(account)
-    lp_token.approve(gauge, amount, {
-        'from': account, 'gas_price': gas_strategy})
-    gauge.deposit(
-        amount, {'from': account, 'gas_price': gas_strategy})
-
-    # check that LP has been transfered
-    assert lp_token.balanceOf(account) == 0
-    assert lp_token.balanceOf(gauge) == amount
+    # Params:
+    # - reward token
+    # - distributor contract
+    # - account from which to mint and provide rewards to distributor contract
+    # - account which administers the distributor contract
+    # - rate dependent on tokens available and weekly reduction (see spreadsheet)
+    setup_distributor(dfx, distributor, master_account,
+                      new_master_account, 1.2842402e16)
 
 
 def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge_controller, distributor, master_account):
@@ -80,7 +57,7 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
         assert eurs_usdc_gauge.claimable_reward(
             master_account, addresses.DFX) == expected_rewards[i]
 
-        utils.fastforward_chain(utils.WEEK)
+        fastforward_chain(WEEK)
 
     # claim staking reward
     reward_amount = eurs_usdc_gauge.claimable_reward(
