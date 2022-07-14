@@ -85,7 +85,7 @@ def distributor(DfxDistributor, DfxUpgradeableProxy, gauge_controller, master_ac
     distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
         addresses.DFX,
         gauge_controller,
-        16e4,
+        0,
         0,
         # should consider using another multisig to deal with access control
         new_master_account,
@@ -140,5 +140,8 @@ def three_liquidity_gauges_v4(LiquidityGaugeV4, DfxUpgradeableProxy, dfx, voting
             gauge_initializer_calldata,
             {"from": master_account, "gas_price": gas_strategy},
         )
-        contracts.append(dfx_upgradeable_proxy)
+
+        gauge_proxy = Contract.from_abi(
+            'LiquidityGaugeV4', dfx_upgradeable_proxy, LiquidityGaugeV4.abi)
+        contracts.append(gauge_proxy)
     yield contracts

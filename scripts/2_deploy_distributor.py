@@ -8,7 +8,7 @@ from brownie.network.gas.strategies import LinearScalingStrategy
 from scripts import addresses, helper
 
 
-LIFETIME_REWARDS_RATE = 1.5e5 * 1e18  # 150,000 DFX over 4 years
+LIFETIME_REWARDS_RATE = 0
 DISTRIBUTED_REWARDS = 0
 
 # Setting gas price is always necessary for deploy

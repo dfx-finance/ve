@@ -2,7 +2,6 @@ from brownie import ZERO_ADDRESS, chain
 from brownie.network.gas.strategies import LinearScalingStrategy
 import pytest
 
-import addresses
 
 WEEK = 86400 * 7
 DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools

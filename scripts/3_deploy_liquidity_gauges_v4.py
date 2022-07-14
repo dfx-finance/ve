@@ -34,7 +34,6 @@ def main():
         "deployed_gaugecontroller", ["gaugeController"])
     dfx_distributor_address = helper.get_json_address(
         "deployed_distributor", ["distributor", "proxy"])
-    print(dfx_distributor_address)
 
     gauge_controller = brownie.interface.IGaugeController(
         gauge_controller_address)
@@ -71,8 +70,9 @@ def main():
             {"from": acct, "gas_price": gas_strategy},
         )
 
+        gauge_weight = 1e18
         gauge_controller.add_gauge(
-            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, {'from': acct, 'gas_price': gas_strategy})
+            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, gauge_weight, {'from': acct, 'gas_price': gas_strategy})
 
         output_data['gauges']['amm'][label] = {
             "logic": gauge.address,

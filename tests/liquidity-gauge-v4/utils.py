@@ -3,6 +3,8 @@ from brownie.network.gas.strategies import LinearScalingStrategy
 import addresses
 
 DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
+DEFAULT_TYPE_WEIGHT = 1e18
+DEFAULT_GAUGE_WEIGHT = 0
 WEEK = 86400 * 7
 
 # Setting gas price is always necessary for deploy
@@ -12,10 +14,10 @@ gas_strategy = LinearScalingStrategy('30 gwei', '250 gwei', 1.3)
 
 def setup_gauges(gauge_controller, gauges, master_account):
     gauge_controller.add_type(
-        'Liquidity', 1e18, {'from': master_account, 'gas_price': gas_strategy})
+        'AMM Liquidity Pools', DEFAULT_TYPE_WEIGHT, {'from': master_account, 'gas_price': gas_strategy})
     for gauge in gauges:
         gauge_controller.add_gauge(
-            gauge, DEFAULT_GAUGE_TYPE, {'from': master_account, 'gas_price': gas_strategy})
+            gauge, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': master_account, 'gas_price': gas_strategy})
 
 
 def mint_dfx(dfx, amount, account):
