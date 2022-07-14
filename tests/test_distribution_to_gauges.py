@@ -79,7 +79,7 @@ def _distribute_to_all_gauges(distributor, three_liquidity_gauges_v4, account):
 
 
 def test_distribute_rewards(dfx, gauge_controller, distributor, three_liquidity_gauges_v4, master_account, new_master_account):
-    # artificially set weight on second gauge
+    # artificially set weight on first and second gauges
     gauge_controller.change_gauge_weight(
         three_liquidity_gauges_v4[0], 1 * 1e18, {'from': master_account, 'gas_price': gas_strategy})
     gauge_controller.change_gauge_weight(
@@ -90,7 +90,7 @@ def test_distribute_rewards(dfx, gauge_controller, distributor, three_liquidity_
     # _cast_votes(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4,
     #             master_account, user_accounts)
 
-    for i in range(10):
+    for _ in range(10):
         # Advance chain clock
         brownie.chain.sleep(utils.WEEK)
         brownie.chain.mine()
