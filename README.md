@@ -6,6 +6,8 @@ for smart contract code and brownie + ganache for testing and deployments.
 
 Implementation working doc: https://docs.google.com/document/d/1t5nprPEhhA1amXQ8VWf-PuXaP0dcPcHz2an-eM0Lg2o/
 
+Calculations on VE emissions: https://docs.google.com/spreadsheets/d/1k1yAvAW_a6bHn4slPboGRl8ONsBEvO66YMWSOva_7MM/edit?usp=sharing
+
 #### References
 
 1. https://eth-brownie.readthedocs.io
@@ -25,10 +27,10 @@ $ python3 -m venv ve-venv
 ```bash
 $ . ve-venv/bin/activate
 $ pip install -r requirements.txt
-$ npm install ganache
+$ npm install ganache (*)
 ```
 
-OpenZeppelin@4.5.0 for StakingRewards.sol
+_\*Due to difficulties with ganache, `yarn hh:node` is now being used from the `frontend-monorepo`. Hardhat is able to use the same settings as `anvil` contained in these scripts._
 
 ```
 $ brownie pm install OpenZeppelin/openzeppelin-contracts@4.5.0
@@ -68,4 +70,18 @@ Or to run a single test with debug messages:
 ```bash
 $ brownie run deploy_gauges.py --network mainnet-fork
 $ brownie run deploy_gaugecontroller.py --network mainnet-fork
+```
+
+## Testing
+
+Tests can be run as a suite with:
+
+```bash
+$ brownie tests
+```
+
+Or tests can be run individually with verbose output, like:
+
+```bash
+$ brownie test tests/test_distribution_to_gauges.py -s
 ```
