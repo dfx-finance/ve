@@ -7,9 +7,8 @@ import brownie
 from utils import fastforward_chain, fund_multisig, gas_strategy, WEEK
 from utils_gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
 
+
 # handle setup logic required for each unit test
-
-
 @pytest.fixture(scope='module', autouse=True)
 def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_account, new_master_account):
     fund_multisig(master_account)

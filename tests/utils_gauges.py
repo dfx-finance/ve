@@ -49,4 +49,3 @@ def deposit_lp_tokens(lp_token, gauge, account):
 
     # check that LP has been transfered
     assert lp_token.balanceOf(account) == 0
-    assert lp_token.balanceOf(gauge) == amount

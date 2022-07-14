@@ -37,3 +37,9 @@ def send_dfx(dfx, amount, from_account, to_account):
                  'from': from_account, 'gas_price': gas_strategy})
     print("Sender account DFX balance:",
           dfx.balanceOf(from_account) / 1e18)
+
+
+def assert_tokens_balance(tokens, account, amount):
+    for token in tokens:
+        balance = token.balanceOf(account) / 10 ** token.decimals()
+        assert balance == amount

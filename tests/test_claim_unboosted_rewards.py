@@ -2,7 +2,7 @@
 import pytest
 
 import addresses
-from utils import fastforward_chain, fund_multisig, gas_strategy, WEEK
+from utils import fastforward_chain, fund_multisig, assert_tokens_balance, gas_strategy, WEEK
 from utils_gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 
 
@@ -29,9 +29,7 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
     starting_dfx_balance = dfx.balanceOf(master_account)
 
     # check that we have been pre-minted LP tokens
-    for lp_token in mock_lp_tokens:
-        balance = lp_token.balanceOf(master_account)
-        print(f'{lp_token.name()}: {balance/1e18}')
+    assert_tokens_balance(mock_lp_tokens, master_account, 1000000000)
 
     # select the EURS LP token and gauge for depositing
     eurs_usdc_lp = mock_lp_tokens[1]

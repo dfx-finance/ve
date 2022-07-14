@@ -3,8 +3,11 @@
 from utils import WEEK, gas_strategy
 
 
-def deposit_to_ve(voting_escrow, user_accounts, st_deposits, st_length, timestamp):
+def deposit_to_ve(dfx, voting_escrow, user_accounts, st_deposits, st_length, timestamp):
     for i, acct in enumerate(user_accounts):
+        dfx.approve(voting_escrow, st_deposits[i],
+                    {'from': acct, 'gas_price': gas_strategy})
+
         voting_escrow.create_lock(
             st_deposits[i], timestamp + (st_length[i] * WEEK), {'from': acct, 'gas_price': gas_strategy})
 
@@ -21,6 +24,12 @@ def submit_ve_votes(gauge_controller, gauges, user_accounts, st_votes):
             gauge_controller.vote_for_gauge_weights(
                 gauges[x], votes[-1][x], {'from': acct, 'gas_price': gas_strategy})
     return votes
+
+
+def submit_ve_vote(gauge_controller, gauges, vote, account):
+    for x in range(len(gauges)):
+        gauge_controller.vote_for_gauge_weights(
+            gauges[x], vote[x], {'from': account, 'gas_price': gas_strategy})
 
 
 def calculate_ve_slope_data(voting_escrow, user_accounts, st_length, timestamp):

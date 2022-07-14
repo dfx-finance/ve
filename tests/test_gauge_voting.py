@@ -10,7 +10,7 @@ from utils_ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
-def setup(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, master_account, user_accounts):
+def setup(dfx, gauge_controller, three_liquidity_gauges_v4, master_account, user_accounts):
     fund_multisig(master_account)
     setup_gauge_controller(
         gauge_controller, three_liquidity_gauges_v4, master_account)
@@ -18,11 +18,9 @@ def setup(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, maste
     # Distribute coins
     mint_dfx(dfx, 1e24, master_account)
 
-    # Move 50k DFX to each user wallet and approve for spending by Voting Escrow
+    # Move 50k DFX to each user wallet
     for acct in user_accounts:
         send_dfx(dfx, 5e22, master_account, acct)
-        dfx.approve(voting_escrow, 5e22,
-                    {'from': acct, 'gas_price': gas_strategy})
 
 
 # @given(
@@ -32,7 +30,7 @@ def setup(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, maste
 # )
 # # strategy will run this test 50(?) times by default, at least 3 is necessary to generate non-0 values
 # @settings(max_examples=3)
-def test_gauge_weight_vote(gauge_controller, voting_escrow, three_liquidity_gauges_v4, user_accounts):
+def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, user_accounts):
     '''
     Test that gauge weights correctly adjust over time.
 
@@ -63,7 +61,7 @@ def test_gauge_weight_vote(gauge_controller, voting_escrow, three_liquidity_gaug
 
     # Deposit for voting
     timestamp = t1
-    deposit_to_ve(voting_escrow, user_accounts,
+    deposit_to_ve(dfx, voting_escrow, user_accounts,
                   st_deposits, st_length, timestamp)
 
     # Place votes in bps (10000 = 100.00%)
