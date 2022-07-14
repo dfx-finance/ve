@@ -1,3 +1,4 @@
+import brownie
 from brownie.network.gas.strategies import LinearScalingStrategy
 
 import addresses
@@ -12,7 +13,19 @@ WEEK = 86400 * 7
 gas_strategy = LinearScalingStrategy('30 gwei', '250 gwei', 1.3)
 
 
-def setup_gauges(gauge_controller, gauges, master_account):
+def fund_multisig(account):
+    account.transfer(addresses.DFX_MULTISIG,
+                     '10 ether',
+                     gas_price=gas_strategy)
+
+
+# Advance chain clock
+def fastforward_chain(seconds):
+    brownie.chain.sleep(seconds)
+    brownie.chain.mine()
+
+
+def setup_gauge_controller(gauge_controller, gauges, master_account):
     gauge_controller.add_type(
         'AMM Liquidity Pools', DEFAULT_TYPE_WEIGHT, {'from': master_account, 'gas_price': gas_strategy})
     for gauge in gauges:
@@ -23,9 +36,6 @@ def setup_gauges(gauge_controller, gauges, master_account):
 def mint_dfx(dfx, amount, account):
     print("Account DFX balance (pre-mint):",
           dfx.balanceOf(account) / 1e18)
-    account.transfer(addresses.DFX_MULTISIG,
-                     '10 ether',
-                     gas_price=gas_strategy)
     dfx.mint(account, amount,
              {'from': addresses.DFX_MULTISIG, 'gas_price': gas_strategy})
     print("Account DFX balance (post-mint):",

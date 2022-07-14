@@ -16,7 +16,8 @@ gas_strategy = LinearScalingStrategy('80 gwei', '250 gwei', 2.0)
 # handle setup logic required for each unit test
 @pytest.fixture(scope='module', autouse=True)
 def setup(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, master_account, user_accounts):
-    utils.setup_gauges(
+    utils.fund_multisig(master_account)
+    utils.setup_gauge_controller(
         gauge_controller, three_liquidity_gauges_v4, master_account)
 
     # Distribute coins

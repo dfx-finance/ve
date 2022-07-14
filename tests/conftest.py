@@ -49,18 +49,13 @@ def voting_escrow():
 
 
 @pytest.fixture(scope='module')
-def mock_lp_token(ERC20LP, master_account):
-    # NOTE: Why does Curve.fi use 1e9 here?
-    yield ERC20LP.deploy('Curve LP Token', 'usdCrv', 18, 1e9, {'from': master_account, 'gas_price': gas_strategy})
-
-
-@pytest.fixture(scope='module')
 def mock_lp_tokens(ERC20LP, master_account):
     test_lps = [
         ('DFX CADC-USDC LP Token', 'cadcUsdc'),
         ('DFX EURS-USDC LP Token', 'eursUsdc'),
         ('DFX XSGD-USDC LP Token', 'xsgdUsdc'),
     ]
+    # NOTE: Why does Curve.fi use 1e9 here?
     lp_tokens = [
         ERC20LP.deploy(name, symbol, 18, 1e9, {
                        'from': master_account, 'gas_price': gas_strategy})
