@@ -37,6 +37,8 @@ $ brownie pm install OpenZeppelin/openzeppelin-contracts@4.5.0
 $ brownie pm install OpenZeppelin/openzeppelin-contracts-upgradeable@4.5.0
 ```
 
+NOTE: Some developers may run into authentication issues with `brownie pm install` or other `brownie` commands. If so, you may add `GITHUB_TOKEN` to a `.env` file. The `.env.example` has an example and links to relevant documentation.
+
 Add remappings to VSCode's `settings.json` file for Solidity:
 
 ```
