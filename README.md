@@ -34,6 +34,7 @@ _\*Due to difficulties with ganache, `yarn hh:node` is now being used from the `
 
 ```
 $ brownie pm install OpenZeppelin/openzeppelin-contracts@4.5.0
+$ brownie pm install OpenZeppelin/openzeppelin-contracts-upgradeable@4.5.0
 ```
 
 Add remappings to VSCode's `settings.json` file for Solidity:
