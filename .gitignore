@@ -7,4 +7,4 @@ reports/
 ve-venv
 scripts/*.json
 node_modules/
-
+settings.json
