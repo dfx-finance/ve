@@ -43,7 +43,8 @@ Add remappings to VSCode's `settings.json` file for Solidity:
 
 ```
 "solidity.remappingsUnix": [
-  "@openzeppelin/=/Users/kyle/.brownie/packages/OpenZeppelin/openzeppelin-contracts@4.5.0"
+  "@openzeppelin/=/Users/kyle/.brownie/packages/OpenZeppelin/openzeppelin-contracts@4.5.0",
+  "@openzeppelinUpgradeable/=/Users/kyle/.brownie/packages/OpenZeppelin/openzeppelin-contracts-upgradeable@4.5.0"
 ]
 ```
 
@@ -55,7 +56,7 @@ $ brownie accounts new <account-name>
 # Enter account password (blank)
 ```
 
-4. Run tests at block num 14957500
+4. **Testing:** Run tests at block num 14957500
 
 ```bash
 (terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@14957500 --unlock 0x27E843260c71443b4CC8cB6bF226C3f77b9695AF
@@ -68,23 +69,9 @@ Or to run a single test with debug messages:
 (terminal 2) $ brownie test tests/<test_script_name>.py --network mainnet-fork -s
 ```
 
-5. Run deploy script
+5. **Deployment:** Run deploy script
 
 ```bash
 $ brownie run deploy_gauges.py --network mainnet-fork
 $ brownie run deploy_gaugecontroller.py --network mainnet-fork
-```
-
-## Testing
-
-Tests can be run as a suite with:
-
-```bash
-$ brownie tests
-```
-
-Or tests can be run individually with verbose output, like:
-
-```bash
-$ brownie test tests/test_distribution_to_gauges.py -s
 ```
