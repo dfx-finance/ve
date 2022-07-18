@@ -56,22 +56,23 @@ $ brownie accounts new <account-name>
 # Enter account password (blank)
 ```
 
-4. **Testing:** Run tests at block num 14957500
+4. **Testing:**.py Run tests at block num 14957500
 
 ```bash
 (terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@14957500 --unlock 0x27E843260c71443b4CC8cB6bF226C3f77b9695AF
-(terminal 2) $ brownie test --network mainnet-fork
+(terminal 2) $ brownie tests
 ```
 
 Or to run a single test with debug messages:
 
 ```bash
-(terminal 2) $ brownie test tests/<test_script_name>.py --network mainnet-fork -s
+(terminal 2) $ brownie test tests/<test_script_name>.py -s
 ```
 
 5. **Deployment:** Run deploy script
 
 ```bash
-$ brownie run deploy_gauges.py --network mainnet-fork
-$ brownie run deploy_gaugecontroller.py --network mainnet-fork
+$ brownie run 1_deploy_gauge_controller.py
+$ brownie run 2_deploy_distributor.py
+$ brownie run 3_deploy_liquidity_gauges_v4.pymainnet-fork
 ```
