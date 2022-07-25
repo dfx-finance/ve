@@ -60,7 +60,7 @@ $ brownie accounts new <account-name>
 
 ```bash
 (terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@14957500 --unlock 0x27E843260c71443b4CC8cB6bF226C3f77b9695AF
-(terminal 2) $ brownie tests
+(terminal 2) $ brownie test
 ```
 
 Or to run a single test with debug messages:

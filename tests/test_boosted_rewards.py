@@ -27,6 +27,21 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
                       new_master_account, 1.2842402e16)
 
 
+@pytest.fixture(scope='module', autouse=True)
+def teardown(voting_escrow, master_account):
+    yield
+
+    # same two users
+    user_0 = accounts[4]
+    user_1 = accounts[5]
+
+    # Withdraw all tokens from lock
+    print("Withdrawing...")
+    for i, acct in enumerate([user_0, user_1]):
+        print(f"Withdraw {i} - {acct}")
+        voting_escrow.withdraw({'from': acct, 'gas_price': gas_strategy})
+
+
 def test_multi_user_stake(dfx, mock_lp_tokens, voting_escrow, three_liquidity_gauges_v4, gauge_controller, distributor, master_account):
     # two random users
     user_0 = accounts[4]
@@ -85,3 +100,5 @@ def test_multi_user_stake(dfx, mock_lp_tokens, voting_escrow, three_liquidity_ga
         user_1, addresses.DFX) / 1e18)
     print(accounts[9], eurs_usdc_gauge.claimable_reward(
         accounts[9], addresses.DFX) / 1e18)
+
+    fastforward_chain(WEEK * 210)

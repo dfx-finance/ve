@@ -25,6 +25,16 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
                       new_master_account, 1.2842402e16)
 
 
+@pytest.fixture(scope='module', autouse=True)
+def teardown(voting_escrow, master_account):
+    yield
+
+    # Withdraw all tokens from lock
+    print("Withdrawing...")
+    print(f"Withdraw {master_account}")
+    voting_escrow.withdraw({'from': master_account, 'gas_price': gas_strategy})
+
+
 def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge_controller, distributor, master_account):
     starting_dfx_balance = dfx.balanceOf(master_account)
 

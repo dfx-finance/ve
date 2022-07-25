@@ -23,6 +23,17 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, master_account, user
         send_dfx(dfx, 5e22, master_account, acct)
 
 
+@pytest.fixture(scope='module', autouse=True)
+def teardown(voting_escrow, user_accounts):
+    yield
+
+    # Withdraw all tokens from lock
+    print("Withdrawing...")
+    for i, acct in enumerate(user_accounts):
+        print(f"Withdraw {i} - {acct}")
+        voting_escrow.withdraw({'from': acct, 'gas_price': gas_strategy})
+
+
 # @given(
 #     st_deposits=strategy("uint256[3]", min_value=1e21, max_value=1e23),
 #     st_length=strategy("uint256[3]", min_value=52, max_value=100),
@@ -126,9 +137,3 @@ def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity
 
         chain.sleep(WEEK * 4)
         chain.mine()
-
-    # Withdraw all tokens from lock
-    print("Withdrawing...")
-    for i, acct in enumerate(user_accounts):
-        print(f"Withdraw {i} - {acct}")
-        voting_escrow.withdraw({'from': acct, 'gas_price': gas_strategy})
