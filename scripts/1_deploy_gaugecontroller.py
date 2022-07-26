@@ -14,6 +14,7 @@ DEFAULT_GAUGE_TYPE_NAME = 'Liquidity'
 DEPLOYED_GAUGE_ADDRESSES = [
     ('CADC_USDC', None),
     ('EUROC_USDC', None),
+    ('EURS_USDC', None),
     ('NZDS_USDC', None),
     ('TRYB_USDC', None),
     ('XIDR_USDC', None),
