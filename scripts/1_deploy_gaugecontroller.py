@@ -13,7 +13,7 @@ USE_LATEST_JSON = True
 DEFAULT_GAUGE_TYPE_NAME = 'Liquidity'
 DEPLOYED_GAUGE_ADDRESSES = [
     ('CADC_USDC', None),
-    ('EURS_USDC', None),
+    ('EUROC_USDC', None),
     ('XSGD_USDC', None),
     ('NZDS_USDC', None),
     ('TRYB_USDC', None),

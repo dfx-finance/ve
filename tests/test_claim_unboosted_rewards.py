@@ -30,7 +30,7 @@ def teardown(voting_escrow, master_account):
     yield
 
     # Withdraw all tokens from lock
-    print("Withdrawing...")
+    print("\nWithdrawing...")
     print(f"Withdraw {master_account}")
     voting_escrow.withdraw({'from': master_account, 'gas_price': gas_strategy})
 
@@ -39,20 +39,20 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
     starting_dfx_balance = dfx.balanceOf(master_account)
 
     # check that we have been pre-minted LP tokens
-    assert_tokens_balance(mock_lp_tokens, master_account, 1000000000)
+    assert_tokens_balance(mock_lp_tokens, master_account, 1e9)
 
-    # select the EURS LP token and gauge for depositing
-    eurs_usdc_lp = mock_lp_tokens[1]
-    eurs_usdc_gauge = three_liquidity_gauges_v4[1]
-    assert 'eurs' in eurs_usdc_lp.name().lower()
-    assert 'eurs' in eurs_usdc_gauge.name().lower()
+    # select the EUROC LP token and gauge for depositing
+    euroc_usdc_lp = mock_lp_tokens[1]
+    euroc_usdc_gauge = three_liquidity_gauges_v4[1]
+    assert 'euroc' in euroc_usdc_lp.name().lower()
+    assert 'euroc' in euroc_usdc_gauge.name().lower()
 
     # deposit tokens to gauge
-    deposit_lp_tokens(eurs_usdc_lp, eurs_usdc_gauge, master_account)
+    deposit_lp_tokens(euroc_usdc_lp, euroc_usdc_gauge, master_account)
 
     # artificially set gauge weight for our gauge
     gauge_controller.change_gauge_weight(
-        eurs_usdc_gauge, 1 * 1e18, {'from': master_account, 'gas_price': gas_strategy})
+        euroc_usdc_gauge, 1 * 1e18, {'from': master_account, 'gas_price': gas_strategy})
 
     # call rewards distribution in various epochs:
     # rewards = [Wednesday before epoch 0, Epoch 0, Epoch 1, ...]
@@ -62,15 +62,15 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
         distributor.distributeRewardToMultipleGauges(
             three_liquidity_gauges_v4, {'from': master_account, 'gas_price': gas_strategy})
 
-        assert eurs_usdc_gauge.claimable_reward(
+        assert euroc_usdc_gauge.claimable_reward(
             master_account, addresses.DFX) == expected_rewards[i]
 
         fastforward_chain(WEEK)
 
     # claim staking reward
-    reward_amount = eurs_usdc_gauge.claimable_reward(
+    reward_amount = euroc_usdc_gauge.claimable_reward(
         master_account, addresses.DFX)
-    eurs_usdc_gauge.claim_rewards(
+    euroc_usdc_gauge.claim_rewards(
         master_account, {'from': master_account, 'gas_price': gas_strategy})
     assert (dfx.balanceOf(master_account) -
             starting_dfx_balance) == reward_amount

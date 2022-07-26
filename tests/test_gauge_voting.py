@@ -28,7 +28,7 @@ def teardown(voting_escrow, user_accounts):
     yield
 
     # Withdraw all tokens from lock
-    print("Withdrawing...")
+    print("\nWithdrawing...")
     for i, acct in enumerate(user_accounts):
         print(f"Withdraw {i} - {acct}")
         voting_escrow.withdraw({'from': acct, 'gas_price': gas_strategy})

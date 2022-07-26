@@ -17,7 +17,7 @@ def main():
     print('--- Deploying Rewards-Only Gauges contract to Ethereum mainnet ---')
     lp_addresses = [
         ('CADC_USDC', addresses.DFX_CADC_USDC_LP),
-        ('EURS_USDC', addresses.DFX_EURS_USDC_LP),
+        ('EUROC_USDC', addresses.DFX_EUROC_USDC_LP),
         ('XSGD_USDC', addresses.DFX_XSGD_USDC_LP),
         ('NZDS_USDC', addresses.DFX_NZDS_USDC_LP),
         ('TRYB_USDC', addresses.DFX_TRYB_USDC_LP),

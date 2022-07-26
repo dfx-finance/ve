@@ -52,10 +52,10 @@ def voting_escrow():
 def mock_lp_tokens(ERC20LP, master_account):
     test_lps = [
         ('DFX CADC-USDC LP Token', 'cadcUsdc'),
-        ('DFX EURS-USDC LP Token', 'eursUsdc'),
+        ('DFX EUROC-USDC LP Token', 'eurocUsdc'),
         ('DFX XSGD-USDC LP Token', 'xsgdUsdc'),
     ]
-    # NOTE: Why does Curve.fi use 1e9 here?
+
     lp_tokens = [
         ERC20LP.deploy(name, symbol, 18, 1e9, {
                        'from': master_account, 'gas_price': gas_strategy})
