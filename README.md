@@ -48,7 +48,7 @@ Add remappings to VSCode's `settings.json` file for Solidity:
 ]
 ```
 
-3. Add ganache local private key to brownie (scripts will have to be adjusted accordingly, the default name used is `anvil`)
+3. Add ganache local private key to brownie (scripts will have to be adjusted accordingly, the default name used is `anvil`). Most likely this will be account 0 coming from the standard Hardhat mnemonic `test test test test test test test test test test test junk`.
 
 ```bash
 $ brownie accounts new <account-name>
