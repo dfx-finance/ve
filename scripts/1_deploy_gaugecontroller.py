@@ -14,10 +14,10 @@ DEFAULT_GAUGE_TYPE_NAME = 'Liquidity'
 DEPLOYED_GAUGE_ADDRESSES = [
     ('CADC_USDC', None),
     ('EUROC_USDC', None),
-    ('XSGD_USDC', None),
     ('NZDS_USDC', None),
     ('TRYB_USDC', None),
     ('XIDR_USDC', None),
+    ('XSGD_USDC', None),
 ]
 DEFAULT_TYPE_WEIGHT = 1e18
 

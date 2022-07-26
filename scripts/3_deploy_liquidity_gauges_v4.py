@@ -42,10 +42,10 @@ def main():
     lp_addresses = [
         ('CADC_USDC', addresses.DFX_CADC_USDC_LP),
         ('EUROC_USDC', addresses.DFX_EUROC_USDC_LP),
-        ('XSGD_USDC', addresses.DFX_XSGD_USDC_LP),
         ('NZDS_USDC', addresses.DFX_NZDS_USDC_LP),
         ('TRYB_USDC', addresses.DFX_TRYB_USDC_LP),
         ('XIDR_USDC', addresses.DFX_XIDR_USDC_LP),
+        ('XSGD_USDC', addresses.DFX_XSGD_USDC_LP),
     ]
     output_data = {'gauges': {'amm': {}}}
     for label, lp_addr in lp_addresses:
