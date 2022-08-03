@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # References:
 # 1. https://github.com/curvefi/curve-dao-contracts/blob/master/tests/integration/GaugeController/test_vote_weight.py
 from brownie import chain, history

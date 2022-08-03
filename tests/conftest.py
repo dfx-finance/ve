@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from brownie import ZERO_ADDRESS, Contract, network
 from brownie.network.gas.strategies import LinearScalingStrategy
 import json
@@ -66,7 +67,6 @@ def mock_lp_tokens(ERC20LP, master_account):
 
 @pytest.fixture(scope='module')
 def gauge_controller(GaugeController, dfx, voting_escrow, master_account):
-    network.gas_limit('auto')
     yield GaugeController.deploy(dfx, voting_escrow, master_account, {'from': master_account, 'gas_price': gas_strategy})
 
 
