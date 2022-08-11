@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 from brownie import ZERO_ADDRESS, Contract, network
-from brownie.network.gas.strategies import LinearScalingStrategy
 import json
 import pytest
 
 import addresses
+from utils import gas_strategy
 
-# Setting gas price is always necessary for deploy
-# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('40 gwei', '150 gwei', 1.3)
+
+@pytest.fixture(scope='session', autouse=True)
+def set_gas_limit():
+    network.gas_limit('auto')
+
 
 '''
 Accounts
@@ -28,6 +30,11 @@ def new_master_account(accounts):
 @pytest.fixture(scope='module')
 def user_accounts(accounts):
     yield accounts[2:5]
+
+
+@pytest.fixture(scope='module')
+def multisig_account(accounts):
+    yield accounts[-1]
 
 
 '''

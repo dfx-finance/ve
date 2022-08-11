@@ -4,7 +4,6 @@ from brownie.network.gas.strategies import LinearScalingStrategy
 
 import addresses
 
-WEEK = 86400 * 7
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool

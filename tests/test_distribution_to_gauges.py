@@ -5,7 +5,7 @@ import pytest
 import brownie
 
 from utils import fastforward_chain, fund_multisig, gas_strategy, WEEK
-from utils_gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
+from utils_gauges import setup_distributor, setup_gauge_controller
 
 
 # handle setup logic required for each unit test
@@ -24,7 +24,7 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
     # - account which administers the distributor contract
     # - rate dependent on tokens available and weekly reduction (see spreadsheet)
     setup_distributor(dfx, distributor, master_account,
-                      new_master_account, 1.2842402e16)
+                      new_master_account, 1.284240247e16)
 
 
 def _distribute_to_all_gauges(distributor, three_liquidity_gauges_v4, account):

@@ -2,12 +2,11 @@
 from brownie.network.gas.strategies import LinearScalingStrategy
 
 from utils import mint_dfx, send_dfx
+from utils_ve import TOTAL_DFX_REWARDS
 
 DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
 DEFAULT_TYPE_WEIGHT = 1e18
 DEFAULT_GAUGE_WEIGHT = 0
-
-TOTAL_DFX_REWARDS = 1_000_000 * 1e18
 
 
 # Setting gas price is always necessary for deploy
@@ -30,13 +29,13 @@ def setup_distributor(dfx, distributor, master_account, new_master_account, rate
     # Distribute rewards to the distributor contract
     send_dfx(dfx, TOTAL_DFX_REWARDS, master_account, distributor)
 
-    # Turn on distributions to gauges
-    distributor.toggleDistributions(
-        {'from': new_master_account, 'gas_price': gas_strategy})
-
     # Set rate to distribute 1,000,000 rewards (see spreadsheet)
     distributor.setRate(
         rate, {'from': new_master_account, 'gas_price': gas_strategy})
+
+    # Turn on distributions to gauges
+    distributor.toggleDistributions(
+        {'from': new_master_account, 'gas_price': gas_strategy})
 
 
 def deposit_lp_tokens(lp_token, gauge, account):

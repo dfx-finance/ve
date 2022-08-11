@@ -28,7 +28,7 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
 
 
 @pytest.fixture(scope='module', autouse=True)
-def teardown(voting_escrow, master_account):
+def teardown(dfx, voting_escrow):
     yield
 
     # same two users
@@ -40,6 +40,14 @@ def teardown(voting_escrow, master_account):
     for i, acct in enumerate([user_0, user_1]):
         print(f"Withdraw {i} - {acct}")
         voting_escrow.withdraw({'from': acct, 'gas_price': gas_strategy})
+
+    # Burn all DFX user balances
+    burn_amt_0 = dfx.balanceOf(user_0)
+    burn_amt_1 = dfx.balanceOf(user_1)
+    dfx.transfer(addresses.DFX_MULTISIG, burn_amt_0, {
+                 'from': user_0, 'gas_price': gas_strategy})
+    dfx.transfer(addresses.DFX_MULTISIG, burn_amt_1, {
+                 'from': user_1, 'gas_price': gas_strategy})
 
 
 def test_multi_user_stake(dfx, mock_lp_tokens, voting_escrow, three_liquidity_gauges_v4, gauge_controller, distributor, master_account):

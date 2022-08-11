@@ -2,6 +2,7 @@
 import pytest
 
 import addresses
+from tests.utils_ve import EMISSION_RATE
 from utils import fastforward_chain, fund_multisig, assert_tokens_balance, gas_strategy, WEEK
 from utils_gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 
@@ -22,7 +23,7 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
     # - account which administers the distributor contract
     # - rate dependent on tokens available and weekly reduction (see spreadsheet)
     setup_distributor(dfx, distributor, master_account,
-                      new_master_account, 1.2842402e16)
+                      new_master_account, EMISSION_RATE)
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -55,7 +56,7 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
         euroc_usdc_gauge, 1 * 1e18, {'from': master_account, 'gas_price': gas_strategy})
 
     # call rewards distribution in various epochs:
-    # rewards = [Wednesday before epoch 0, Epoch 0, Epoch 1, ...]
+    # rewards = [Wednesday before epoch 0, epoch 1, epoch 2, ...]
     expected_rewards = [0, 0, 7706757122187200000000,
                         15353655206616800000000, 22941159183524400000000]
     for i in range(5):
