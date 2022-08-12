@@ -55,12 +55,6 @@ def test_full_distribution(dfx, mock_lp_tokens, three_liquidity_gauges_v4, distr
             4.737013827255874e22, 4.737013827255874e22),
     ]
 
-    # select the EUROC LP token and gauge for depositing
-    euroc_usdc_lp = mock_lp_tokens[1]
-    euroc_usdc_gauge = three_liquidity_gauges_v4[1]
-    assert 'euroc' in euroc_usdc_lp.name().lower()
-    assert 'euroc' in euroc_usdc_gauge.name().lower()
-
     # init 10s before the week change
     t0 = chain.time()
     t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
