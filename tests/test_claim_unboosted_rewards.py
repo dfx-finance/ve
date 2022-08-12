@@ -28,7 +28,7 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
 
 
 @pytest.fixture(scope='module', autouse=True)
-def teardown(voting_escrow, master_account):
+def teardown():
     yield
     brownie.chain.reset()
 
@@ -54,8 +54,8 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
 
     # call rewards distribution in various epochs:
     # rewards = [Wednesday before epoch 0, epoch 1, epoch 2, ...]
-    expected_rewards = [0, 0, 7706757122187200000000,
-                        15353655206616800000000, 22941159183524400000000]
+    expected_rewards = [0, 0, 3207448777992800000000,
+                        6389985028646000000000, 9547802249677200000000]
     for i in range(5):
         distributor.distributeRewardToMultipleGauges(
             three_liquidity_gauges_v4, {'from': master_account, 'gas_price': gas_strategy})
