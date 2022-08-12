@@ -6,7 +6,7 @@ from utils_ve import TOTAL_DFX_REWARDS
 
 DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
 DEFAULT_TYPE_WEIGHT = 1e18
-DEFAULT_GAUGE_WEIGHT = 0
+DEFAULT_GAUGE_WEIGHT = 1e18
 
 
 # Setting gas price is always necessary for deploy
