@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from brownie import chain
 from datetime import datetime, timedelta
+import brownie
 import pytest
 
 from utils import fastforward_chain, fund_multisig, gas_strategy
@@ -30,6 +31,7 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
 @pytest.fixture(scope='module', autouse=True)
 def teardown():
     yield
+    brownie.chain.reset()
 
 
 def test_full_distribution(dfx, three_liquidity_gauges_v4, distributor, master_account):

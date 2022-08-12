@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+import brownie
 import pytest
 
 import addresses
-from tests.utils_ve import EMISSION_RATE
-from utils import fastforward_chain, fund_multisig, assert_tokens_balance, gas_strategy, WEEK
+from utils import fastforward_chain, fund_multisig, assert_tokens_balance, gas_strategy
 from utils_gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
+from utils_ve import EMISSION_RATE, WEEK
 
 
 # handle setup logic required for each unit test
@@ -29,11 +30,7 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
 @pytest.fixture(scope='module', autouse=True)
 def teardown(voting_escrow, master_account):
     yield
-
-    # Withdraw all tokens from lock
-    print("\nWithdrawing...")
-    print(f"Withdraw {master_account}")
-    voting_escrow.withdraw({'from': master_account, 'gas_price': gas_strategy})
+    brownie.chain.reset()
 
 
 def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge_controller, distributor, master_account):
