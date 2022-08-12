@@ -2,11 +2,12 @@
 # References:
 # 1. https://github.com/curvefi/curve-dao-contracts/blob/master/tests/integration/GaugeController/test_vote_weight.py
 from brownie import chain, history
+import brownie
 import pytest
 
-from utils import fund_multisig, mint_dfx, send_dfx, gas_strategy, WEEK
+from utils import fund_multisig, mint_dfx, send_dfx, gas_strategy
 from utils_gauges import setup_gauge_controller
-from utils_ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data
+from utils_ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data, WEEK
 
 
 # handle setup logic required for each unit test
@@ -25,14 +26,9 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, master_account, user
 
 
 @pytest.fixture(scope='module', autouse=True)
-def teardown(voting_escrow, user_accounts):
+def teardown():
     yield
-
-    # Withdraw all tokens from lock
-    print("\nWithdrawing...")
-    for i, acct in enumerate(user_accounts):
-        print(f"Withdraw {i} - {acct}")
-        voting_escrow.withdraw({'from': acct, 'gas_price': gas_strategy})
+    brownie.chain.reset()
 
 
 # @given(

@@ -4,8 +4,9 @@ import pytest
 
 import brownie
 
-from utils import fastforward_chain, fund_multisig, gas_strategy, WEEK
+from utils import fastforward_chain, fund_multisig, gas_strategy
 from utils_gauges import setup_distributor, setup_gauge_controller
+from utils_ve import WEEK
 
 
 # handle setup logic required for each unit test
@@ -25,6 +26,12 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, distributor, master_
     # - rate dependent on tokens available and weekly reduction (see spreadsheet)
     setup_distributor(dfx, distributor, master_account,
                       new_master_account, 1.284240247e16)
+
+
+@pytest.fixture(scope='module', autouse=True)
+def teardown():
+    yield
+    brownie.chain.reset()
 
 
 def _distribute_to_all_gauges(distributor, three_liquidity_gauges_v4, account):
