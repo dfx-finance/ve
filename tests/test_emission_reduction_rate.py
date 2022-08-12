@@ -32,7 +32,7 @@ def teardown():
     yield
 
 
-def test_full_distribution(dfx, mock_lp_tokens, three_liquidity_gauges_v4, distributor, master_account):
+def test_full_distribution(dfx, three_liquidity_gauges_v4, distributor, master_account):
     # expected rewards amounts starting with epoch 1 (nothing distributed during epoch 0)
     # - epoch: miningEpoch according to the distributor contract
     # - startEpochSupply (Wei): the amount the contract has internally accounted for supplying.
