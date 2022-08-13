@@ -5,15 +5,19 @@ import operator
 import os
 
 from brownie import network, accounts, config
+from brownie.network.gas.strategies import LinearScalingStrategy
 
 
 NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = [
-    "hardhat", "development", "ganache"]
+    'hardhat', 'development', 'ganache']
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
-    "mainnet-fork",
-    "binance-fork",
-    "matic-fork",
+    'mainnet-fork',
+    'binance-fork',
+    'matic-fork',
 ]
+# Setting gas price is always necessary for deploy
+# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
+gas_strategy = LinearScalingStrategy('20 gwei', '150 gwei', 1.3)
 
 
 def get_account(number=None):
@@ -21,14 +25,14 @@ def get_account(number=None):
         return accounts[0]
     if number:
         return accounts[number]
-    if network.show_active() in config["networks"]:
-        account = accounts.add(config["wallets"]["from_key"])
+    if network.show_active() in config['networks']:
+        account = accounts.add(config['wallets']['from_key'])
         return account
     return None
 
 
 def encode_function_data(initializer=None, *args):
-    """Encodes the function call so we can work with an initializer.
+    '''Encodes the function call so we can work with an initializer.
     Args:
         initializer ([brownie.network.contract.ContractTx], optional):
         The initializer function we want to call. Example: `box.store`.
@@ -37,7 +41,7 @@ def encode_function_data(initializer=None, *args):
         The arguments to pass to the initializer function
     Returns:
         [bytes]: Return the encoded bytes.
-    """
+    '''
     if not len(args):
         args = b''
 
@@ -63,22 +67,22 @@ def upgrade(
                 proxy.address,
                 newimplementation_address,
                 encoded_function_call,
-                {"from": account},
+                {'from': account},
             )
         else:
             transaction = proxy_admin_contract.upgrade(
-                proxy.address, newimplementation_address, {"from": account}
+                proxy.address, newimplementation_address, {'from': account}
             )
     else:
         if initializer:
             encoded_function_call = encode_function_data(initializer, *args)
             transaction = proxy.upgradeToAndCall(
                 newimplementation_address, encoded_function_call, {
-                    "from": account}
+                    'from': account}
             )
         else:
             transaction = proxy.upgradeTo(
-                newimplementation_address, {"from": account})
+                newimplementation_address, {'from': account})
     return transaction
 
 

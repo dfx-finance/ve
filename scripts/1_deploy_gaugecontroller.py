@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 import json
-import os
 
 from brownie import ZERO_ADDRESS, GaugeController, VeBoostProxy, accounts
 from brownie.network import gas_price
-from brownie.network.gas.strategies import LinearScalingStrategy
 import time
 
-import scripts.addresses as addresses
+from scripts import addresses
+from scripts.helper import gas_strategy
 
 USE_LATEST_JSON = True
-DEFAULT_GAUGE_TYPE_NAME = 'Liquidity'
+DEFAULT_GAUGE_TYPE_NAME = 'DFX AMM Liquidity'
 DEPLOYED_GAUGE_ADDRESSES = [
     ('CADC_USDC', None),
     ('EUROC_USDC', None),
@@ -22,7 +21,6 @@ DEPLOYED_GAUGE_ADDRESSES = [
 ]
 DEFAULT_TYPE_WEIGHT = 1e18
 
-gas_strategy = LinearScalingStrategy('60 gwei', '150 gwei', 1.3)
 gas_price(gas_strategy)
 
 
@@ -31,7 +29,7 @@ output_data = {'veBoostProxy': None, 'gaugeController': None}
 
 def main():
     print((
-        'Script 1 of 3:\n\n'
+        'Script 1 of 4:\n\n'
         'NOTE: This script expects configuration for:\n'
         '\t1. VotingEscrow (VeDFX) contract address'
     ))

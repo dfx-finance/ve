@@ -23,7 +23,7 @@ def setup_gauge_controller(gauge_controller, gauges, master_account):
 
 
 def setup_distributor(dfx, distributor, master_account, new_master_account, rate):
-    # Supply distributor contract with rewards
+    # Supply master account contract with rewards
     mint_dfx(dfx, TOTAL_DFX_REWARDS, master_account)
 
     # Distribute rewards to the distributor contract

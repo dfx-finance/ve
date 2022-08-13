@@ -2,23 +2,22 @@
 import json
 import time
 
-from brownie import Contract, DfxUpgradeableProxy, LiquidityGaugeV4, accounts, interface
 import brownie
+from brownie import DfxUpgradeableProxy, LiquidityGaugeV4, accounts
 from brownie.network import gas_price
-from brownie.network.gas.strategies import LinearScalingStrategy
 
-from scripts import addresses, helper
+from scripts import addresses
+from scripts.helper import gas_strategy, get_json_address
 
-
-gas_strategy = LinearScalingStrategy('60 gwei', '150 gwei', 1.3)
 gas_price(gas_strategy)
 
 DEFAULT_GAUGE_TYPE = 0
+DEFAULT_GAUGE_WEIGHT = 1e18
 
 
 def main():
     print((
-        'Script 3 of 3:\n\n'
+        'Script 3 of 4:\n\n'
         'NOTE: This script expects configuration for:\n'
         '\t1. VeBoostProxy address\n'
         '\t2. DfxDistributor address\n'
@@ -28,12 +27,12 @@ def main():
     acct = accounts.load('anvil')
     fake_multisig = accounts[1]
 
-    ve_boost_proxy_address = helper.get_json_address(
-        "deployed_gaugecontroller", ["veBoostProxy"])
-    gauge_controller_address = helper.get_json_address(
-        "deployed_gaugecontroller", ["gaugeController"])
-    dfx_distributor_address = helper.get_json_address(
-        "deployed_distributor", ["distributor", "proxy"])
+    ve_boost_proxy_address = get_json_address(
+        'deployed_gaugecontroller', ['veBoostProxy'])
+    gauge_controller_address = get_json_address(
+        'deployed_gaugecontroller', ['gaugeController'])
+    dfx_distributor_address = get_json_address(
+        'deployed_distributor', ['distributor', 'proxy'])
 
     gauge_controller = brownie.interface.IGaugeController(
         gauge_controller_address)
@@ -68,16 +67,15 @@ def main():
             gauge.address,
             fake_multisig,
             gauge_initializer_calldata,
-            {"from": acct, "gas_price": gas_strategy},
+            {'from': acct, 'gas_price': gas_strategy},
         )
 
-        gauge_weight = 1e18
         gauge_controller.add_gauge(
-            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, gauge_weight, {'from': acct, 'gas_price': gas_strategy})
+            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': acct, 'gas_price': gas_strategy})
 
         output_data['gauges']['amm'][label] = {
-            "logic": gauge.address,
-            "proxy": dfx_upgradeable_proxy.address,
+            'logic': gauge.address,
+            'proxy': dfx_upgradeable_proxy.address,
         }
 
     with open(f'./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json', 'w') as output_f:

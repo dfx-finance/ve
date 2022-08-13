@@ -1,13 +1,13 @@
+#!/usr/bin/env python
 from brownie import RewardsOnlyGauge, accounts
 from brownie.network import gas_price
-from brownie.network.gas.strategies import LinearScalingStrategy
 import json
 import time
 
-import scripts.addresses as addresses
+from scripts import addresses
+from scripts.helper import gas_strategy
 
 
-gas_strategy = LinearScalingStrategy('60 gwei', '150 gwei', 1.3)
 gas_price(gas_strategy)
 
 
