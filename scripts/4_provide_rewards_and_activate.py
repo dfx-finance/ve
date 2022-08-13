@@ -68,7 +68,7 @@ def main():
         'totalRewards': dfx.balanceOf(distributor),
         'distributionsOn': distributor.distributionsOn(),
     }
-    with open(f'./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json', 'w') as output_f:
+    with open(f'./scripts/provided_rewards_and_activated_{int(time.time())}.json', 'w') as output_f:
         json.dump(output_data, output_f, indent=4)
 
 
