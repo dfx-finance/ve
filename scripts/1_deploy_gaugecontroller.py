@@ -1,14 +1,12 @@
 #!/usr/bin/env python
-import json
-
 from brownie import ZERO_ADDRESS, GaugeController, VeBoostProxy, accounts
 from brownie.network import gas_price
+import json
 import time
 
 from scripts import addresses
 from scripts.helper import gas_strategy
 
-USE_LATEST_JSON = True
 DEFAULT_GAUGE_TYPE_NAME = 'DFX AMM Liquidity'
 DEPLOYED_GAUGE_ADDRESSES = [
     ('CADC_USDC', None),
@@ -22,7 +20,6 @@ DEPLOYED_GAUGE_ADDRESSES = [
 DEFAULT_TYPE_WEIGHT = 1e18
 
 gas_price(gas_strategy)
-
 
 output_data = {'veBoostProxy': None, 'gaugeController': None}
 

@@ -7,10 +7,8 @@ from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy, accounts
 from scripts import addresses
 from scripts.helper import gas_strategy, get_json_address
 
-
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
-
 
 output_data = {'distributor': {'logic': None, 'proxy': None}}
 
@@ -20,7 +18,7 @@ def main():
         'Script 2 of 4:\n\n'
         'NOTE: This script expects configuration for:\n'
         '\t1. GaugeController address\n'
-        '\t2. DFX token rewards per second as `rate`\n'
+        '\t2. DFX token rewards per second\n'
         '\t3. Total amount of previously distributed rewards\n'
         '\t4. Governor and Guardian addresses'
     ))

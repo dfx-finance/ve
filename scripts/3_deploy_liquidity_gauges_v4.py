@@ -14,6 +14,8 @@ gas_price(gas_strategy)
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
 
+output_data = {'gauges': {'amm': {}}}
+
 
 def main():
     print((
@@ -47,7 +49,7 @@ def main():
         ('XIDR_USDC', addresses.DFX_XIDR_USDC_LP),
         ('XSGD_USDC', addresses.DFX_XSGD_USDC_LP),
     ]
-    output_data = {'gauges': {'amm': {}}}
+
     for label, lp_addr in lp_addresses:
         # deploy gauge logic
         gauge = LiquidityGaugeV4.deploy(
