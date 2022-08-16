@@ -1,4 +1,4 @@
-# @version 0.3.3
+# @version 0.3.6
 """
 @title Liquidity Gauge v4
 @author DFX Finance

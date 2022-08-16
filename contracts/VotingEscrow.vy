@@ -1,4 +1,4 @@
-# @version 0.3.3
+# @version 0.3.6
 """
 @title Voting Escrow
 @author Curve Finance
