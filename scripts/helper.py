@@ -4,8 +4,10 @@ import json
 import operator
 import os
 
-from brownie import network, accounts, config
+from brownie import Contract, network, accounts, config
 from brownie.network.gas.strategies import LinearScalingStrategy
+
+from scripts import addresses
 
 
 NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = [
@@ -94,3 +96,8 @@ def get_json_address(fn_predicate, keys):
         with open(os.path.join('./scripts', addresses_fn), 'r') as json_f:
             json_data = json.load(json_f)
             return reduce(operator.getitem, keys, json_data)
+
+
+def load_dfx_token():
+    abi = json.load(open('./tests/abis/Dfx.json'))
+    return Contract.from_abi('DFX', addresses.DFX, abi)

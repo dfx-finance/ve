@@ -1,22 +1,16 @@
 #!/usr/bin/env python
 import brownie
-from brownie import accounts, Contract
-from brownie.network.web3 import web3
+from brownie import accounts
 import json
 import time
 
 from scripts import addresses
-from scripts.helper import gas_strategy, get_json_address
+from scripts.helper import gas_strategy, get_json_address, load_dfx_token
 
 REWARDS_RATE = 1.60345055442863e16
 TOTAL_DFX_REWARDS = 1_248_560 * 1e18
 
 output_data = {'distributor': {'proxy': None, 'distributionsOn': None}}
-
-
-def load_dfx_token():
-    abi = json.load(open('./tests/abis/Dfx.json'))
-    return Contract.from_abi('DFX', addresses.DFX, abi)
 
 
 def send_dfx(dfx, amount, from_account, to_account):
@@ -41,8 +35,7 @@ def main():
     dfx_distributor_address = get_json_address(
         'deployed_distributor', ['distributor', 'proxy'])
 
-    distributor = brownie.interface.IDfxDistributor(
-        dfx_distributor_address)
+    distributor = brownie.interface.IDfxDistributor(dfx_distributor_address)
 
     # unlock multisig account
     brownie.rpc.unlock_account(addresses.DFX_MULTISIG)
