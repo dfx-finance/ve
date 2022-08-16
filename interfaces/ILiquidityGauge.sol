@@ -4,7 +4,7 @@ pragma solidity ^0.8.7;
 
 interface ILiquidityGauge {
     // solhint-disable-next-line
-    function staking_token() external returns (address stakingToken);
+    function staking_token() external view returns (address stakingToken);
 
     // solhint-disable-next-line
     function deposit_reward_token(address _rewardToken, uint256 _amount) external;
