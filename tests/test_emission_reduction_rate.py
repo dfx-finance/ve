@@ -84,4 +84,4 @@ def test_full_distribution(dfx, three_liquidity_gauges_v4, distributor, master_a
         assert total_distributed == calculatedDistributed
         assert (TOTAL_DFX_REWARDS - distributor_balance) == actuallyDistributed
 
-        fastforward_chain(WEEK)
+        fastforward_chain(num_weeks=1, delta=0)

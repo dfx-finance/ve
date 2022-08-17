@@ -63,7 +63,7 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
         assert euroc_usdc_gauge.claimable_reward(
             master_account, addresses.DFX) == expected_rewards[i]
 
-        fastforward_chain(WEEK)
+        fastforward_chain(num_weeks=1, delta=0)
 
     # claim staking reward
     reward_amount = euroc_usdc_gauge.claimable_reward(

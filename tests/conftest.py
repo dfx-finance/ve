@@ -5,6 +5,7 @@ import pytest
 
 import addresses
 from utils import gas_strategy
+from utils_chain import fastforward_chain
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -79,6 +80,8 @@ def gauge_controller(GaugeController, dfx, voting_escrow, master_account):
 
 @pytest.fixture(scope='module')
 def distributor(DfxDistributor, DfxUpgradeableProxy, gauge_controller, master_account, new_master_account):
+    fastforward_chain(num_weeks=0, delta=0)
+
     # Deploy DfxDistributor logic
     dfx_distributor = DfxDistributor.deploy(
         {'from': master_account, 'gas_price': gas_strategy})

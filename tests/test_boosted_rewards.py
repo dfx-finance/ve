@@ -76,19 +76,17 @@ def test_multi_user_stake(dfx, mock_lp_tokens, voting_escrow, three_liquidity_ga
 
     # set chain to 10s before the week change (during epoch 1) and
     # distribute available reward to gauges
-    t0 = chain.time()
     assert distributor.miningEpoch() == 0
 
-    t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
-    chain.sleep(t1 - t0)
+    fastforward_chain(num_weeks=2, delta=-10)
     distributor.distributeRewardToMultipleGauges(
         three_liquidity_gauges_v4, {'from': master_account, 'gas_price': gas_strategy})
     assert distributor.miningEpoch() == 1
 
     # advance chain to 5h10s before next epoch change
-    chain.sleep(WEEK - 5*60*60)
-    t2 = chain.time()
-    deposit_to_ve(dfx, voting_escrow, [user_0], [2.5e23], [208], t2)
+    fastforward_chain(num_weeks=1, delta=-5*60*60-10)
+    now = chain.time()
+    deposit_to_ve(dfx, voting_escrow, [user_0], [2.5e23], [208], now)
     submit_ve_vote(gauge_controller, three_liquidity_gauges_v4,
                    [0, 10000, 0], user_0)
 
@@ -103,8 +101,7 @@ def test_multi_user_stake(dfx, mock_lp_tokens, voting_escrow, three_liquidity_ga
     assert distributor.miningEpoch() == 1
 
     # 10s before next epoch (3) begins
-    t3 = (t2 + WEEK) // WEEK * WEEK - 10
-    fastforward_chain(t3 - t2)
+    fastforward_chain(num_weeks=1, delta=-1)
 
     # test next 5 epochs between naked and boosted rewards
     for i in range(5):
@@ -124,4 +121,4 @@ def test_multi_user_stake(dfx, mock_lp_tokens, voting_escrow, three_liquidity_ga
             user_0, addresses.DFX) // 1e18) == user0_rewards
         assert int(euroc_usdc_gauge.claimable_reward(
             user_1, addresses.DFX) // 1e18) == user1_rewards
-        fastforward_chain(WEEK)
+        fastforward_chain(num_weeks=1, delta=0)

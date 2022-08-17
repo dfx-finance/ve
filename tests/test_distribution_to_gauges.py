@@ -57,7 +57,7 @@ def test_distribute_rewards(dfx, gauge_controller, distributor, three_liquidity_
         three_liquidity_gauges_v4[1], 1.1 * 1e18, {'from': master_account, 'gas_price': gas_strategy})
 
     for _ in range(10):
-        fastforward_chain(WEEK)
+        fastforward_chain(num_weeks=1, delta=0)
 
         # Gauge distributions
         distribute_logs = _distribute_to_all_gauges(
