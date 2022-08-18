@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 from brownie.network.gas.strategies import LinearScalingStrategy
 
-from utils import mint_dfx, send_dfx
-from utils_ve import TOTAL_DFX_REWARDS
+from .token import mint_dfx, send_dfx, gas_strategy
+from .ve import TOTAL_DFX_REWARDS
 
 DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
 DEFAULT_TYPE_WEIGHT = 1e18
 DEFAULT_GAUGE_WEIGHT = 1e18
-
-
-# Setting gas price is always necessary for deploy
-# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('30 gwei', '250 gwei', 1.3)
 
 
 def setup_gauge_controller(gauge_controller, gauges, master_account):

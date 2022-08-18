@@ -3,9 +3,9 @@ from brownie import ZERO_ADDRESS, Contract, network
 import json
 import pytest
 
-import addresses
-from utils import gas_strategy
-from utils_chain import fastforward_chain
+from utils import addresses
+from utils.chain import fastforward_chain
+from utils.token import gas_strategy
 
 
 @pytest.fixture(scope='session', autouse=True)

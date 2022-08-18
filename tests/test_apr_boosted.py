@@ -4,8 +4,7 @@ from brownie import accounts
 from math import isclose
 import pytest
 
-from utils import fund_multisig
-from utils_apr import (
+from utils.apr import (
     calc_boosted_apr,
     claimable_rewards,
     distribute_to_gauges,
@@ -13,9 +12,10 @@ from utils_apr import (
     mint_lp_tokens,
     mint_vedfx_and_vote,
 )
-from utils_chain import fastforward_chain
-from utils_gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils_ve import EMISSION_RATE
+from utils.chain import fastforward_chain
+from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
+from utils.token import fund_multisig
+from utils.ve import EMISSION_RATE
 
 
 # handle setup logic required for each unit test

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from brownie.network.gas.strategies import LinearScalingStrategy
 
-import addresses
+from . import addresses
 
 
 # Setting gas price is always necessary for deploy

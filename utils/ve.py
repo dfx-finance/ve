@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from utils import gas_strategy
+from .token import gas_strategy
 
 WEEK = 86400 * 7
 EMISSION_RATE = 1.60345055442863e16

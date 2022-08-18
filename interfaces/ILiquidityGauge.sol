@@ -3,6 +3,10 @@
 pragma solidity ^0.8.7;
 
 interface ILiquidityGauge {
+    function balanceOf(address _addr) external view returns (uint256 amount);
+
+    function totalSupply() external view returns (uint256 amount);
+
     // solhint-disable-next-line
     function staking_token() external view returns (address stakingToken);
 

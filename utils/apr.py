@@ -3,8 +3,8 @@ import brownie
 from datetime import datetime
 import math
 
-from utils import mint_dfx, gas_strategy
-from utils_ve import deposit_to_ve, submit_ve_vote, WEEK
+from .token import mint_dfx, gas_strategy
+from .ve import deposit_to_ve, submit_ve_vote, WEEK
 
 EPOCHS_PER_YEAR = math.floor((365 * 24 * 60 * 60) / WEEK)
 DFX_PRICE = 0.554326

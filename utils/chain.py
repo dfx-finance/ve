@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import brownie
 
-from utils_ve import WEEK
+from .ve import WEEK
 
 
 # Fast-forwards chain state to delta (seconds) after (or before if negative)

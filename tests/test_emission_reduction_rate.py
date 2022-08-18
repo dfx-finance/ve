@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 import brownie
 import pytest
 
-from utils import fund_multisig, gas_strategy
-from utils_chain import fastforward_chain
-from utils_gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
-from utils_ve import EMISSION_RATE, WEEK
+from utils.chain import fastforward_chain
+from utils.gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
+from utils.token import fund_multisig, gas_strategy
+from utils.ve import EMISSION_RATE, WEEK
 
 
 # handle setup logic required for each unit test
