@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import brownie
 from brownie import accounts
-from datetime import datetime
 import pytest
 
 import addresses

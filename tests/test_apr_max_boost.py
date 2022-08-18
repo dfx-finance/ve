@@ -4,7 +4,6 @@ from brownie import accounts
 from math import isclose
 import pytest
 
-import addresses
 from utils import fund_multisig, mint_dfx, gas_strategy
 from utils_apr import (
     calc_boosted_apr,

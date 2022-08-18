@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from math import isclose
 import brownie
 from brownie import accounts
+from math import isclose
 import pytest
 
 from utils import fund_multisig

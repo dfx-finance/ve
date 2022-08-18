@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from cmath import isclose
 import brownie
+from math import isclose
 import pytest
 
 import addresses
