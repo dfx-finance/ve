@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+from cmath import isclose
 import brownie
 import pytest
 
 import addresses
-from utils import fastforward_chain, fund_multisig, assert_tokens_balance, gas_strategy
+from utils import fund_multisig, assert_tokens_balance, gas_strategy
+from utils_chain import fastforward_chain
 from utils_gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils_ve import EMISSION_RATE, WEEK
 
@@ -60,15 +62,15 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
         distributor.distributeRewardToMultipleGauges(
             three_liquidity_gauges_v4, {'from': master_account, 'gas_price': gas_strategy})
 
-        assert euroc_usdc_gauge.claimable_reward(
-            master_account, addresses.DFX) == expected_rewards[i]
+        assert isclose(euroc_usdc_gauge.claimable_reward(
+            master_account, addresses.DFX), expected_rewards[i], abs_tol=1e16)
 
-        fastforward_chain(num_weeks=1, delta=0)
+        fastforward_chain(num_weeks=1, delta=10)
 
     # claim staking reward
     reward_amount = euroc_usdc_gauge.claimable_reward(
         master_account, addresses.DFX)
     euroc_usdc_gauge.claim_rewards(
         master_account, {'from': master_account, 'gas_price': gas_strategy})
-    assert (dfx.balanceOf(master_account) -
-            starting_dfx_balance) == reward_amount
+    assert isclose(dfx.balanceOf(master_account) -
+                   starting_dfx_balance, reward_amount, abs_tol=1e16)

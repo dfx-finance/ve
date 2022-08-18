@@ -4,7 +4,8 @@ import pytest
 
 import brownie
 
-from utils import fastforward_chain, fund_multisig, gas_strategy
+from utils import fund_multisig, gas_strategy
+from utils_chain import fastforward_chain
 from utils_gauges import setup_distributor, setup_gauge_controller
 from utils_ve import WEEK
 

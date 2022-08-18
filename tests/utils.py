@@ -16,19 +16,13 @@ def fund_multisig(account):
 
 
 def mint_dfx(dfx, amount, account):
-    print("Account DFX balance (pre-mint):",
-          dfx.balanceOf(account) / 1e18)
     dfx.mint(account, amount,
              {'from': addresses.DFX_MULTISIG, 'gas_price': gas_strategy})
-    print("Account DFX balance (post-mint):",
-          dfx.balanceOf(account) / 1e18)
 
 
 def send_dfx(dfx, amount, from_account, to_account):
     dfx.transfer(to_account, amount, {
                  'from': from_account, 'gas_price': gas_strategy})
-    print("Sender account DFX balance:",
-          dfx.balanceOf(from_account) / 1e18)
 
 
 def assert_tokens_balance(tokens, account, amount):

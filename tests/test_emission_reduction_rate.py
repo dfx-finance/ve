@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 import brownie
 import pytest
 
-from utils import fastforward_chain, fund_multisig, gas_strategy
+from utils import fund_multisig, gas_strategy
+from utils_chain import fastforward_chain
 from utils_gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
 from utils_ve import EMISSION_RATE, WEEK
 
@@ -84,4 +85,4 @@ def test_full_distribution(dfx, three_liquidity_gauges_v4, distributor, master_a
         assert total_distributed == calculatedDistributed
         assert (TOTAL_DFX_REWARDS - distributor_balance) == actuallyDistributed
 
-        fastforward_chain(num_weeks=1, delta=0)
+        fastforward_chain(num_weeks=1, delta=10)

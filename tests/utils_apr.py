@@ -1,0 +1,158 @@
+#!/usr/bin/env python
+import brownie
+from datetime import datetime
+import math
+
+from utils import mint_dfx, gas_strategy
+from utils_ve import deposit_to_ve, submit_ve_vote, WEEK
+
+EPOCHS_PER_YEAR = math.floor((365 * 24 * 60 * 60) / WEEK)
+DFX_PRICE = 0.554326
+LP_PRICE = 1.00452
+TOKENLESS_PRODUCTION = 40  # %, as hardcoded in contract
+
+
+# Print current chain time and epoch
+def log_times(distributor, stage):
+    now = brownie.chain.time()
+    print(f"{stage} -- chain time:", datetime.fromtimestamp(now))
+    print(f"{stage} -- current epoch:", distributor.miningEpoch())
+
+
+def get_euro_usdc_gauge(mock_lp_tokens, three_liquidity_gauges_v4):
+    euroc_usdc_lp = mock_lp_tokens[1]
+    euroc_usdc_gauge = three_liquidity_gauges_v4[1]
+    assert 'euroc' in euroc_usdc_lp.name().lower()
+    assert 'euroc' in euroc_usdc_gauge.name().lower()
+    return euroc_usdc_lp, euroc_usdc_gauge
+
+
+# mint lp tokens for the users (default: 10,000)
+def mint_lp_tokens(euroc_usdc_lp, users, signer_account, amount=10e21):
+    for user in users:
+        euroc_usdc_lp.mint(user, amount, {
+            'from': signer_account, 'gas_price': gas_strategy})
+        assert euroc_usdc_lp.balanceOf(user) == amount
+
+
+def mint_vedfx_and_vote(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, voted_gauge, account, amount=1e5):
+    mint_dfx(dfx, amount * 1e18, account)
+    lock_timestamp = brownie.chain.time()
+    deposit_to_ve(dfx, voting_escrow, [account],
+                  [1e21], [100], lock_timestamp)
+    # Place votes in bps (10000 = 100.00%)
+    submit_ve_vote(gauge_controller, three_liquidity_gauges_v4,
+                   [0, 10000, 0], account)
+    assert gauge_controller.vote_user_power(account) == 10000
+    voted_gauge.user_checkpoint(
+        account, {'from': account, 'gas_price': gas_strategy})
+
+
+# Distribute rewards to all registered gauges and return balances
+def distribute_to_gauges(dfx, distributor, gauges, account, assertions):
+    distributor.distributeRewardToMultipleGauges(
+        gauges, {'from': account, 'gas_price': gas_strategy})
+    balances = {g: dfx.balanceOf(g) for g in gauges}
+    for g, expected_balance in assertions.items():
+        try:
+            assert balances[g] == expected_balance
+        except Exception as e:
+            print(f"{balances[g]} != {expected_balance}")
+            raise e
+    return balances
+
+
+# Fetch relative weights of all registered gauges
+def gauge_relative_weights(gauge_controller, gauges):
+    weights = {}
+    for g in gauges:
+        weights[g] = gauge_controller.gauge_relative_weight(g)
+    return weights
+
+
+# Fetch the available rewards to claim for all users
+def claimable_rewards(dfx, gauge, users):
+    rewards = {}
+    total = 0
+    for u in users:
+        amount = gauge.claimable_reward(u, dfx.address)
+        rewards[u] = amount
+        total += amount
+    rewards['combined'] = dfx.balanceOf(gauge)
+    return rewards
+
+
+def claim_rewards(gauge, reward_address, users, signer_account):
+    rewards = {}
+    total = 0
+    for u in users:
+        gauge.claim_rewards(
+            u, {'from': signer_account, 'gas_price': gas_strategy})
+        amount = gauge.claimed_reward(u, reward_address)
+        rewards[u] = amount
+        total += amount
+    rewards['combined'] = total
+    return rewards
+
+
+def calc_theoretical_rewards(distributor, gauge_weight):
+    global_rewards = distributor.rate() * WEEK
+    gauge_rewards = global_rewards * gauge_weight / 1e18
+    return global_rewards, gauge_rewards
+
+
+# boosted_weight = (gauge_lp_balance * 40/100) + \
+#     (gauge_lp_total * voting_balance / voting_total * (100-40)/100)
+def calc_earning_weight(lp_balance, lp_total, voting_balance, voting_total):
+    lim = lp_balance * TOKENLESS_PRODUCTION / 100
+    if voting_total > 0:
+        lim += lp_total * voting_balance / \
+            voting_total * (100 - TOKENLESS_PRODUCTION) / 100
+    return min(lp_balance, lim)
+
+
+# https://resources.curve.fi/reward-gauges/boosting-your-crv-rewards
+# https://gov.balanced.network/t/baln-token-economics-enhancement-bbaln/161
+def calc_boosted_apr(voting_escrow, veboost_proxy, gauge, account, available_rewards):
+    gauge_lp_balance = gauge.balanceOf(account)
+    gauge_lp_total = gauge.totalSupply()
+    voting_balance = veboost_proxy.adjusted_balance_of(account)
+    voting_total = voting_escrow.totalSupply()
+
+    earning_weight = calc_earning_weight(
+        gauge_lp_balance, gauge_lp_total, voting_balance, voting_total)
+
+    boosted_rewards_weight = earning_weight / gauge_lp_total
+    boosted_rewards = boosted_rewards_weight * available_rewards
+    yearly_rewards = boosted_rewards * EPOCHS_PER_YEAR
+    if gauge_lp_balance:
+        return (yearly_rewards * DFX_PRICE) / (gauge_lp_balance * LP_PRICE)
+    return 0
+
+
+# boosted_weight = (gauge_lp_balance * 40/100) + \
+#     (gauge_lp_total * voting_balance / voting_total * (100-40)/100)
+def calc_required_vedfx(voting_escrow, veboost_proxy, gauge, account):
+    gauge_lp_balance = gauge.balanceOf(account)
+    gauge_lp_total = gauge.totalSupply()
+    voting_balance = veboost_proxy.adjusted_balance_of(account)
+    voting_total = voting_escrow.totalSupply()
+
+    earning_weight = calc_earning_weight(
+        gauge_lp_balance, gauge_lp_total, voting_balance, voting_total)
+
+    additional_vedfx = 0
+    while True:
+        if earning_weight < gauge_lp_balance:
+            a = gauge_lp_balance - \
+                (gauge_lp_balance * TOKENLESS_PRODUCTION/100)
+            b = (a / (100-TOKENLESS_PRODUCTION)/100) / \
+                voting_total * gauge_lp_total
+            additional_vedfx += b
+            voting_balance += b
+            voting_total += b
+            earning_weight = calc_earning_weight(
+                gauge_lp_balance, gauge_lp_total, voting_balance, voting_total)
+        else:
+            break
+    return additional_vedfx
