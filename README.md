@@ -75,7 +75,6 @@ Or to run a single test with debug messages:
 $ brownie run 1_deploy_gaugecontroller.py
 $ brownie run 2_deploy_distributor.py
 $ brownie run 3_deploy_liquidity_gauges_v4.py
-$ brownie run 4_provide_rewards_and_activate.py
 ```
 
 6. **Operation:** Check status

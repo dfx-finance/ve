@@ -1,12 +1,6 @@
 #!/usr/bin/env python
-from brownie.network.gas.strategies import LinearScalingStrategy
-
 from . import addresses
-
-
-# Setting gas price is always necessary for deploy
-# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('30 gwei', '250 gwei', 1.3)
+from .chain import gas_strategy
 
 
 def fund_multisig(account):

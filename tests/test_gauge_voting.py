@@ -5,9 +5,11 @@ from brownie import chain, history
 import brownie
 import pytest
 
+from utils.chain import gas_strategy
+from utils.constants import WEEK
 from utils.gauges import setup_gauge_controller
-from utils.token import fund_multisig, mint_dfx, send_dfx, gas_strategy
-from utils.ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data, WEEK
+from utils.token import fund_multisig, mint_dfx, send_dfx
+from utils.ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data
 
 
 # handle setup logic required for each unit test

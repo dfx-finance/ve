@@ -1,13 +1,12 @@
 #!/usr/bin/env python
+import brownie
 from datetime import datetime
 import pytest
 
-import brownie
-
-from utils.chain import fastforward_chain
+from utils.chain import fastforward_chain, gas_strategy
+from utils.constants import EMISSION_RATE
 from utils.gauges import setup_distributor, setup_gauge_controller
-from utils.token import fund_multisig, gas_strategy
-from utils.ve import EMISSION_RATE
+from utils.token import fund_multisig
 
 
 # handle setup logic required for each unit test

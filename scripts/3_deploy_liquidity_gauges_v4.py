@@ -56,7 +56,6 @@ def main():
             {'from': acct, 'gas_price': gas_strategy})
 
         # deploy gauge behind proxy
-        # NOTE: do we also want this for DFX? Why?
         gauge_initializer_calldata = gauge.initialize.encode_input(
             lp_addr,
             addresses.DFX_MULTISIG,

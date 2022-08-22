@@ -12,10 +12,11 @@ from utils.apr import (
     get_euro_usdc_gauge,
     mint_lp_tokens
 )
-from utils.chain import fastforward_chain
+from utils.chain import fastforward_chain, gas_strategy
+from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.token import fund_multisig, mint_dfx, gas_strategy
-from utils.ve import deposit_to_ve, submit_ve_vote, EMISSION_RATE
+from utils.token import fund_multisig, mint_dfx
+from utils.ve import deposit_to_ve, submit_ve_vote
 
 
 # handle setup logic required for each unit test

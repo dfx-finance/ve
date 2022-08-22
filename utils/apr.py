@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 import brownie
 from datetime import datetime
-import math
 
-from .token import mint_dfx, gas_strategy
-from .ve import deposit_to_ve, submit_ve_vote, WEEK
-
-EPOCHS_PER_YEAR = math.floor((365 * 24 * 60 * 60) / WEEK)
-DFX_PRICE = 0.554326
-LP_PRICE = 1.00452
-TOKENLESS_PRODUCTION = 40  # %, as hardcoded in contract
+from .chain import gas_strategy
+from .constants import WEEK, EPOCHS_PER_YEAR, TOKENLESS_PRODUCTION, DFX_PRICE, LP_PRICE
+from .token import mint_dfx
+from .ve import deposit_to_ve, submit_ve_vote
 
 
 # Print current chain time and epoch

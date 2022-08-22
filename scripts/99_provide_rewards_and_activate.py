@@ -41,7 +41,7 @@ def main():
     brownie.rpc.unlock_account(addresses.DFX_MULTISIG)
 
     # provide multisig with ether
-    acct.transfer(addresses.DFX_MULTISIG, "1 ether")
+    acct.transfer(addresses.DFX_MULTISIG, "2 ether", gas_price=gas_strategy)
 
     # Distribute rewards to the distributor contract
     send_dfx(dfx, TOTAL_DFX_REWARDS, addresses.DFX_MULTISIG, distributor)

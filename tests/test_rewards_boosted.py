@@ -5,10 +5,10 @@ import pytest
 
 from utils import addresses
 from utils.apr import get_euro_usdc_gauge, mint_lp_tokens, mint_vedfx_and_vote
-from utils.chain import fastforward_chain
+from utils.chain import fastforward_chain, gas_strategy
+from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.token import fund_multisig, gas_strategy
-from utils.ve import EMISSION_RATE
+from utils.token import fund_multisig
 
 
 # handle setup logic required for each unit test

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-from brownie.network.gas.strategies import LinearScalingStrategy
-
-from .token import mint_dfx, send_dfx, gas_strategy
-from .ve import TOTAL_DFX_REWARDS
-
-DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
-DEFAULT_TYPE_WEIGHT = 1e18
-DEFAULT_GAUGE_WEIGHT = 1e18
+from .chain import gas_strategy
+from .token import mint_dfx, send_dfx
+from .constants import (
+    DEFAULT_GAUGE_TYPE,
+    DEFAULT_GAUGE_WEIGHT,
+    DEFAULT_TYPE_WEIGHT,
+    TOTAL_DFX_REWARDS
+)
 
 
 def setup_gauge_controller(gauge_controller, gauges, master_account):

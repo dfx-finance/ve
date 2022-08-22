@@ -1,13 +1,12 @@
 #!/usr/bin/env python
-from brownie import chain
-from datetime import datetime, timedelta
 import brownie
+from datetime import datetime, timedelta
 import pytest
 
-from utils.chain import fastforward_chain
+from utils.chain import fastforward_chain, gas_strategy
+from utils.constants import EMISSION_RATE, WEEK
 from utils.gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
-from utils.token import fund_multisig, gas_strategy
-from utils.ve import EMISSION_RATE, WEEK
+from utils.token import fund_multisig
 
 
 # handle setup logic required for each unit test
@@ -59,9 +58,9 @@ def test_full_distribution(dfx, three_liquidity_gauges_v4, distributor, master_a
     ]
 
     # init 10s before the week change
-    t0 = chain.time()
+    t0 = brownie.chain.time()
     t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
-    chain.sleep(t1 - t0)
+    brownie.chain.sleep(t1 - t0)
 
     # assert advancing 1 week after deployment plus some # of days until wednesday before new epoch
     assert 7 < timedelta(seconds=t1 - t0).days < 14

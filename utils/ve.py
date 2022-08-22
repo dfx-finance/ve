@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-from .token import gas_strategy
-
-WEEK = 86400 * 7
-EMISSION_RATE = 1.60345055442863e16
-TOTAL_DFX_REWARDS = 1_248_560 * 1e18
+from .chain import gas_strategy
+from .constants import WEEK
 
 
 def deposit_to_ve(dfx, voting_escrow, user_accounts, st_deposits, st_length, timestamp):

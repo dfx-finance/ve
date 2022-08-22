@@ -45,7 +45,6 @@ def main():
         addresses.DFX_MULTISIG,  # guardian
         ZERO_ADDRESS   # delegate gauge for pulling type 2 gauge rewards
     )
-
     dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
         fake_multisig,

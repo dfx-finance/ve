@@ -13,9 +13,9 @@ from utils.apr import (
     mint_vedfx_and_vote,
 )
 from utils.chain import fastforward_chain
+from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.token import fund_multisig
-from utils.ve import EMISSION_RATE
 
 
 # handle setup logic required for each unit test
