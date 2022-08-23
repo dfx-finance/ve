@@ -19,7 +19,7 @@ output_data = {'gauges': {'amm': {}}}
 
 def main():
     print((
-        'Script 3 of 4:\n\n'
+        'Script 3 of 3:\n\n'
         'NOTE: This script expects configuration for:\n'
         '\t1. VeBoostProxy address\n'
         '\t2. DfxDistributor address\n'
