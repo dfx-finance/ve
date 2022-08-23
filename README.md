@@ -30,7 +30,9 @@ $ pip install -r requirements.txt
 $ npm install ganache (*)
 ```
 
-_\*Due to difficulties with ganache, `yarn hh:node` is now being used from the `frontend-monorepo`. Hardhat is able to use the same settings as `anvil` contained in these scripts._
+_\*Due to difficulties with ganache, `yarn hh:node` is now being used from the `frontend-monorepo`. Hardhat is able to use the same settings as `anvil` contained in these scripts. Edit: It appears that while Brownie may be able to launch and interact with Anvil using default settings,
+it is not able to attach to instances running independently. This is evidenced [here](https://github.com/eth-brownie/brownie/blob/4ae5f527ea86eb95766fe225a0f67620ffd36022/brownie/network/rpc/__init__.py#L23); when this is updated in brownie's source, we may then be able
+to use it for local testing as a drop-in for hardhat on this repo_
 
 ```
 $ brownie pm install OpenZeppelin/openzeppelin-contracts@4.5.0
