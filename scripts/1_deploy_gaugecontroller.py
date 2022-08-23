@@ -31,7 +31,7 @@ def main():
         '\t1. VotingEscrow (VeDFX) contract address'
     ))
 
-    acct = accounts.load('anvil')
+    acct = accounts.load('hardhat')
 
     print('--- Deploying VeBoostProxy contract to Ethereum mainnet ---')
     # (votingEscrow address, delegation address, admin address)

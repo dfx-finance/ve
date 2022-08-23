@@ -26,7 +26,7 @@ def main():
         '\t3. GaugeController address'
     ))
 
-    acct = accounts.load('anvil')
+    acct = accounts.load('hardhat')
     fake_multisig = accounts[1]
 
     ve_boost_proxy_address = get_json_address(

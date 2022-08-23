@@ -22,7 +22,7 @@ def main():
         '\t3. Total amount of previously distributed rewards\n'
         '\t4. Governor and Guardian addresses'
     ))
-    acct = accounts.load('anvil')
+    acct = accounts.load('hardhat')
     fake_multisig = accounts[1]
 
     gauge_controller_address = get_json_address(
