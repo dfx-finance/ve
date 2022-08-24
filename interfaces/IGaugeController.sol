@@ -15,4 +15,6 @@ interface IGaugeController {
     function add_gauge(address addr, int128 gauge_type) external;
 
     function add_gauge(address addr, int128 gauge_type, uint256 weight) external;
+
+    function add_type(string memory _name, uint256 weight) external;
 }

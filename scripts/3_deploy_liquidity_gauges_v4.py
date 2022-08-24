@@ -32,7 +32,7 @@ def main():
     ve_boost_proxy_address = get_json_address(
         'deployed_gaugecontroller', ['veBoostProxy'])
     gauge_controller_address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
+        'deployed_gaugecontroller', ['gaugeController', 'proxy'])
     dfx_distributor_address = get_json_address(
         'deployed_distributor', ['distributor', 'proxy'])
 
@@ -64,7 +64,7 @@ def main():
             ve_boost_proxy_address,
             dfx_distributor_address,
         )
-        dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
+        gauge_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
             fake_multisig,
             gauge_initializer_calldata,
@@ -72,11 +72,11 @@ def main():
         )
 
         gauge_controller.add_gauge(
-            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': acct, 'gas_price': gas_strategy})
+            gauge_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': acct, 'gas_price': gas_strategy})
 
         output_data['gauges']['amm'][label] = {
             'logic': gauge.address,
-            'proxy': dfx_upgradeable_proxy.address,
+            'proxy': gauge_proxy.address,
         }
 
     with open(f'./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json', 'w') as output_f:

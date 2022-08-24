@@ -26,7 +26,7 @@ def main():
     fake_multisig = accounts[1]
 
     gauge_controller_address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
+        'deployed_gaugecontroller', ['gaugeController', 'proxy'])
     if not gauge_controller_address:
         return FileNotFoundError('No GaugeController deployments found')
 
@@ -45,13 +45,13 @@ def main():
         addresses.DFX_MULTISIG,  # guardian
         ZERO_ADDRESS   # delegate gauge for pulling type 2 gauge rewards
     )
-    dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
+    dfx_distributor_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
         fake_multisig,
         distributor_initializer_calldata,
         {'from': acct, 'gas_price': gas_strategy},
     )
-    output_data['distributor']['proxy'] = dfx_upgradable_proxy.address
+    output_data['distributor']['proxy'] = dfx_distributor_proxy.address
 
     # Write output to file
     with open(f'./scripts/deployed_distributor_{int(time.time())}.json', 'w') as output_f:
