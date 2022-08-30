@@ -27,10 +27,11 @@ $ python3 -m venv ve-venv
 ```bash
 $ . ve-venv/bin/activate
 $ pip install -r requirements.txt
-$ npm install ganache (*)
 ```
 
-_\*Due to difficulties with ganache, `yarn hh:node` is now being used from the `frontend-monorepo`. Hardhat is able to use the same settings as `anvil` contained in these scripts._
+_\*Due to difficulties with ganache, `yarn hh:node` is now being used from the `frontend-monorepo`. Hardhat is able to use the same settings as `anvil` contained in these scripts. Edit: It appears that while Brownie may be able to launch and interact with Anvil using default settings,
+it is not able to attach to instances running independently. This is evidenced [here](https://github.com/eth-brownie/brownie/blob/4ae5f527ea86eb95766fe225a0f67620ffd36022/brownie/network/rpc/__init__.py#L23); when this is updated in brownie's source, we may then be able
+to use it for local testing as a drop-in for hardhat on this repo_
 
 ```
 $ brownie pm install OpenZeppelin/openzeppelin-contracts@4.5.0
@@ -48,7 +49,7 @@ Add remappings to VSCode's `settings.json` file for Solidity:
 ]
 ```
 
-3. Add ganache local private key to brownie (scripts will have to be adjusted accordingly, the default name used is `anvil`). Most likely this will be account 0 coming from the standard Hardhat mnemonic `test test test test test test test test test test test junk`.
+3. Add hardhat local private key to brownie (scripts will have to be adjusted accordingly, the default name used is `hardhat`). Most likely this will be account 0 coming from the standard Hardhat mnemonic `test test test test test test test test test test test junk`.
 
 ```bash
 $ brownie accounts new <account-name>
@@ -56,10 +57,18 @@ $ brownie accounts new <account-name>
 # Enter account password (blank)
 ```
 
-4. **Testing:**.py Run tests at block num 14957500
+4. **Testing:**.py Run tests at block num 15051000
+   Using hardhat node from frontend repo:
 
 ```bash
-(terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@14957500 --unlock 0x27E843260c71443b4CC8cB6bF226C3f77b9695AF
+(terminal 1: frontend-monorepo) $ yarn hh:node
+(terminal 2: ve) $ brownie test
+```
+
+or with ganache-cli:
+
+```bash
+(terminal 1) $ npm ganache -d --fork <ETH_RPC_URL>@15051000 --unlock 0x27E843260c71443b4CC8cB6bF226C3f77b9695AF
 (terminal 2) $ brownie test
 ```
 

@@ -19,14 +19,13 @@ output_data = {'gauges': {'amm': {}}}
 
 def main():
     print((
-        'Script 3 of 4:\n\n'
+        'Script 3 of 3:\n\n'
         'NOTE: This script expects configuration for:\n'
         '\t1. VeBoostProxy address\n'
         '\t2. DfxDistributor address\n'
         '\t3. GaugeController address'
     ))
-
-    acct = accounts.load('anvil')
+    acct = accounts.load('hardhat')
     fake_multisig = accounts[9]
 
     ve_boost_proxy_address = get_json_address(
