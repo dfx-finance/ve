@@ -27,7 +27,7 @@ def main():
     ))
 
     acct = accounts.load('anvil')
-    fake_multisig = accounts[1]
+    fake_multisig = accounts[9]
 
     ve_boost_proxy_address = get_json_address(
         'deployed_gaugecontroller', ['veBoostProxy'])

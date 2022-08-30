@@ -9,7 +9,6 @@ from utils.apr import calc_boosted_apr
 
 
 SECONDS_PER_YEAR = 365 * 24 * 60 * 60
-DFX_PRICE_USD = 0.60
 
 
 def main():

@@ -23,7 +23,7 @@ def main():
         '\t4. Governor and Guardian addresses'
     ))
     acct = accounts.load('anvil')
-    fake_multisig = accounts[1]
+    fake_multisig = accounts[9]
 
     gauge_controller_address = get_json_address(
         'deployed_gaugecontroller', ['gaugeController'])
