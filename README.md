@@ -16,13 +16,15 @@ Calculations on VE emissions: https://docs.google.com/spreadsheets/d/1k1yAvAW_a6
 
 #### External Audits
 
-Curve:
+##### Curve:
 
 1. https://curve.fi/files/00-ToB.pdf
 2. https://curve.fi/files/01-ToB.pdf
-   Angle:
-3. https://github.com/AngleProtocol/angle-core/blob/main/audits/Sigma%20Prime%20Audit%20Report%20July%2021.pdf
-4. https://github.com/AngleProtocol/angle-core/blob/main/audits/Chainsecurity%20Audit%20Report%20December%2021.pdf
+
+##### Angle:
+
+1. https://github.com/AngleProtocol/angle-core/blob/main/audits/Sigma%20Prime%20Audit%20Report%20July%2021.pdf
+2. https://github.com/AngleProtocol/angle-core/blob/main/audits/Chainsecurity%20Audit%20Report%20December%2021.pdf
 
 ### Getting started:
 
