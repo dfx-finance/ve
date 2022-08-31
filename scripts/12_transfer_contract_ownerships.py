@@ -19,12 +19,27 @@ def transfer_veboost_proxy(orig_addr, new_addr):
         new_addr, {'from': orig_addr, 'gas_price': gas_strategy})
     veboost_proxy.accept_transfer_ownership(
         {'from': new_addr, 'gas_price': gas_strategy})
-    print("VeBoostProxy transfer success:", new_addr == veboost_proxy.admin())
+    print(
+        f"VeBoostProxy transfer success: {veboost_proxy.admin() == new_addr}")
+
+
+def transfer_gauge_controller(orig_addr, new_addr):
+    gauge_controller_address = get_json_address(
+        'deployed_gaugecontroller', ['gaugeController'])
+    gauge_controller = brownie.interface.IGaugeController(
+        gauge_controller_address)
+    gauge_controller.commit_transfer_ownership(
+        new_addr, {'from': orig_addr, 'gas_price': gas_strategy})
+    gauge_controller.accept_transfer_ownership(
+        {'from': new_addr, 'gas_price': gas_strategy})
+    print(
+        f"GaugeController transfer success: {gauge_controller.admin() == new_addr}")
 
 
 def main():
     print('Transfer contracts...')
-    # transfer_veboost_proxy(DEPLOY_ACCT, NEW_MULTISIG_ADDRESS)
+    transfer_veboost_proxy(DEPLOY_ACCT, NEW_MULTISIG_ADDRESS)
+    transfer_gauge_controller(DEPLOY_ACCT, NEW_MULTISIG_ADDRESS)
 
 
 if __name__ == '__main__':
