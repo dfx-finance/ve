@@ -13,6 +13,8 @@ gas_price(gas_strategy)
 
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
+DEPLOY_ACCT = accounts.load('hardhat')
+PROXY_MULTISIG = accounts[8]
 
 output_data = {'gauges': {'amm': {}}}
 
@@ -25,8 +27,7 @@ def main():
         '\t2. DfxDistributor address\n'
         '\t3. GaugeController address'
     ))
-    acct = accounts.load('hardhat')
-    fake_multisig = accounts[9]
+    # fake_multisig = accounts[9]
 
     ve_boost_proxy_address = get_json_address(
         'deployed_gaugecontroller', ['veBoostProxy'])
@@ -52,7 +53,7 @@ def main():
     for label, lp_addr in lp_addresses:
         # deploy gauge logic
         gauge = LiquidityGaugeV4.deploy(
-            {'from': acct, 'gas_price': gas_strategy})
+            {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
         # deploy gauge behind proxy
         gauge_initializer_calldata = gauge.initialize.encode_input(
@@ -65,13 +66,13 @@ def main():
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
-            fake_multisig,
+            PROXY_MULTISIG,
             gauge_initializer_calldata,
-            {'from': acct, 'gas_price': gas_strategy},
+            {'from': DEPLOY_ACCT, 'gas_price': gas_strategy},
         )
 
         gauge_controller.add_gauge(
-            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': acct, 'gas_price': gas_strategy})
+            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
         output_data['gauges']['amm'][label] = {
             'logic': gauge.address,
