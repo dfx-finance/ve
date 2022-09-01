@@ -1,9 +1,5 @@
-/** @type import('hardhat/config').HardhatUserConfig */
 
 require("dotenv").config(); // eslint-disable-line
-// import "@nomiclabs/hardhat-waffle";
-
-
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn moreww
@@ -44,11 +40,7 @@ const config = {
       forking: {
         enabled: true,
         url: process.env["RPC_URL"] ? process.env["RPC_URL"] : "http://127.0.0.1:8545",
-        // blockNumber: 14622621
-        // blockNumber : 14938343
-        // blockNumber: 14956384,
         blockNumber: 15051000,
-        // blockNumber : 13431617,
       },
       blockGasLimit: 20000000,
       allowUnlimitedContractSize: true,
