@@ -11,9 +11,9 @@ REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
 DEPLOY_ACCT = accounts.load('hardhat')
-PROXY_MULTISIG = accounts[8]
-GOVERNOR_MULTISIG = addresses.DFX_MULTISIG
-GUARDIAN_MULTISIG = addresses.DFX_MULTISIG
+PROXY_MULTISIG = accounts[7]
+GOVERNOR_MULTISIG = DEPLOY_ACCT
+GUARDIAN_MULTISIG = DEPLOY_ACCT
 
 output_data = {'distributor': {'logic': None, 'proxy': None}}
 

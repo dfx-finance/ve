@@ -13,8 +13,9 @@ gas_price(gas_strategy)
 
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
+
 DEPLOY_ACCT = accounts.load('hardhat')
-PROXY_MULTISIG = accounts[8]
+PROXY_MULTISIG = accounts[7]
 
 output_data = {'gauges': {'amm': {}}}
 
@@ -27,7 +28,6 @@ def main():
         '\t2. DfxDistributor address\n'
         '\t3. GaugeController address'
     ))
-    # fake_multisig = accounts[9]
 
     ve_boost_proxy_address = get_json_address(
         'deployed_gaugecontroller', ['veBoostProxy'])
@@ -58,7 +58,7 @@ def main():
         # deploy gauge behind proxy
         gauge_initializer_calldata = gauge.initialize.encode_input(
             lp_addr,
-            addresses.DFX_MULTISIG,
+            DEPLOY_ACCT,
             addresses.DFX,
             addresses.VOTE_ESCROW,
             ve_boost_proxy_address,
