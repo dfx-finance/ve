@@ -4,8 +4,8 @@ import time
 
 from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy, accounts
 
-from scripts import addresses
-from scripts.helper import gas_strategy, get_json_address
+from scripts import addresses, contracts
+from scripts.helper import gas_strategy
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
@@ -28,10 +28,7 @@ def main():
         '\t4. Governor and Guardian addresses'
     ))
 
-    gauge_controller_address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
-    if not gauge_controller_address:
-        return FileNotFoundError('No GaugeController deployments found')
+    gauge_controller = contracts.gauge_controller()
 
     print('--- Deploying Distributor contract to Ethereum mainnet ---')
     dfx_distributor = DfxDistributor.deploy(
@@ -40,7 +37,7 @@ def main():
 
     distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
         addresses.DFX,
-        gauge_controller_address,
+        gauge_controller.address,
         REWARDS_RATE,
         PREV_DISTRIBUTED_REWARDS,
         # needs another multisig to deal with access control behind proxy (ideally 2)

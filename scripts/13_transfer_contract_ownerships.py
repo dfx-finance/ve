@@ -3,7 +3,7 @@ import brownie
 from brownie import accounts
 from brownie.network import gas_price
 
-from scripts import addresses
+from scripts import contracts
 from scripts.helper import gas_strategy, get_json_address
 
 DEPLOY_ACCT = accounts.load('hardhat')
@@ -20,9 +20,7 @@ gas_price(gas_strategy)
 
 
 def transfer_veboost_admin(orig_addr, new_addr):
-    ve_boost_proxy_address = get_json_address(
-        'deployed_gaugecontroller', ['veBoostProxy'])
-    veboost_proxy = brownie.interface.IVeBoostProxy(ve_boost_proxy_address)
+    veboost_proxy = contracts.veboost_proxy()
     veboost_proxy.commit_admin(
         new_addr, {'from': orig_addr, 'gas_price': gas_strategy})
     veboost_proxy.accept_transfer_ownership(
@@ -32,10 +30,7 @@ def transfer_veboost_admin(orig_addr, new_addr):
 
 
 def transfer_gauge_controller_admin(orig_addr, new_addr):
-    gauge_controller_address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
-    gauge_controller = brownie.interface.IGaugeController(
-        gauge_controller_address)
+    gauge_controller = contracts.gauge_controller()
     gauge_controller.commit_transfer_ownership(
         new_addr, {'from': orig_addr, 'gas_price': gas_strategy})
     gauge_controller.accept_transfer_ownership(
@@ -45,10 +40,7 @@ def transfer_gauge_controller_admin(orig_addr, new_addr):
 
 
 def transfer_distributor_governor(orig_addr, new_addr):
-    dfx_distributor_address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-    dfx_distributor = brownie.interface.IDfxDistributor(
-        dfx_distributor_address)
+    dfx_distributor = contracts.dfx_distributor()
     governor_role = dfx_distributor.GOVERNOR_ROLE()
     dfx_distributor.grantRole(governor_role, new_addr, {
                               'from': orig_addr, 'gas_price': gas_strategy})
@@ -60,10 +52,7 @@ def transfer_distributor_governor(orig_addr, new_addr):
 
 
 def transfer_distributor_guardian(orig_addr, new_addr):
-    dfx_distributor_address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-    dfx_distributor = brownie.interface.IDfxDistributor(
-        dfx_distributor_address)
+    dfx_distributor = contracts.dfx_distributor()
     guardian_role = dfx_distributor.GUARDIAN_ROLE()
     dfx_distributor.grantRole(guardian_role, new_addr, {
                               'from': orig_addr, 'gas_price': gas_strategy})
@@ -75,9 +64,7 @@ def transfer_distributor_guardian(orig_addr, new_addr):
 
 
 def transfer_liquidity_gauge_v4(gauge_id, orig_addr, new_addr):
-    gauge_addr = get_json_address('deployed_liquidity_gauges_v4', [
-        'gauges', 'amm', gauge_id, 'proxy'])
-    gauge = brownie.interface.ILiquidityGauge(gauge_addr)
+    gauge = contracts.gauge(gauge_id)
     gauge.commit_transfer_ownership(
         new_addr, {'from': orig_addr, 'gas_price': gas_strategy})
     gauge.accept_transfer_ownership(
@@ -86,17 +73,14 @@ def transfer_liquidity_gauge_v4(gauge_id, orig_addr, new_addr):
 
 
 def transfer_all_liquidity_gauges(orig_addr, new_addr):
-    gauge_ids = ['CADC_USDC', 'EURS_USDC', 'EUROC_USDC',
-                 'NZDS_USDC', 'TRYB_USDC', 'XIDR_USDC', 'XSGD_USDC']
-    for gauge_id in gauge_ids:
+    for gauge_id in contracts.GAUGE_IDS:
         transfer_liquidity_gauge_v4(gauge_id, orig_addr, new_addr)
 
 
 def transfer_distributor_proxy(orig_addr, new_addr):
-    dfx_distributor_address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
+    dfx_distributor = contracts.dfx_distributor()
     upgradeable_proxy = brownie.interface.IDfxUpgradeableProxy(
-        dfx_distributor_address)
+        dfx_distributor.address)
     upgradeable_proxy.changeAdmin(
         new_addr, {'from': orig_addr, 'gas_price': gas_strategy})
     print(
@@ -104,9 +88,8 @@ def transfer_distributor_proxy(orig_addr, new_addr):
 
 
 def transfer_liquidity_gauge_v4_proxy(gauge_id, orig_addr, new_addr):
-    gauge_addr = get_json_address('deployed_liquidity_gauges_v4', [
-        'gauges', 'amm', gauge_id, 'proxy'])
-    upgradeable_proxy = brownie.interface.IDfxUpgradeableProxy(gauge_addr)
+    gauge = contracts.gauge(gauge_id)
+    upgradeable_proxy = brownie.interface.IDfxUpgradeableProxy(gauge.address)
     upgradeable_proxy.changeAdmin(
         new_addr, {'from': orig_addr, 'gas_price': gas_strategy})
     print(
@@ -114,9 +97,7 @@ def transfer_liquidity_gauge_v4_proxy(gauge_id, orig_addr, new_addr):
 
 
 def transfer_all_gauge_proxies(orig_addr, new_addr):
-    gauge_ids = ['CADC_USDC', 'EURS_USDC', 'EUROC_USDC',
-                 'NZDS_USDC', 'TRYB_USDC', 'XIDR_USDC', 'XSGD_USDC']
-    for gauge_id in gauge_ids:
+    for gauge_id in contracts.GAUGE_IDS:
         transfer_liquidity_gauge_v4_proxy(gauge_id, orig_addr, new_addr)
 
 

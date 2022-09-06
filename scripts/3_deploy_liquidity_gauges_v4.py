@@ -6,8 +6,8 @@ import brownie
 from brownie import DfxUpgradeableProxy, LiquidityGaugeV4, accounts
 from brownie.network import gas_price
 
-from scripts import addresses
-from scripts.helper import gas_strategy, get_json_address
+from scripts import addresses, contracts
+from scripts.helper import gas_strategy
 
 gas_price(gas_strategy)
 
@@ -29,15 +29,9 @@ def main():
         '\t3. GaugeController address'
     ))
 
-    ve_boost_proxy_address = get_json_address(
-        'deployed_gaugecontroller', ['veBoostProxy'])
-    gauge_controller_address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
-    dfx_distributor_address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-
-    gauge_controller = brownie.interface.IGaugeController(
-        gauge_controller_address)
+    veboost_proxy = contracts.veboost_proxy()
+    gauge_controller = contracts.gauge_controller()
+    dfx_distributor = contracts.dfx_distributor()
 
     print('--- Deploying Liquidity Gauges (v4) contract to Ethereum mainnet ---')
     lp_addresses = [
@@ -61,8 +55,8 @@ def main():
             DEPLOY_ACCT,
             addresses.DFX,
             addresses.VOTE_ESCROW,
-            ve_boost_proxy_address,
-            dfx_distributor_address,
+            veboost_proxy.address,
+            dfx_distributor.address,
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
