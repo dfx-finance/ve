@@ -42,7 +42,7 @@ def main():
         PREV_DISTRIBUTED_REWARDS,
         # needs another multisig to deal with access control behind proxy (ideally 2)
         GOVERNOR_MULTISIG,  # governor
-        addresses.DFX_MULTISIG,  # guardian
+        GUARDIAN_MULTISIG,  # guardian
         ZERO_ADDRESS   # delegate gauge for pulling type 2 gauge rewards
     )
     dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(

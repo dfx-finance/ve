@@ -6,8 +6,8 @@ import brownie
 from brownie import accounts
 from brownie.network import gas_price
 
-from scripts import addresses
-from scripts.helper import get_json_address, gas_strategy
+from scripts import addresses, contracts
+from scripts.helper import get_json_address, gas_strategy, load_dfx_token
 
 
 DEPLOY_ACCT = accounts.load('hardhat')
@@ -17,26 +17,24 @@ gas_price(gas_strategy)
 
 
 def main():
-    dfx_distributor_address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-    # cadc_gauge_address = get_json_address(
-    #     'deployed_liquidity_gauges_v4', ['gauges', 'amm', 'CADC_USDC', 'proxy'])
-    # eurs_gauge_address = get_json_address(
-    #     'deployed_liquidity_gauges_v4', ['gauges', 'amm', 'EURS_USDC', 'proxy'])
-    # euroc_gauge_address = get_json_address(
-    #     'deployed_liquidity_gauges_v4', ['gauges', 'amm', 'EUROC_USDC', 'proxy'])
-    # nzds_gauge_address = get_json_address(
-    #     'deployed_liquidity_gauges_v4', ['gauges', 'amm', 'NZDS_USDC', 'proxy'])
-    # tryb_gauge_address = get_json_address(
-    #     'deployed_liquidity_gauges_v4', ['gauges', 'amm', 'TRYB_USDC', 'proxy'])
-    # xidr_gauge_address = get_json_address(
-    #     'deployed_liquidity_gauges_v4', ['gauges', 'amm', 'XIDR_USDC', 'proxy'])
-    # xsgd_gauge_address = get_json_address(
-    #     'deployed_liquidity_gauges_v4', ['gauges', 'amm', 'XSGD_USDC', 'proxy'])
+    dfx = load_dfx_token()
+    dfx_distributor = contracts.dfx_distributor()
 
-    distributor = brownie.interface.IDfxDistributor(dfx_distributor_address)
-    distributor.toggleDistributions(
-        {'from': DFX_MULTISIG, 'gas_price': gas_strategy})
+    # disable distributions
+    dfx_distributor.toggleDistributions(
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+
+    # set rate to 0
+    dfx_distributor.setRate(
+        0, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+
+    distributor_bal = dfx.balanceOf(dfx_distributor.address)
+    multisig_starting_bal = dfx.balanceOf(DFX_MULTISIG)
+    dfx_distributor.recoverERC20(dfx.address, DFX_MULTISIG, distributor_bal, {
+                                 'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+    multisig_ending_bal = dfx.balanceOf(DFX_MULTISIG)
+    print(multisig_starting_bal)
+    print(multisig_ending_bal)
 
 
 if __name__ == '__main__':

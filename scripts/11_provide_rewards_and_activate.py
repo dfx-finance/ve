@@ -32,9 +32,6 @@ def main():
 
     dfx_distributor = contracts.dfx_distributor()
 
-    # unlock multisig account
-    accounts.at(addresses.DFX_MULTISIG, force=True)
-
     # provide multisig with ether
     DEPLOY_ACCT.transfer(addresses.DFX_MULTISIG,
                          "2 ether", gas_price=gas_strategy)
@@ -48,7 +45,7 @@ def main():
 
     # Turn on distributions to gauges
     dfx_distributor.toggleDistributions(
-        {'from': addresses.DFX_MULTISIG, 'gas_price': gas_strategy})
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
     output_data['distributor'] = {
         'proxy': dfx_distributor.address,
