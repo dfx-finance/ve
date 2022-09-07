@@ -98,8 +98,23 @@ $ brownie run 2_deploy_distributor.py
 $ brownie run 3_deploy_liquidity_gauges_v4.py
 ```
 
-6. **Operation:** Check status
+6. **Operation:**
 
-```bash
-$ brownie run 10_ve_status.py
-```
+   1. Print current state of VE to console
+
+   ```bash
+   $ brownie run 10_log_ve_status.py
+   ```
+
+   2. Provide rewards to the Distributor contract and activate gauges
+
+   ```bash
+   $ brownie run 11_provide_rewards_and_activate.py
+   ```
+
+   3. Print current state of VE to console again to verify
+   4. Fast-forward chain until end of epoch 1
+
+   ```bash
+   $ brownie run 12_fastforward_chain.py
+   ```

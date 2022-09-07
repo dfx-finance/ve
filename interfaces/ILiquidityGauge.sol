@@ -3,14 +3,14 @@
 pragma solidity ^0.8.7;
 
 interface ILiquidityGauge {
+    function admin() external view returns (address _addr);
+
     function balanceOf(address _addr) external view returns (uint256 amount);
 
     function totalSupply() external view returns (uint256 amount);
 
-    // solhint-disable-next-line
     function staking_token() external view returns (address stakingToken);
 
-    // solhint-disable-next-line
     function deposit_reward_token(address _rewardToken, uint256 _amount) external;
 
     function deposit(
@@ -20,9 +20,11 @@ interface ILiquidityGauge {
         bool _claim_rewards
     ) external;
 
-    // solhint-disable-next-line
     function claim_rewards(address _addr) external;
 
-    // solhint-disable-next-line
     function claim_rewards(address _addr, address _receiver) external;
+
+    function commit_transfer_ownership(address _addr) external;
+
+    function accept_transfer_ownership() external;
 }

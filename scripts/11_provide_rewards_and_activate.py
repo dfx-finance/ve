@@ -1,14 +1,15 @@
 #!/usr/bin/env python
-import brownie
 from brownie import accounts
 import json
 import time
 
-from scripts import addresses
-from scripts.helper import gas_strategy, get_json_address, load_dfx_token
+from scripts import addresses, contracts
+from scripts.helper import gas_strategy, load_dfx_token
 
 REWARDS_RATE = 1.60345055442863e16
 TOTAL_DFX_REWARDS = 1_248_560 * 1e18
+
+DEPLOY_ACCT = accounts.load('hardhat')
 
 output_data = {'distributor': {'proxy': None, 'distributionsOn': None}}
 
@@ -22,44 +23,36 @@ def send_dfx(dfx, amount, from_account, to_account):
 
 def main():
     print((
-        'Script 4 of 4:\n\n'
         'NOTE: This script expects configuration for:\n'
         '\t1. DfxDistributor address\n'
         '\t2. Total amount of rewards to provide\n'
         '\t3. New DFX token rewards per second\n'
     ))
-
-    acct = accounts.load('anvil')
     dfx = load_dfx_token()
 
-    dfx_distributor_address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-
-    distributor = brownie.interface.IDfxDistributor(dfx_distributor_address)
-
-    # unlock multisig account
-    brownie.rpc.unlock_account(addresses.DFX_MULTISIG)
+    dfx_distributor = contracts.dfx_distributor()
 
     # provide multisig with ether
-    acct.transfer(addresses.DFX_MULTISIG, "2 ether", gas_price=gas_strategy)
+    DEPLOY_ACCT.transfer(addresses.DFX_MULTISIG,
+                         "2 ether", gas_price=gas_strategy)
 
     # Distribute rewards to the distributor contract
-    send_dfx(dfx, TOTAL_DFX_REWARDS, addresses.DFX_MULTISIG, distributor)
+    send_dfx(dfx, TOTAL_DFX_REWARDS, addresses.DFX_MULTISIG, dfx_distributor)
 
     # Set rate to distribute 1,000,000 rewards (see spreadsheet)
-    distributor.setRate(
-        REWARDS_RATE, {'from': addresses.DFX_MULTISIG, 'gas_price': gas_strategy})
+    dfx_distributor.setRate(
+        REWARDS_RATE, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
     # Turn on distributions to gauges
-    distributor.toggleDistributions(
-        {'from': addresses.DFX_MULTISIG, 'gas_price': gas_strategy})
+    dfx_distributor.toggleDistributions(
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
     output_data['distributor'] = {
-        'proxy': dfx_distributor_address,
+        'proxy': dfx_distributor.address,
         'rewardsSupplied': TOTAL_DFX_REWARDS,
         'rewardsRate': REWARDS_RATE,
-        'totalRewards': dfx.balanceOf(distributor),
-        'distributionsOn': distributor.distributionsOn(),
+        'totalRewards': dfx.balanceOf(dfx_distributor),
+        'distributionsOn': dfx_distributor.distributionsOn(),
     }
     with open(f'./scripts/provided_rewards_and_activated_{int(time.time())}.json', 'w') as output_f:
         json.dump(output_data, output_f, indent=4)

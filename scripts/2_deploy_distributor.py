@@ -4,11 +4,16 @@ import time
 
 from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy, accounts
 
-from scripts import addresses
-from scripts.helper import gas_strategy, get_json_address
+from scripts import addresses, contracts
+from scripts.helper import gas_strategy
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
+
+DEPLOY_ACCT = accounts.load('hardhat')
+PROXY_MULTISIG = accounts[7]
+GOVERNOR_MULTISIG = DEPLOY_ACCT
+GUARDIAN_MULTISIG = DEPLOY_ACCT
 
 output_data = {'distributor': {'logic': None, 'proxy': None}}
 
@@ -23,34 +28,28 @@ def main():
         '\t4. Governor and Guardian addresses'
     ))
 
-    acct = accounts.load('hardhat')
-    fake_multisig = accounts[9]
-
-    gauge_controller_address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
-    if not gauge_controller_address:
-        return FileNotFoundError('No GaugeController deployments found')
+    gauge_controller = contracts.gauge_controller()
 
     print('--- Deploying Distributor contract to Ethereum mainnet ---')
     dfx_distributor = DfxDistributor.deploy(
-        {'from': acct, 'gas_price': gas_strategy})
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
     output_data['distributor']['logic'] = dfx_distributor.address
 
     distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
         addresses.DFX,
-        gauge_controller_address,
+        gauge_controller.address,
         REWARDS_RATE,
         PREV_DISTRIBUTED_REWARDS,
         # needs another multisig to deal with access control behind proxy (ideally 2)
-        addresses.DFX_MULTISIG,  # governor
-        addresses.DFX_MULTISIG,  # guardian
+        GOVERNOR_MULTISIG,  # governor
+        GUARDIAN_MULTISIG,  # guardian
         ZERO_ADDRESS   # delegate gauge for pulling type 2 gauge rewards
     )
     dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
-        fake_multisig,
+        PROXY_MULTISIG,
         distributor_initializer_calldata,
-        {'from': acct, 'gas_price': gas_strategy},
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy},
     )
     output_data['distributor']['proxy'] = dfx_upgradable_proxy.address
 

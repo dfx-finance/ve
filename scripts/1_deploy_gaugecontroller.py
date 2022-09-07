@@ -18,8 +18,10 @@ DEPLOYED_GAUGE_ADDRESSES = [
     ('XSGD_USDC', None),
 ]
 DEFAULT_TYPE_WEIGHT = 1e18
+DEPLOY_ACCT = accounts.load('hardhat')
 
 gas_price(gas_strategy)
+
 
 output_data = {'veBoostProxy': None, 'gaugeController': None}
 
@@ -31,21 +33,19 @@ def main():
         '\t1. VotingEscrow (VeDFX) contract address'
     ))
 
-    acct = accounts.load('hardhat')
-
     print('--- Deploying VeBoostProxy contract to Ethereum mainnet ---')
     # (votingEscrow address, delegation address, admin address)
-    ve_boost_proxy = VeBoostProxy.deploy(addresses.VOTE_ESCROW, ZERO_ADDRESS, acct, {
-        'from': acct, 'gas_price': gas_strategy})
+    ve_boost_proxy = VeBoostProxy.deploy(addresses.VOTE_ESCROW, ZERO_ADDRESS, DEPLOY_ACCT, {
+        'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
     output_data['veBoostProxy'] = ve_boost_proxy.address
 
     print('--- Deploying Gauge Controller contract to Ethereum mainnet ---')
     gauge_controller = GaugeController.deploy(
-        addresses.DFX, addresses.VOTE_ESCROW, acct, {'from': acct, 'gas_price': gas_strategy})
+        addresses.DFX, addresses.VOTE_ESCROW, DEPLOY_ACCT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
     print('--- Configure Gauge Controller with "Liquidity" type ---')
     gauge_controller.add_type(
-        DEFAULT_GAUGE_TYPE_NAME, DEFAULT_TYPE_WEIGHT, {'from': acct, 'gas_price': gas_strategy})
+        DEFAULT_GAUGE_TYPE_NAME, DEFAULT_TYPE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
     output_data['gaugeController'] = gauge_controller.address
     with open(f'./scripts/deployed_gaugecontroller_{int(time.time())}.json', 'w') as output_f:

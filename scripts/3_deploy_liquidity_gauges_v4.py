@@ -6,13 +6,16 @@ import brownie
 from brownie import DfxUpgradeableProxy, LiquidityGaugeV4, accounts
 from brownie.network import gas_price
 
-from scripts import addresses
-from scripts.helper import gas_strategy, get_json_address
+from scripts import addresses, contracts
+from scripts.helper import gas_strategy
 
 gas_price(gas_strategy)
 
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
+
+DEPLOY_ACCT = accounts.load('hardhat')
+PROXY_MULTISIG = accounts[7]
 
 output_data = {'gauges': {'amm': {}}}
 
@@ -25,18 +28,10 @@ def main():
         '\t2. DfxDistributor address\n'
         '\t3. GaugeController address'
     ))
-    acct = accounts.load('hardhat')
-    fake_multisig = accounts[9]
 
-    ve_boost_proxy_address = get_json_address(
-        'deployed_gaugecontroller', ['veBoostProxy'])
-    gauge_controller_address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
-    dfx_distributor_address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-
-    gauge_controller = brownie.interface.IGaugeController(
-        gauge_controller_address)
+    veboost_proxy = contracts.veboost_proxy()
+    gauge_controller = contracts.gauge_controller()
+    dfx_distributor = contracts.dfx_distributor()
 
     print('--- Deploying Liquidity Gauges (v4) contract to Ethereum mainnet ---')
     lp_addresses = [
@@ -52,26 +47,26 @@ def main():
     for label, lp_addr in lp_addresses:
         # deploy gauge logic
         gauge = LiquidityGaugeV4.deploy(
-            {'from': acct, 'gas_price': gas_strategy})
+            {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
         # deploy gauge behind proxy
         gauge_initializer_calldata = gauge.initialize.encode_input(
             lp_addr,
-            addresses.DFX_MULTISIG,
+            DEPLOY_ACCT,
             addresses.DFX,
             addresses.VOTE_ESCROW,
-            ve_boost_proxy_address,
-            dfx_distributor_address,
+            veboost_proxy.address,
+            dfx_distributor.address,
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
-            fake_multisig,
+            PROXY_MULTISIG,
             gauge_initializer_calldata,
-            {'from': acct, 'gas_price': gas_strategy},
+            {'from': DEPLOY_ACCT, 'gas_price': gas_strategy},
         )
 
         gauge_controller.add_gauge(
-            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': acct, 'gas_price': gas_strategy})
+            dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
         output_data['gauges']['amm'][label] = {
             'logic': gauge.address,
