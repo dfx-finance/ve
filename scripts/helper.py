@@ -5,6 +5,7 @@ import operator
 import os
 
 from brownie import Contract, network, accounts, config
+from brownie.network import show_active, gas_price
 from brownie.network.gas.strategies import LinearScalingStrategy
 
 from scripts import addresses
@@ -17,6 +18,7 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
     'binance-fork',
     'matic-fork',
 ]
+
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
 gas_strategy = LinearScalingStrategy('50 gwei', '200 gwei', 1.3)
@@ -101,3 +103,16 @@ def get_json_address(fn_predicate, keys):
 def load_dfx_token():
     abi = json.load(open('./tests/abis/Dfx.json'))
     return Contract.from_abi('DFX', addresses.DFX, abi)
+
+
+def network_info():
+    connected_network = show_active()
+    is_local_network = connected_network in ['ganache-cli', 'hardhat']
+    if is_local_network:
+        gas_price(gas_strategy)
+    return connected_network, is_local_network
+
+
+def get_addresses():
+    connected_network, _ = network_info()
+    return addresses.Polygon() if 'polygon' in connected_network else addresses.Ethereum()
