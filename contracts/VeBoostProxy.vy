@@ -36,8 +36,8 @@ future_admin: public(address)
 @external
 def __init__(_voting_escrow: address, _delegation: address, _admin: address):
 
-    assert _voting_escrow != ZERO_ADDRESS
-    assert _admin != ZERO_ADDRESS
+    assert _voting_escrow != empty(address)
+    assert _admin != empty(address)
 
     self.voting_escrow = _voting_escrow
 
@@ -57,7 +57,7 @@ def adjusted_balance_of(_account: address) -> uint256:
     @return veCRV balance
     """
     _delegation: address = self.delegation
-    if _delegation == ZERO_ADDRESS:
+    if _delegation == empty(address):
         return ERC20(self.voting_escrow).balanceOf(_account)
     return VeDelegation(_delegation).adjusted_balance_of(_account)
 
@@ -70,8 +70,8 @@ def kill_delegation():
     """
     assert msg.sender == self.admin
 
-    self.delegation = ZERO_ADDRESS
-    log DelegationSet(ZERO_ADDRESS)
+    self.delegation = empty(address)
+    log DelegationSet(empty(address))
 
 
 @external

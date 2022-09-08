@@ -92,11 +92,33 @@ Or to run a single test with debug messages:
 
 5. **Deployment:** Run deploy script
 
-```bash
-$ brownie run 1_deploy_gaugecontroller.py
-$ brownie run 2_deploy_distributor.py
-$ brownie run 3_deploy_liquidity_gauges_v4.py
-```
+   1. Add deploy account brownie by private key
+
+   ```bash
+   $ brownie accounts new deployve
+   $ brownie accounts new deployve-proxyadmin
+   ```
+
+   2. Edit deploy scripts in _step 3_ to load account with wallets `deployve` and `deployve-proxyadmin`
+
+   3. Edit `gas_strategy` in `./scripts/helper.py` with recent gas prices from Etherscan
+
+   4. Run deploy scripts
+      Polygon:
+
+   ```bash
+   $ brownie run 1_deploy_gaugecontroller.py --network polygon-main
+   $ brownie run 2_deploy_distributor.py --network polygon-main
+   $ brownie run 3_deploy_liquidity_gauges_v4.py --network polygon-main
+   ```
+
+   Ethereum:
+
+   ```bash
+   $ brownie run 1_deploy_gaugecontroller.py
+   $ brownie run 2_deploy_distributor.py
+   $ brownie run 3_deploy_liquidity_gauges_v4.py
+   ```
 
 6. **Operation:**
 
