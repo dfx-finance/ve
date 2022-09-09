@@ -4,16 +4,19 @@ import time
 
 from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy, accounts
 
-from scripts import addresses, contracts
-from scripts.helper import gas_strategy
+from scripts import contracts
+from scripts.helper import get_addresses, network_info, gas_strategy
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
-DEPLOY_ACCT = accounts.load('hardhat')
-PROXY_MULTISIG = accounts[7]
+DEPLOY_ACCT = accounts.load('deployve')
+PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
 GOVERNOR_MULTISIG = DEPLOY_ACCT
 GUARDIAN_MULTISIG = DEPLOY_ACCT
+
+addresses = get_addresses()
+connected_network, is_local_network = network_info()
 
 output_data = {'distributor': {'logic': None, 'proxy': None}}
 
@@ -27,14 +30,17 @@ def main():
         '\t3. Total amount of previously distributed rewards\n'
         '\t4. Governor and Guardian addresses'
     ))
+    should_verify = not is_local_network
 
     gauge_controller = contracts.gauge_controller()
 
-    print('--- Deploying Distributor contract to Ethereum mainnet ---')
+    # print(f'--- Deploying Distributor contract to {connected_network} ---')
     dfx_distributor = DfxDistributor.deploy(
-        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy}, publish_source=should_verify)
     output_data['distributor']['logic'] = dfx_distributor.address
 
+    print(
+        f'--- Deploying Distributor proxy contract to {connected_network} ---')
     distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
         addresses.DFX,
         gauge_controller.address,
@@ -50,6 +56,7 @@ def main():
         PROXY_MULTISIG,
         distributor_initializer_calldata,
         {'from': DEPLOY_ACCT, 'gas_price': gas_strategy},
+        publish_source=should_verify,
     )
     output_data['distributor']['proxy'] = dfx_upgradable_proxy.address
 

@@ -21,7 +21,7 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('50 gwei', '200 gwei', 1.3)
+gas_strategy = LinearScalingStrategy('40 gwei', '120 gwei', 1.3)
 
 
 def get_account(number=None):
