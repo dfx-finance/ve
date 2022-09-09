@@ -1,0 +1,34 @@
+{
+    "gauges": {
+        "amm": {
+            "CADC_USDC": {
+                "logic": "0xD20dBF3244a16862D1338B615120019756fD712b",
+                "proxy": "0x520ee39Fe7bEabF788477F0e27e9c6878699cA1A"
+            },
+            "EUROC_USDC": {
+                "logic": "0xD20dBF3244a16862D1338B615120019756fD712b",
+                "proxy": "0xD4Ad6E5A7EEb7bF7E0914fFBa08160fB58cAA889"
+            },
+            "EURS_USDC": {
+                "logic": "0xD20dBF3244a16862D1338B615120019756fD712b",
+                "proxy": "0xb932c30c27F4894c4Ab4C0AE85FAD565AC01775c"
+            },
+            "NZDS_USDC": {
+                "logic": "0xD20dBF3244a16862D1338B615120019756fD712b",
+                "proxy": "0xB8B9F0BB88dEcDe89bd365eC7487354f5C632F5d"
+            },            
+            "TRYB_USDC": {
+                "logic": "0xD20dBF3244a16862D1338B615120019756fD712b",
+                "proxy": "0x49ae0Fd61d530bE50b08a7548E2060cA051679C8"
+            },
+            "XIDR_USDC": {
+                "logic": "0xD20dBF3244a16862D1338B615120019756fD712b",
+                "proxy": "0x9B838964cf77a92ae57dc495eb34eA459a6bb7D8"
+            },
+            "XSGD_USDC": {
+                "logic": "0xD20dBF3244a16862D1338B615120019756fD712b",
+                "proxy": "0x71888507aa3Ad92A9b5d89618AdcAbb027797a3D"
+            }            
+        }
+    }
+}

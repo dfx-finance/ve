@@ -45,14 +45,14 @@ def main():
         ('XSGD_USDC',  addresses.DFX_XSGD_USDC_LP),
     ]
 
+    # deploy gauge logic
+    gauge = LiquidityGaugeV4.deploy(
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+
+    print("Sleeping after deploy....")
+    time.sleep(10)
+
     for label, lp_addr in lp_addresses:
-        # deploy gauge logic
-        gauge = LiquidityGaugeV4.deploy(
-            {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
-
-        print("Sleeping after deploy....")
-        time.sleep(10)
-
         # deploy gauge behind proxy
         print(
             f'--- Deploying LiquidityGaugeV4 proxy contract to {connected_network} ---')
@@ -80,6 +80,8 @@ def main():
             'logic': gauge.address,
             'proxy': dfx_upgradeable_proxy.address,
         }
+        with open(f'./scripts/deployed_liquidity_gauges_v4_{label}_{int(time.time())}.json', 'w') as output_f:
+            json.dump(output_data, output_f, indent=4)
 
     with open(f'./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json', 'w') as output_f:
         json.dump(output_data, output_f, indent=4)

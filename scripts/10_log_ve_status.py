@@ -3,13 +3,15 @@ import brownie
 from brownie import accounts
 import math
 
-from scripts import addresses, contracts
-from scripts.helper import get_json_address, load_dfx_token
+from scripts import contracts
+from scripts.helper import get_addresses, load_dfx_token
 from utils.apr import calc_boosted_apr
 
 
 SECONDS_PER_YEAR = 365 * 24 * 60 * 60
 DEPLOY_ACCT = accounts.load('hardhat')
+
+addresses = get_addresses()
 
 
 def get_gauge_info(dfx, voting_escrow, veboost_proxy, acct, gauge):

@@ -21,7 +21,7 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('40 gwei', '120 gwei', 1.3)
+gas_strategy = LinearScalingStrategy('30 gwei', '50 gwei', 1.3)
 
 
 def get_account(number=None):
@@ -101,8 +101,9 @@ def get_json_address(fn_predicate, keys):
 
 
 def load_dfx_token():
+    addrs = get_addresses()
     abi = json.load(open('./tests/abis/Dfx.json'))
-    return Contract.from_abi('DFX', addresses.DFX, abi)
+    return Contract.from_abi('DFX', addrs.DFX, abi)
 
 
 def network_info():

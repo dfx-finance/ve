@@ -3,13 +3,15 @@ from brownie import accounts
 import json
 import time
 
-from scripts import addresses, contracts
-from scripts.helper import gas_strategy, load_dfx_token
+from scripts import contracts
+from scripts.helper import get_addresses, gas_strategy, load_dfx_token
 
 REWARDS_RATE = 1.60345055442863e16
 TOTAL_DFX_REWARDS = 1_248_560 * 1e18
 
 DEPLOY_ACCT = accounts.load('hardhat')
+
+addresses = get_addresses()
 
 output_data = {'distributor': {'proxy': None, 'distributionsOn': None}}
 
