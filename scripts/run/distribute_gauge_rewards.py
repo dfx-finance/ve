@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 from brownie import accounts
-import json
-import time
 
 from scripts import contracts
 from scripts.helper import get_addresses, gas_strategy
-from utils.apr import distribute_to_gauges
 
 DEPLOY_ACCT = accounts.load('deployve')
 
