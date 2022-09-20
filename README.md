@@ -103,7 +103,7 @@ Or to run a single test with debug messages:
 
    3. Edit `gas_strategy` in `./scripts/helper.py` with recent gas prices from Etherscan
 
-   4. Deploy veDFX if necessary (already exists on mainnet)
+   4. Deploy veDFX contract if necessary
 
    ```bash
    $ brownie run 99_deploy_vedfx.py --network <network-name>
@@ -121,9 +121,9 @@ Or to run a single test with debug messages:
    Ethereum:
 
    ```bash
-   $ brownie run 1_deploy_gaugecontroller.py
-   $ brownie run 2_deploy_distributor.py
-   $ brownie run 3_deploy_liquidity_gauges_v4.py
+   $ brownie run 1_deploy_gaugecontroller.py --network ethereum
+   $ brownie run 2_deploy_distributor.py --network ethereum
+   $ brownie run 3_deploy_liquidity_gauges_v4.py --network ethereum
    ```
 
 6. **Operation:**
@@ -131,18 +131,41 @@ Or to run a single test with debug messages:
    1. Print current state of VE to console
 
    ```bash
-   $ brownie run 10_log_ve_status.py
+   $ brownie run run/log_ve_status.py --network <network-name>
    ```
 
-   2. Provide rewards to the Distributor contract and activate gauges
+   2. Provide rewards to the Distributor contract and activate gauges (edit with DFX rewards to add and initial distribution rate)
 
    ```bash
-   $ brownie run 11_provide_rewards_and_activate.py
+   $ brownie run run/provide_distributor_rewards.py --network <network-name>
    ```
 
-   3. Print current state of VE to console again to verify
-   4. Fast-forward chain until end of epoch 1
+   3. Activate distributions
 
    ```bash
-   $ brownie run 12_fastforward_chain.py
+   $ brownie run run/toggle_gauge_distributor.py --network <network-name>
+   ```
+
+   4. Print current state of VE to console again to verify
+
+   5. Once next epoch is begun:
+
+      - (Public) Poke to update mining rate
+
+      ```bash
+      $ brownie run run/poke_distributor_mining_rewards.py --network <network-name>
+      ```
+
+      - (Private to Governor) Distribute rewards to all gauges
+
+      ```bash
+      $ brownie run run/distribute_gauge_rewards.py --network <network-name>
+      ```
+
+7. **Local testing (hardhat only):**
+
+   1. Fast-forward chain until end of epoch 1
+
+   ```bash
+   $ brownie run run/fastforward_chain.py
    ```
