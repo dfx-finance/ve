@@ -103,7 +103,13 @@ Or to run a single test with debug messages:
 
    3. Edit `gas_strategy` in `./scripts/helper.py` with recent gas prices from Etherscan
 
-   4. Run deploy scripts
+   4. Deploy veDFX if necessary (already exists on mainnet)
+
+   ```bash
+   $ brownie run 99_deploy_vedfx.py --network <network-name>
+   ```
+
+   5. Run deploy scripts
       Polygon:
 
    ```bash

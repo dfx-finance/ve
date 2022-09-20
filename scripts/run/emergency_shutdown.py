@@ -2,12 +2,11 @@
 # 1. Stop distribution to all gauges
 #    - Rewards within gauge will remain available to _any_ user who continues to stake through following epoch
 # 2. Withdraw all DFX ERC20 from distributor gauge to multisig
-import brownie
 from brownie import accounts
 from brownie.network import gas_price
 
 from scripts import addresses, contracts
-from scripts.helper import get_json_address, gas_strategy, load_dfx_token
+from scripts.helper import gas_strategy, load_dfx_token
 
 
 DEPLOY_ACCT = accounts.load('hardhat')

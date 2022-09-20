@@ -19,6 +19,8 @@ interface IVotingEscrow {
 
   function locked(address user) external view returns (uint amount, uint end);
 
+  function locked__end(address user) external view returns (uint amount);
+
   function create_lock(uint value, uint unlock_time) external;
 
   function increase_amount(uint value) external;

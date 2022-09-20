@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 import brownie
+from brownie import network
 
 from scripts.helper import get_json_address
 
-GAUGE_IDS = ['CADC_USDC', 'EURS_USDC', 'EUROC_USDC',
-             'NZDS_USDC', 'TRYB_USDC', 'XIDR_USDC', 'XSGD_USDC']
+
+GAUGE_IDS = None
+if network.show_active() == 'ethereum':
+    GAUGE_IDS = ['CADC_USDC', 'EURS_USDC', 'EUROC_USDC',
+                 'NZDS_USDC', 'TRYB_USDC', 'XIDR_USDC', 'XSGD_USDC']
+if network.show_active() == 'polygon-main':
+    GAUGE_IDS = ['CADC_USDC', 'EURS_USDC',
+                 'NZDS_USDC', 'TRYB_USDC', 'XSGD_USDC']
 
 
 def gauge_controller():

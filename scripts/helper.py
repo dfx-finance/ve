@@ -12,16 +12,15 @@ from scripts import addresses
 
 
 NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = [
-    'hardhat', 'development', 'ganache']
+    'hardhat', 'development', 'ganache', 'ganache-cli']
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
     'mainnet-fork',
     'binance-fork',
     'matic-fork',
 ]
-
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('30 gwei', '50 gwei', 1.3)
+gas_strategy = LinearScalingStrategy('40 gwei', '55 gwei', 1.3)
 
 
 def get_account(number=None):
@@ -116,4 +115,10 @@ def network_info():
 
 def get_addresses():
     connected_network, _ = network_info()
-    return addresses.Polygon() if 'polygon' in connected_network else addresses.Ethereum()
+
+    if connected_network == 'hardhat':
+        return addresses.Localhost
+    if connected_network == 'polygon-main':
+        return addresses.Polygon
+    if connected_network == 'ethereum':
+        return addresses.Ethereum

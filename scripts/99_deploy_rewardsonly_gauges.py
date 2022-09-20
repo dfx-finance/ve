@@ -12,7 +12,7 @@ gas_price(gas_strategy)
 
 
 def main():
-    acct = accounts.load('anvil')
+    acct = accounts.load('hardhat')
 
     print('--- Deploying Rewards-Only Gauges contract to Ethereum mainnet ---')
     lp_addresses = [

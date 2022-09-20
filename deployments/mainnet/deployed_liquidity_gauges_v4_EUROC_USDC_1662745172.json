@@ -1,0 +1,10 @@
+{
+    "gauges": {
+        "amm": {
+            "EUROC_USDC": {
+                "logic": "0x7cdA85C85ceDc16E71bAa8a18D3690eE4fCb75a9",
+                "proxy": "0x6491ddF9d767B089Ce0ad25d9F917Dfc44AE29Be"
+            }
+        }
+    }
+}

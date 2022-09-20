@@ -10,6 +10,8 @@ from scripts.helper import get_addresses, network_info, gas_strategy
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
+# DEPLOY_ACCT = accounts.load('hardhat')
+# PROXY_MULTISIG = accounts[7]
 DEPLOY_ACCT = accounts.load('deployve')
 PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
 GOVERNOR_MULTISIG = DEPLOY_ACCT
@@ -31,10 +33,11 @@ def main():
         '\t4. Governor and Guardian addresses'
     ))
     should_verify = not is_local_network
+    should_verify = False
 
     gauge_controller = contracts.gauge_controller()
 
-    # print(f'--- Deploying Distributor contract to {connected_network} ---')
+    print(f'--- Deploying Distributor contract to {connected_network} ---')
     dfx_distributor = DfxDistributor.deploy(
         {'from': DEPLOY_ACCT, 'gas_price': gas_strategy}, publish_source=should_verify)
     output_data['distributor']['logic'] = dfx_distributor.address
