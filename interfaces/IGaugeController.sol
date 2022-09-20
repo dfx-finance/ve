@@ -18,4 +18,8 @@ interface IGaugeController {
     function commit_transfer_ownership(address account) external;
 
     function accept_transfer_ownership() external;    
+    
+    function n_gauges() external view returns (int128);
+
+    function gauges(uint256 index) external view returns (address);
 }

@@ -6,7 +6,7 @@ import time
 from scripts import contracts
 from scripts.helper import get_addresses, gas_strategy, load_dfx_token
 
-REWARDS_RATE = 1.29429313196262e11
+REWARDS_RATE = 1.29429313196261e11
 TOTAL_DFX_REWARDS = 10.0782788486211 * 1e18
 
 DEPLOY_ACCT = accounts.load('deployve')
