@@ -1,17 +1,22 @@
 #!/usr/bin/env python
 import brownie
-from brownie import accounts
+from brownie import accounts, chain, web3
+from datetime import datetime
 import math
 
-from scripts import addresses, contracts
-from scripts.helper import get_json_address, load_dfx_token
+from scripts import contracts
+from scripts.helper import get_addresses, load_dfx_token
 from utils.apr import calc_boosted_apr
 
 
 SECONDS_PER_YEAR = 365 * 24 * 60 * 60
-DEPLOY_ACCT = accounts.load('hardhat')
+DEPLOY_ACCT = accounts.load('deployve')
+
+addresses = get_addresses()
 
 
+# TODO: check this, seems to return APR for deploy acct as a user,
+# should be returning a global (not tied to any particular account) APR
 def get_gauge_info(dfx, voting_escrow, veboost_proxy, acct, gauge):
     apr = math.inf
     available_rewards = dfx.balanceOf(gauge)
@@ -26,6 +31,9 @@ def main():
     veboost_proxy = contracts.veboost_proxy()
     gauges = contracts.gauges()
 
+    block_num = web3.eth.block_number
+    block_timestamp = chain[block_num]['timestamp']
+
     dfx = load_dfx_token()
     voting_escrow = brownie.interface.IVotingEscrow(addresses.VOTE_ESCROW)
 
@@ -34,6 +42,7 @@ def main():
     rate = dfx_distributor.rate()
 
     print((
+        f'Block time: {datetime.fromtimestamp(block_timestamp)}\n'
         f'Distributions: {rewards_enabled}\n'
         f'Distributor mining epoch: {dfx_distributor.miningEpoch()}\n'
         f'Distributor balance (DFX): {dfx_distributor.address} ({distributor_dfx_balance / 1e18})\n'

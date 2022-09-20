@@ -1,4 +1,4 @@
-# @version 0.3.6
+# @version 0.3.3
 
 """
 @title Gauge Controller
@@ -124,9 +124,9 @@ def __init__(_token: address, _voting_escrow: address, _admin: address):
     @param _token `ERC20DFX` contract address
     @param _voting_escrow `VotingEscrow` contract address
     """
-    assert _token != empty(address)
-    assert _voting_escrow != empty(address)
-    assert _admin != empty(address)
+    assert _token != ZERO_ADDRESS
+    assert _voting_escrow != ZERO_ADDRESS
+    assert _admin != ZERO_ADDRESS
 
     self.admin = _admin
     self.token = _token
@@ -141,7 +141,7 @@ def commit_transfer_ownership(addr: address):
     @param addr Address to have ownership transferred to
     """
     assert msg.sender == self.admin  # dev: admin only
-    assert addr != empty(address)  # dev: future admin cannot be the 0 address
+    assert addr != ZERO_ADDRESS  # dev: future admin cannot be the 0 address
     self.future_admin = addr
     log CommitOwnership(addr)
 
