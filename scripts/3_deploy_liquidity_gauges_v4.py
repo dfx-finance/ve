@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import json
-from sqlite3 import connect
 import time
 
 from brownie import DfxUpgradeableProxy, LiquidityGaugeV4, accounts
@@ -14,10 +13,10 @@ connected_network, is_local_network = network_info()
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
 
-# DEPLOY_ACCT = accounts.load('hardhat')
-# PROXY_MULTISIG = accounts[7]
-DEPLOY_ACCT = accounts.load('deployve')
-PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
+DEPLOY_ACCT = accounts.load('hardhat')
+PROXY_MULTISIG = accounts[7]
+# DEPLOY_ACCT = accounts.load('deployve')
+# PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
 
 output_data = {'gauges': {'amm': {}}}
 
@@ -41,26 +40,23 @@ def main():
         f'--- Deploying Liquidity Gauges (v4) contract to {connected_network} ---')
     lp_addresses = [
         ('CADC_USDC',  addresses.DFX_CADC_USDC_LP),
-        # ('EUROC_USDC', addresses.DFX_EUROC_USDC_LP),
+        ('EUROC_USDC', addresses.DFX_EUROC_USDC_LP),
         ('EURS_USDC',  addresses.DFX_EURS_USDC_LP),
         ('NZDS_USDC',  addresses.DFX_NZDS_USDC_LP),
         ('TRYB_USDC',  addresses.DFX_TRYB_USDC_LP),
-        # ('XIDR_USDC',  addresses.DFX_XIDR_USDC_LP),
+        ('XIDR_USDC',  addresses.DFX_XIDR_USDC_LP),
         ('XSGD_USDC',  addresses.DFX_XSGD_USDC_LP),
     ]
 
     # deploy gauge logic
-    # gauge = LiquidityGaugeV4.deploy(
-    #     {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
-    gauge = LiquidityGaugeV4.at("0x42bB711a7D087ade9198F75a5Ec0803e98F3FB66")
+    gauge = LiquidityGaugeV4.deploy(
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
     if connected_network != 'hardhat':
         print("Sleeping after deploy....")
         time.sleep(10)
 
     for label, lp_addr in lp_addresses:
-        if label in ['CADC_USDC', 'EURS_USDC', 'NZDS_USDC']:
-            continue
         # deploy gauge behind proxy
         print(
             f'--- Deploying LiquidityGaugeV4 proxy contract to {connected_network} ---')
@@ -88,8 +84,8 @@ def main():
             'logic': gauge.address,
             'proxy': dfx_upgradeable_proxy.address,
         }
-        with open(f'./scripts/deployed_liquidity_gauges_v4_{label}_{int(time.time())}.json', 'w') as output_f:
-            json.dump(output_data, output_f, indent=4)
+        # with open(f'./scripts/deployed_liquidity_gauges_v4_{label}_{int(time.time())}.json', 'w') as output_f:
+        #     json.dump(output_data, output_f, indent=4)
 
     with open(f'./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json', 'w') as output_f:
         json.dump(output_data, output_f, indent=4)

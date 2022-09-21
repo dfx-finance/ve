@@ -6,7 +6,7 @@ from scripts.helper import get_json_address
 
 
 GAUGE_IDS = None
-if network.show_active() == 'ethereum':
+if network.show_active() in ['ethereum', 'hardhat']:
     GAUGE_IDS = ['CADC_USDC', 'EURS_USDC', 'EUROC_USDC',
                  'NZDS_USDC', 'TRYB_USDC', 'XIDR_USDC', 'XSGD_USDC']
 if network.show_active() == 'polygon-main':
