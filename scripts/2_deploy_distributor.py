@@ -10,10 +10,10 @@ from scripts.helper import get_addresses, network_info, gas_strategy
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
-# DEPLOY_ACCT = accounts.load('hardhat')
-# PROXY_MULTISIG = accounts[7]
-DEPLOY_ACCT = accounts.load('deployve')
-PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
+DEPLOY_ACCT = accounts.load('hardhat')
+PROXY_MULTISIG = accounts[7]
+# DEPLOY_ACCT = accounts.load('deployve')
+# PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
 GOVERNOR_MULTISIG = DEPLOY_ACCT
 GUARDIAN_MULTISIG = DEPLOY_ACCT
 

@@ -10,7 +10,8 @@ from utils.apr import calc_boosted_apr
 
 
 SECONDS_PER_YEAR = 365 * 24 * 60 * 60
-DEPLOY_ACCT = accounts.load('deployve')
+DEPLOY_ACCT = accounts.load('hardhat')
+# DEPLOY_ACCT = accounts.load('deployve')
 
 addresses = get_addresses()
 
