@@ -151,7 +151,7 @@ _Networks:_
   - (Public) Poke to update mining rate
 
     ```bash
-    $ brownie run run/poke_distributor_mining_rewards.py --network <network-name>
+    $ brownie run run/poke_distributor_mining_parameters.py --network <network-name>
     ```
 
   - (Private to Governor) Distribute rewards to all gauges
