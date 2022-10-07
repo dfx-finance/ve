@@ -14,7 +14,7 @@ def main():
         'NOTE: This script expects configuration for:\n'
         '\t1. DfxDistributor address\n'
     ))
-    dfx_distributor = contracts.dfx_distributor()
+    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     # Public function to advance epoch & recalculate reward rate when previous
     # epoch has expired

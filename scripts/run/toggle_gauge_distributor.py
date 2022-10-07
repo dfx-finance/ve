@@ -23,7 +23,7 @@ def main():
         '\t3. New DFX token rewards per second\n'
     ))
 
-    dfx_distributor = contracts.dfx_distributor()
+    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     # Turn on distributions to gauges
     dfx_distributor.toggleDistributions(

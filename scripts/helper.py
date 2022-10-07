@@ -89,16 +89,6 @@ def upgrade(
     return transaction
 
 
-# Return value from json file (by filename predicate) via a list of keys to drill down
-def get_json_address(fn_predicate, keys):
-    addresses_fn = [fn for fn in sorted(os.listdir('./scripts'))
-                    if fn.startswith(fn_predicate) and fn.endswith('.json')][-1]
-    if addresses_fn:
-        with open(os.path.join('./scripts', addresses_fn), 'r') as json_f:
-            json_data = json.load(json_f)
-            return reduce(operator.getitem, keys, json_data)
-
-
 def load_dfx_token():
     addrs = get_addresses()
     abi = json.load(open('./tests/abis/Dfx.json'))

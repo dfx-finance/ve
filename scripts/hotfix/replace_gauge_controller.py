@@ -37,39 +37,33 @@ output_data = {'replacementGaugeController': None,
 
 
 def main():
-    # print(connected_network)
-    # print("--- Addresses")
-    # print("DFX", addresses.DFX)
-    # print("veDFX", addresses.VOTE_ESCROW)
-    # print("Deploy Acct:", DEPLOY_ACCT.address)
-
     dfx_distributor = brownie.interface.IDfxDistributor(
         DFX_DISTRIBUTOR_ADDRESS)
     # TOGGLE: Only required when running the script step-by-step
     gauge_controller = brownie.interface.IGaugeController(
         GAUGE_CONTROLLER_ADDRESS)
 
-    # # 1. Deploy new GaugeController
-    # print(
-    #     f'--- Deploying Gauge Controller contract to {connected_network} ---')
-    # gauge_controller_params = eth_abi.encode_abi(['address', 'address', 'address'],
-    #                                              (addresses.DFX, addresses.VOTE_ESCROW, DEPLOY_ACCT.address)).hex()
-    # gauge_controller = GaugeController.deploy(
-    #     addresses.DFX, addresses.VOTE_ESCROW, DEPLOY_ACCT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
-    # time.sleep(3)
-    # output_data['replacementGaugeController'] = gauge_controller.address
-    # output_data['replacementGaugeControllerParams'] = gauge_controller_params
+    # 1. Deploy new GaugeController
+    print(
+        f'--- Deploying Gauge Controller contract to {connected_network} ---')
+    gauge_controller_params = eth_abi.encode_abi(['address', 'address', 'address'],
+                                                 (addresses.DFX, addresses.VOTE_ESCROW, DEPLOY_ACCT.address)).hex()
+    gauge_controller = GaugeController.deploy(
+        addresses.DFX, addresses.VOTE_ESCROW, DEPLOY_ACCT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+    time.sleep(3)
+    output_data['replacementGaugeController'] = gauge_controller.address
+    output_data['replacementGaugeControllerParams'] = gauge_controller_params
 
-    # print(
-    #     f'--- Configure Gauge Controller with "Liquidity" type on {connected_network} ---')
-    # gauge_controller.add_type(
-    #     DEFAULT_GAUGE_TYPE_NAME, DEFAULT_TYPE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+    print(
+        f'--- Configure Gauge Controller with "Liquidity" type on {connected_network} ---')
+    gauge_controller.add_type(
+        DEFAULT_GAUGE_TYPE_NAME, DEFAULT_TYPE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
-    # # 2. Add all existing gauges to GaugeController
-    # for _, gauge_addr in GAUGE_ADDRESSES:
-    #     print('--- Add gauge to GaugeController ---')
-    #     gauge_controller.add_gauge(
-    #         gauge_addr, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+    # 2. Add all existing gauges to GaugeController
+    for _, gauge_addr in GAUGE_ADDRESSES:
+        print('--- Add gauge to GaugeController ---')
+        gauge_controller.add_gauge(
+            gauge_addr, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
     # 3. Update Distributor with new GaugeController address
     orig_controller_addr = dfx_distributor.controller()

@@ -14,28 +14,16 @@ if network.show_active() == 'polygon-main':
                  'NZDS_USDC', 'TRYB_USDC', 'XSGD_USDC']
 
 
-def gauge_controller():
-    _address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
-    if not _address:
-        return LookupError('No GaugeController deployments found')
-    return brownie.interface.IGaugeController(_address)
+def veboost_proxy(address):
+    return brownie.interface.IVeBoostProxy(address)
 
 
-def dfx_distributor():
-    _address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-    if not _address:
-        return LookupError('No GaugeDistributor deployments found')
-    return brownie.interface.IDfxDistributor(_address)
+def gauge_controller(address):
+    return brownie.interface.IGaugeController(address)
 
 
-def veboost_proxy():
-    _address = get_json_address(
-        'deployed_gaugecontroller', ['veBoostProxy'])
-    if not _address:
-        return LookupError('No VeBoostProxy deployments found')
-    return brownie.interface.IVeBoostProxy(_address)
+def dfx_distributor(address):
+    return brownie.interface.IDfxDistributor(address)
 
 
 def gauge(gauge_id):

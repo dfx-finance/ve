@@ -28,9 +28,9 @@ def get_gauge_info(dfx, voting_escrow, veboost_proxy, acct, gauge):
 
 
 def main():
-    dfx_distributor = contracts.dfx_distributor()
-    veboost_proxy = contracts.veboost_proxy()
-    gauges = contracts.gauges()
+    veboost_proxy = contracts.veboost_proxy(addresses.VOTE_ESCROW)
+    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
+    gauges = contracts.gauges(addresses.GAUGE_CONTROLLER)
 
     block_num = web3.eth.block_number
     block_timestamp = chain[block_num]['timestamp']
