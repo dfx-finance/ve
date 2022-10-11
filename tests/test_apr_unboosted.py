@@ -4,7 +4,6 @@ import brownie
 from brownie import accounts
 import pytest
 
-from utils import addresses
 from utils.apr import (
     distribute_to_gauges,
     calc_boosted_apr,
@@ -16,7 +15,8 @@ from utils.apr import (
 from utils.chain import fastforward_chain, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.token import fund_multisig
+from utils.testing import addresses
+from utils.testing.token import fund_multisig
 
 
 # handle setup logic required for each unit test
@@ -111,7 +111,7 @@ def test_unboosted_apr(dfx, mock_lp_tokens, distributor, voting_escrow, veboost_
                             expected_rewards=[1603681962425288096000, 1603671355782503732000])
     apr = calc_boosted_apr(voting_escrow, veboost_proxy,
                            euroc_usdc_gauge, user_0, available_rewards['combined'])
-    assert isclose(apr, 1.8407160722410767, abs_tol=1e-4)
+    assert isclose(apr, 1.4611242790681405, abs_tol=1e-4)
 
     # 4. Test what happens when no rewards are during the epoch. Does the APR immediately fall to 0?
     fastforward_chain(num_weeks=2, delta=-10)
@@ -143,7 +143,7 @@ def test_unboosted_apr(dfx, mock_lp_tokens, distributor, voting_escrow, veboost_
         dfx, euroc_usdc_gauge, [user_0, user_1])
     apr = calc_boosted_apr(voting_escrow, veboost_proxy,
                            euroc_usdc_gauge, user_0, available_rewards['combined'])
-    assert isclose(apr, 3.638810711704843, abs_tol=1e-5)
+    assert isclose(apr, 2.8883305368143133, abs_tol=1e-5)
 
     # Fast-forward until 10s before end of epoch 3
     fastforward_chain(num_weeks=1, delta=-10)

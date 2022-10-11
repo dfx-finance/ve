@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from .chain import gas_strategy
-from .token import mint_dfx, send_dfx
+from .testing.token import mint_dfx
+from .token import send_dfx
 from .constants import (
     DEFAULT_GAUGE_TYPE,
     DEFAULT_GAUGE_WEIGHT,

@@ -15,7 +15,7 @@ from utils.apr import (
 from utils.chain import fastforward_chain
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.token import fund_multisig
+from utils.testing.token import fund_multisig
 
 
 # handle setup logic required for each unit test
@@ -82,7 +82,7 @@ def test_boosted_apr(dfx, mock_lp_tokens, distributor, gauge_controller, voting_
     available_rewards = claimable_rewards(
         dfx, euroc_usdc_gauge, users)
 
-    expected = [4.601927142720035, 1.8407160722410767]
+    expected = [3.6528106976703514, 1.4611242790681405]
     for i, user in enumerate(users):
         apr = calc_boosted_apr(
             voting_escrow, veboost_proxy, euroc_usdc_gauge, user, available_rewards['combined'])

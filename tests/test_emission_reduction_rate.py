@@ -6,7 +6,7 @@ import pytest
 from utils.chain import fastforward_chain, gas_strategy
 from utils.constants import EMISSION_RATE, WEEK
 from utils.gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
-from utils.token import fund_multisig
+from utils.testing.token import fund_multisig
 
 
 # handle setup logic required for each unit test

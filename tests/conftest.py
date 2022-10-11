@@ -3,8 +3,8 @@ from brownie import ZERO_ADDRESS, Contract, network
 import json
 import pytest
 
-from utils import addresses
 from utils.chain import fastforward_chain
+from utils.testing import addresses
 from utils.token import gas_strategy
 
 
