@@ -2,10 +2,10 @@
 import json
 import time
 
-from brownie import DfxUpgradeableProxy, LiquidityGaugeV4, accounts
+from brownie import DfxUpgradeableProxy, LiquidityGaugeV4
 
 from scripts import contracts
-from scripts.helper import get_addresses, network_info, gas_strategy
+from scripts.helper import get_addresses, network_info, gas_strategy, DEPLOY_ACCT, PROXY_MULTISIG
 
 addresses = get_addresses()
 connected_network, is_local_network = network_info()
@@ -13,10 +13,6 @@ connected_network, is_local_network = network_info()
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
 
-DEPLOY_ACCT = accounts.load('hardhat')
-PROXY_MULTISIG = accounts[7]
-# DEPLOY_ACCT = accounts.load('deployve')
-# PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
 
 output_data = {'gauges': {'amm': {}}}
 
@@ -32,9 +28,9 @@ def main():
     should_verify = not is_local_network
     # should_verify = False
 
-    veboost_proxy = contracts.veboost_proxy()
-    gauge_controller = contracts.gauge_controller()
-    dfx_distributor = contracts.dfx_distributor()
+    veboost_proxy = contracts.veboost_proxy(addresses.VE_BOOST_PROXY)
+    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
+    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     print(
         f'--- Deploying Liquidity Gauges (v4) contract to {connected_network} ---')

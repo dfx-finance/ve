@@ -2,20 +2,22 @@
 import json
 import time
 
-from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy, accounts
+from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
 from scripts import contracts
-from scripts.helper import get_addresses, network_info, gas_strategy
+from scripts.helper import (
+    get_addresses,
+    network_info,
+    gas_strategy,
+    DEPLOY_ACCT,
+    PROXY_MULTISIG,
+    GOVERNOR_MULTISIG,
+    GUARDIAN_MULTISIG,
+)
+
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
-
-DEPLOY_ACCT = accounts.load('hardhat')
-PROXY_MULTISIG = accounts[7]
-# DEPLOY_ACCT = accounts.load('deployve')
-# PROXY_MULTISIG = accounts.load('deployve-proxyadmin')
-GOVERNOR_MULTISIG = DEPLOY_ACCT
-GUARDIAN_MULTISIG = DEPLOY_ACCT
 
 addresses = get_addresses()
 connected_network, is_local_network = network_info()
