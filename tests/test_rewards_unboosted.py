@@ -3,11 +3,12 @@ import brownie
 from math import isclose
 import pytest
 
-from utils import addresses
 from utils.chain import fastforward_chain, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.token import fund_multisig, assert_tokens_balance
+from utils.testing import addresses
+from utils.testing.token import fund_multisig
+from utils.token import assert_tokens_balance
 
 
 # handle setup logic required for each unit test

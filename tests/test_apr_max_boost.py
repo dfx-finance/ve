@@ -15,7 +15,7 @@ from utils.apr import (
 from utils.chain import fastforward_chain, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.token import fund_multisig, mint_dfx
+from utils.testing.token import fund_multisig, mint_dfx
 from utils.ve import deposit_to_ve, submit_ve_vote
 
 
@@ -110,4 +110,4 @@ def test_apply_max_boost(dfx, mock_lp_tokens, voting_escrow, gauge_controller, d
         dfx, euroc_usdc_gauge, [user_0, user_1])
     apr = calc_boosted_apr(
         voting_escrow, veboost_proxy, euroc_usdc_gauge, user_1, available_rewards['combined'])
-    assert isclose(apr, 4.601927142720035, abs_tol=1e-4)
+    assert isclose(apr, 3.6528106976703514, abs_tol=1e-4)
