@@ -1,16 +1,12 @@
 #!/usr/bin/env python
-from brownie import accounts
 import json
 import time
 
 from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy, load_dfx_token
+from scripts.helper import get_addresses, gas_strategy, load_dfx_token, DEPLOY_ACCT
 
 REWARDS_RATE = 1.60345055442863e16
 TOTAL_DFX_REWARDS = 1_248_560 * 1e18
-
-DEPLOY_ACCT = accounts.load('hardhat')
-# DEPLOY_ACCT = accounts.load('deployve')
 
 addresses = get_addresses()
 

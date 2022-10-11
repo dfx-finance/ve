@@ -3,9 +3,10 @@ from brownie import accounts, VeDFX
 from brownie.network import gas_price
 import eth_abi
 import json
+import os
 import time
 
-from scripts.helper import gas_strategy, get_addresses, network_info
+from scripts.helper import gas_strategy, get_addresses, network_info, DEPLOY_ACCT
 
 
 gas_price(gas_strategy)
@@ -14,8 +15,6 @@ addresses = get_addresses()
 
 
 def main():
-    acct = accounts.load('deployve')
-
     print(f'--- Deploying veDFX contract to {connected_network} ---')
 
     output_data = {'veDFX': None}

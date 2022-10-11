@@ -4,10 +4,9 @@ from brownie import accounts
 from brownie.network import gas_price
 
 from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses, get_json_address
+from scripts.helper import gas_strategy, get_addresses, DEPLOY_ACCT, PROXY_MULTISIG
 
-DEPLOY_ACCT = accounts.load('hardhat')
-PROXY_MULTISIG = accounts[7]
+
 NEW_PROXY_MULTISIG = accounts[8]
 NEW_ADMIN_MULTISIG = accounts[9]
 NEW_GOVERNOR_MULTISIG = NEW_ADMIN_MULTISIG

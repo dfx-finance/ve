@@ -8,7 +8,10 @@ from brownie import Contract, network, accounts, config
 from brownie.network import show_active, gas_price
 from brownie.network.gas.strategies import LinearScalingStrategy
 
+from dotenv import load_dotenv
 from scripts import addresses
+
+load_dotenv()
 
 
 NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = [
@@ -21,6 +24,13 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
 gas_strategy = LinearScalingStrategy('40 gwei', '55 gwei', 1.3)
+
+# Script wallets
+DEPLOY_ACCT_WALLET = os.getenv('DEPLOY_WALLET', 'hardhat')
+DEPLOY_ACCT = accounts.load(DEPLOY_ACCT_WALLET)
+PROXY_MULTISIG = accounts[7] if DEPLOY_ACCT_WALLET == 'hardhat' else accounts.load('deployve-proxyadmin')
+GOVERNOR_MULTISIG = DEPLOY_ACCT if DEPLOY_ACCT_WALLET == 'hardhat' else accounts.load('deployve-governor')
+GUARDIAN_MULTISIG = DEPLOY_ACCT if DEPLOY_ACCT_WALLET == 'hardhat' else accounts.load('deployve-guardian')
 
 
 def get_account(number=None):

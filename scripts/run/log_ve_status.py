@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import accounts, chain, web3
+from brownie import chain, web3
 from datetime import datetime
 import math
 
@@ -10,14 +10,10 @@ from utils.constants import DFX_PRICE, LP_PRICE
 
 
 SECONDS_PER_YEAR = 365 * 24 * 60 * 60
-# DEPLOY_ACCT = accounts.load('hardhat')
-DEPLOY_ACCT = accounts.load('deployve')
 
 addresses = get_addresses()
 
 
-# TODO: check this, seems to return APR for deploy acct as a user,
-# should be returning a global (not tied to any particular account) APR
 def get_gauge_info(dfx, gauge):
     apr = math.inf
     available_rewards = dfx.balanceOf(gauge)

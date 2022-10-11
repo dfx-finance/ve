@@ -6,13 +6,12 @@ from brownie import accounts
 from brownie.network import gas_price
 
 from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses, load_dfx_token
+from scripts.helper import gas_strategy, get_addresses, load_dfx_token, DEPLOY_ACCT
 
 
 gas_price(gas_strategy)
 addresses = get_addresses()
 
-DEPLOY_ACCT = accounts.load('hardhat')
 DFX_MULTISIG = accounts.at(address=addresses.DFX_MULTISIG, force=True)
 
 

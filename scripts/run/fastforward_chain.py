@@ -1,13 +1,11 @@
 #!/usr/bin/env python
-from brownie import accounts, chain
+from brownie import chain
 from brownie.network import gas_price
 
 from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses
+from scripts.helper import gas_strategy, get_addresses, DEPLOY_ACCT
+from utils.constants import WEEK
 
-WEEK = 86400 * 7
-
-DEPLOY_ACCT = accounts.load('hardhat')
 
 addresses = get_addresses()
 gas_price(gas_strategy)

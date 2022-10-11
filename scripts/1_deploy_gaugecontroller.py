@@ -4,12 +4,10 @@ import eth_abi
 import json
 import time
 
-from scripts.helper import get_addresses, network_info, gas_strategy
+from scripts.helper import get_addresses, network_info, gas_strategy, DEPLOY_ACCT
 
 DEFAULT_GAUGE_TYPE_NAME = 'DFX AMM Liquidity'
 DEFAULT_TYPE_WEIGHT = 1e18
-DEPLOY_ACCT = accounts.load('hardhat')
-# DEPLOY_ACCT = accounts.load('deployve')
 
 addresses = get_addresses()
 connected_network, _ = network_info()

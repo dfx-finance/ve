@@ -4,7 +4,7 @@ from datetime import datetime
 
 from .chain import gas_strategy
 from .constants import WEEK, EPOCHS_PER_YEAR, TOKENLESS_PRODUCTION, DFX_PRICE, LP_PRICE
-from .token import mint_dfx
+from .testing.token import mint_dfx
 from .ve import deposit_to_ve, submit_ve_vote
 
 
