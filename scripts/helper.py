@@ -110,5 +110,5 @@ def get_addresses():
         return addresses.Localhost
     if connected_network == 'polygon-main':
         return addresses.Polygon
-    if connected_network == 'ethereum':
+    if connected_network in ['ethereum', 'mainnet']:
         return addresses.Ethereum
