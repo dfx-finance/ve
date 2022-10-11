@@ -33,9 +33,9 @@ def main():
         '\t4. Governor and Guardian addresses'
     ))
     should_verify = not is_local_network
-    should_verify = False
+    # should_verify = False
 
-    gauge_controller = contracts.gauge_controller()
+    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
 
     print(f'--- Deploying Distributor contract to {connected_network} ---')
     dfx_distributor = DfxDistributor.deploy(

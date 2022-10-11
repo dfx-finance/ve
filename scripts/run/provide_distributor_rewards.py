@@ -36,7 +36,7 @@ def main():
     ))
     dfx = load_dfx_token()
 
-    dfx_distributor = contracts.dfx_distributor()
+    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     # provide multisig with ether
     DEPLOY_ACCT.transfer(addresses.DFX_MULTISIG,

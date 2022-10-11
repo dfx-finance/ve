@@ -126,6 +126,14 @@ def calc_boosted_apr(voting_escrow, veboost_proxy, gauge, account, available_rew
     return 0
 
 
+def calc_global_boosted_apr(gauge, available_rewards):
+    gauge_lp_total = gauge.totalSupply()
+    yearly_rewards = available_rewards * EPOCHS_PER_YEAR
+    if gauge_lp_total:
+        return (yearly_rewards * DFX_PRICE) / (gauge_lp_total * LP_PRICE)
+    return 0
+
+
 # boosted_weight = (gauge_lp_balance * 40/100) + \
 #     (gauge_lp_total * voting_balance / voting_total * (100-40)/100)
 def calc_required_vedfx(voting_escrow, veboost_proxy, gauge, account):

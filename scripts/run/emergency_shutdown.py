@@ -5,19 +5,20 @@
 from brownie import accounts
 from brownie.network import gas_price
 
-from scripts import addresses, contracts
-from scripts.helper import gas_strategy, load_dfx_token
+from scripts import contracts
+from scripts.helper import gas_strategy, get_addresses, load_dfx_token
 
+
+gas_price(gas_strategy)
+addresses = get_addresses()
 
 DEPLOY_ACCT = accounts.load('hardhat')
 DFX_MULTISIG = accounts.at(address=addresses.DFX_MULTISIG, force=True)
 
-gas_price(gas_strategy)
-
 
 def main():
     dfx = load_dfx_token()
-    dfx_distributor = contracts.dfx_distributor()
+    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     # disable distributions
     dfx_distributor.toggleDistributions(
@@ -29,9 +30,9 @@ def main():
 
     distributor_bal = dfx.balanceOf(dfx_distributor.address)
     multisig_starting_bal = dfx.balanceOf(DFX_MULTISIG)
-    dfx_distributor.recoverERC20(dfx.address, DFX_MULTISIG, distributor_bal, {
+    dfx_distributor.recoverERC20(dfx.address, addresses.DFX_MULTISIG, distributor_bal, {
                                  'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
-    multisig_ending_bal = dfx.balanceOf(DFX_MULTISIG)
+    multisig_ending_bal = dfx.balanceOf(addresses.DFX_MULTISIG)
     print(multisig_starting_bal)
     print(multisig_ending_bal)
 

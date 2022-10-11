@@ -27,4 +27,6 @@ interface ILiquidityGauge {
     function commit_transfer_ownership(address _addr) external;
 
     function accept_transfer_ownership() external;
+
+    function name() external view returns (string memory name);
 }

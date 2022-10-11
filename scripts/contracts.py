@@ -2,50 +2,55 @@
 import brownie
 from brownie import network
 
-from scripts.helper import get_json_address
+from scripts import addresses
 
 
-GAUGE_IDS = None
-if network.show_active() in ['ethereum', 'hardhat']:
-    GAUGE_IDS = ['CADC_USDC', 'EURS_USDC', 'EUROC_USDC',
-                 'NZDS_USDC', 'TRYB_USDC', 'XIDR_USDC', 'XSGD_USDC']
-if network.show_active() == 'polygon-main':
-    GAUGE_IDS = ['CADC_USDC', 'EURS_USDC',
-                 'NZDS_USDC', 'TRYB_USDC', 'XSGD_USDC']
+GAUGE_ADDRESSES = None
+if network.show_active() in ['ethereum', 'mainnet']:
+    GAUGE_ADDRESSES = [
+        addresses.Ethereum.DFX_CADC_USDC_GAUGE,
+        addresses.Ethereum.DFX_EUROC_USDC_GAUGE,
+        addresses.Ethereum.DFX_EURS_USDC_GAUGE,
+        addresses.Ethereum.DFX_NZDS_USDC_GAUGE,
+        addresses.Ethereum.DFX_TRYB_USDC_GAUGE,
+        addresses.Ethereum.DFX_XIDR_USDC_GAUGE,
+        addresses.Ethereum.DFX_XSGD_USDC_GAUGE,
+    ]
+elif network.show_active() == 'polygon-main':
+    GAUGE_ADDRESSES = [
+        addresses.Polygon.DFX_CADC_USDC_GAUGE,
+        addresses.Polygon.DFX_EURS_USDC_GAUGE,
+        addresses.Polygon.DFX_NZDS_USDC_GAUGE,
+        addresses.Polygon.DFX_TRYB_USDC_GAUGE,
+        addresses.Polygon.DFX_XSGD_USDC_GAUGE,
+    ]
+elif network.show_active() == 'hardhat':
+    GAUGE_ADDRESSES = [
+        addresses.Localhost.DFX_CADC_USDC_GAUGE,
+        addresses.Localhost.DFX_EUROC_USDC_GAUGE,
+        addresses.Localhost.DFX_EURS_USDC_GAUGE,
+        addresses.Localhost.DFX_NZDS_USDC_GAUGE,
+        addresses.Localhost.DFX_TRYB_USDC_GAUGE,
+        addresses.Localhost.DFX_XIDR_USDC_GAUGE,
+        addresses.Localhost.DFX_XSGD_USDC_GAUGE,
+    ]
 
 
-def gauge_controller():
-    _address = get_json_address(
-        'deployed_gaugecontroller', ['gaugeController'])
-    if not _address:
-        return LookupError('No GaugeController deployments found')
-    return brownie.interface.IGaugeController(_address)
+def veboost_proxy(address):
+    return brownie.interface.IVeBoostProxy(address)
 
 
-def dfx_distributor():
-    _address = get_json_address(
-        'deployed_distributor', ['distributor', 'proxy'])
-    if not _address:
-        return LookupError('No GaugeDistributor deployments found')
-    return brownie.interface.IDfxDistributor(_address)
+def gauge_controller(address):
+    return brownie.interface.IGaugeController(address)
 
 
-def veboost_proxy():
-    _address = get_json_address(
-        'deployed_gaugecontroller', ['veBoostProxy'])
-    if not _address:
-        return LookupError('No VeBoostProxy deployments found')
-    return brownie.interface.IVeBoostProxy(_address)
+def dfx_distributor(address):
+    return brownie.interface.IDfxDistributor(address)
 
 
-def gauge(gauge_id):
-    _address = get_json_address(
-        'deployed_liquidity_gauges_v4', ['gauges', 'amm', gauge_id, 'proxy'])
-    if not _address:
-        return LookupError(f'No Gauge deployments for {gauge_id} found')
-    return brownie.interface.ILiquidityGauge(_address)
+def gauge(address):
+    return brownie.interface.ILiquidityGauge(address)
 
 
 def gauges():
-    _gauges = [gauge(gauge_id) for gauge_id in GAUGE_IDS]
-    return _gauges
+    return [gauge(gauge_addr) for gauge_addr in GAUGE_ADDRESSES]

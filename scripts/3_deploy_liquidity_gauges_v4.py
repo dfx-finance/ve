@@ -30,7 +30,7 @@ def main():
         '\t3. GaugeController address'
     ))
     should_verify = not is_local_network
-    should_verify = False
+    # should_verify = False
 
     veboost_proxy = contracts.veboost_proxy()
     gauge_controller = contracts.gauge_controller()
@@ -56,8 +56,8 @@ def main():
         print("Sleeping after deploy....")
         time.sleep(10)
 
+    # deploy gauge behind proxy
     for label, lp_addr in lp_addresses:
-        # deploy gauge behind proxy
         print(
             f'--- Deploying LiquidityGaugeV4 proxy contract to {connected_network} ---')
         gauge_initializer_calldata = gauge.initialize.encode_input(
