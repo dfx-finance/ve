@@ -279,7 +279,6 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
         }
     }
 
-    // TESTING
     /// @notice Passes through rewards from governor wallet to a gauge
     /// @param gaugeAddr Address of the gauge to send tokens to
     /// @param rewardTokenAddr Address of the reward token to send to gauge
