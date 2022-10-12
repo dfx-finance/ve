@@ -1,12 +1,9 @@
 #!/usr/bin/env python
-from brownie import accounts
-
 from scripts import contracts
 from scripts.helper import get_addresses, gas_strategy, DEPLOY_ACCT
 
 
 addresses = get_addresses()
-
 
 def main():
     print((
