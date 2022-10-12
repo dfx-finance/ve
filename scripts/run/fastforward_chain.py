@@ -19,10 +19,9 @@ def main():
     t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
     chain.sleep(t1 - t0)
 
-    # distribute rewards to gauges
-    gauge_addrs = [g.address for g in contracts.gauges()]
-    dfx_distributor.distributeRewardToMultipleGauges(
-        gauge_addrs, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+    # recalculate reward rate
+    dfx_distributor.updateMiningParameters(
+        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
 
 if __name__ == '__main__':
