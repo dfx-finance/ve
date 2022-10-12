@@ -36,7 +36,7 @@ def teardown():
     brownie.chain.reset()
 
 
-def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge_controller, distributor, master_account):
+def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge_controller, distributor, master_account, new_master_account):
     starting_dfx_balance = dfx.balanceOf(master_account)
 
     # check that we have been pre-minted LP tokens
@@ -69,7 +69,7 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
         fastforward_chain(num_weeks=1, delta=10)
 
         # Manually Distribute rewards to gauge via the distributor contract
-        mint_dfx(dfx, 15000*1e18, master_account)
-        dfx.approve(distributor, 15000*1e18, {'from': master_account, 'gas_price': gas_strategy})
-        distributor.passRewardToGauge(euroc_usdc_gauge, addresses.DFX, 15000*1e18, {'from': master_account, 'gas_price': gas_strategy})
+        mint_dfx(dfx, 15000*1e18, new_master_account)
+        dfx.approve(distributor, 15000*1e18, {'from': new_master_account, 'gas_price': gas_strategy})
+        distributor.passRewardToGauge(euroc_usdc_gauge, addresses.DFX, 15000*1e18, {'from': new_master_account, 'gas_price': gas_strategy})
         print(dfx.balanceOf(euroc_usdc_gauge) / 1e18)   

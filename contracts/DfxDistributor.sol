@@ -286,9 +286,10 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     /// @param rewardTally Amount of tokens to send to gauge
     /// @dev This is a DFX-custom function to easily pass-through manual reward distributions
     /// to gauge contracts
-    function passRewardToGauge(address gaugeAddr, address rewardTokenAddr, uint256 rewardTally) external nonReentrant {
+    function passRewardToGauge(address gaugeAddr, address rewardTokenAddr, uint256 rewardTally) external onlyRole(GOVERNOR_ROLE) {
         IERC20(rewardTokenAddr).safeTransferFrom(msg.sender, address(this), rewardTally);
         ILiquidityGauge(gaugeAddr).deposit_reward_token(address(rewardTokenAddr), rewardTally);
+        emit RewardDistributed(gaugeAddr, rewardTally);
     }
 
     /// @notice Updates mining rate and supply at the start of the epoch
@@ -373,13 +374,7 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     /// @dev As this function assumes that `distributeReward` has been called during the week, it also assumes that the `startEpochSupply`
     /// parameter has been put up to date
     function setRate(uint256 _newRate) external onlyRole(GOVERNOR_ROLE) {
-        //// Checking if the new rate is compatible with the amount of DFX tokens this contract has in balance
-        //// This check assumes, like this function, that `distributeReward` has correctly been called before
-        // require(
-        //     rewardToken.balanceOf(address(this)) >=
-        //         ((_newRate * RATE_REDUCTION_COEFFICIENT) * WEEK) / (RATE_REDUCTION_COEFFICIENT - BASE),
-        //     "4"
-        // );
+        // NOTE: Check for 4 yr rate > rewards supplied from Angle removed here
         rate = _newRate;
         emit RateUpdated(_newRate);
     }
