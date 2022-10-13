@@ -71,17 +71,22 @@ def main():
             {'from': DEPLOY_ACCT, 'gas_price': gas_strategy},
             publish_source=should_verify,
         )
+        output_data['gauges']['amm'][label] = {
+            'logic': gauge.address,
+            'calldata': gauge_initializer_calldata,
+            'proxy': dfx_upgradeable_proxy.address,
+        }
+        with open(f'./scripts/deployed_liquidity_gauges_v4_{label}_{int(time.time())}.json', 'w') as output_f:
+            json.dump(output_data, output_f, indent=4)        
+
+        if connected_network != 'hardhat':
+            print("Sleeping after deploy....")
+            time.sleep(3)
 
         print('--- Add gauge to GaugeController ---')
         gauge_controller.add_gauge(
             dfx_upgradeable_proxy.address, DEFAULT_GAUGE_TYPE, DEFAULT_GAUGE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 
-        output_data['gauges']['amm'][label] = {
-            'logic': gauge.address,
-            'proxy': dfx_upgradeable_proxy.address,
-        }
-        # with open(f'./scripts/deployed_liquidity_gauges_v4_{label}_{int(time.time())}.json', 'w') as output_f:
-        #     json.dump(output_data, output_f, indent=4)
 
     with open(f'./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json', 'w') as output_f:
         json.dump(output_data, output_f, indent=4)

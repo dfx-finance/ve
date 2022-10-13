@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import ZERO_ADDRESS, GaugeController, VeBoostProxy, accounts
+from brownie import ZERO_ADDRESS, GaugeController, VeBoostProxy
 import eth_abi
 import json
 import time
