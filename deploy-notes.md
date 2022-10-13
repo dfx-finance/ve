@@ -1,3 +1,5 @@
+`rm scripts/*.json`
+
 to deploy:
 brownie run 1_deploy_gaugecontroller.py --network hardhat
 brownie run 2_deploy_distributor.py --network hardhat
