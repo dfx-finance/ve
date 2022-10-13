@@ -44,7 +44,7 @@ def main():
     output_data['gaugeControllerParams'] = gauge_controller_params
 
     print(
-        f'--- Configure Gauge Controller with "Liquidity" type on {connected_network} ---')
+        f'--- Configure Gauge Controller with "{DEFAULT_GAUGE_TYPE_NAME}" type on {connected_network} ---')
     gauge_controller.add_type(
         DEFAULT_GAUGE_TYPE_NAME, DEFAULT_TYPE_WEIGHT, {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
 

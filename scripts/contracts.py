@@ -10,7 +10,7 @@ if network.show_active() in ['ethereum', 'mainnet']:
     GAUGE_ADDRESSES = [
         addresses.Ethereum.DFX_CADC_USDC_GAUGE,
         addresses.Ethereum.DFX_EUROC_USDC_GAUGE,
-        addresses.Ethereum.DFX_EURS_USDC_GAUGE,
+        addresses.Ethereum.DFX_GYEN_USDC_GAUGE,
         addresses.Ethereum.DFX_NZDS_USDC_GAUGE,
         addresses.Ethereum.DFX_TRYB_USDC_GAUGE,
         addresses.Ethereum.DFX_XIDR_USDC_GAUGE,
@@ -28,7 +28,7 @@ elif network.show_active() == 'hardhat':
     GAUGE_ADDRESSES = [
         addresses.Localhost.DFX_CADC_USDC_GAUGE,
         addresses.Localhost.DFX_EUROC_USDC_GAUGE,
-        addresses.Localhost.DFX_EURS_USDC_GAUGE,
+        addresses.Localhost.DFX_GYEN_USDC_GAUGE,
         addresses.Localhost.DFX_NZDS_USDC_GAUGE,
         addresses.Localhost.DFX_TRYB_USDC_GAUGE,
         addresses.Localhost.DFX_XIDR_USDC_GAUGE,
