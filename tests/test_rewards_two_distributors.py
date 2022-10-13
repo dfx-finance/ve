@@ -36,9 +36,7 @@ def teardown():
     brownie.chain.reset()
 
 
-def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge_controller, distributor, master_account, new_master_account):
-    starting_dfx_balance = dfx.balanceOf(master_account)
-
+def test_single_user_two_distributors(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge_controller, distributor, master_account, new_master_account):
     # check that we have been pre-minted LP tokens
     assert_tokens_balance(mock_lp_tokens, master_account, 1e9)
 
@@ -57,19 +55,19 @@ def test_single_user_stake(dfx, mock_lp_tokens, three_liquidity_gauges_v4, gauge
 
     # call rewards distribution in various epochs:
     # rewards = [Wednesday before epoch 0, epoch 1, epoch 2, ...]
-    expected_rewards = [0, 0, 3207448777992800000000,
-                        6389985028646000000000, 9547802249677200000000]
+    expected_rewards = [0, 14999718292392400000000, 33207374248706800000000,
+                        51389910501346800000000, 69547727723329200000000]
     for i in range(5):
         distributor.distributeRewardToMultipleGauges(
             three_liquidity_gauges_v4, {'from': master_account, 'gas_price': gas_strategy})
 
-        claimable_reward = euroc_usdc_gauge.claimable_reward(master_account, addresses.DFX)
-        # assert isclose(claimable_reward, expected_rewards[i], abs_tol=1e16)
-
-        fastforward_chain(num_weeks=1, delta=10)
-
-        # Manually Distribute rewards to gauge via the distributor contract
+        # Manually distribute rewards to gauge via the distributor contract
         mint_dfx(dfx, 15000*1e18, new_master_account)
         dfx.approve(distributor, 15000*1e18, {'from': new_master_account, 'gas_price': gas_strategy})
         distributor.passRewardToGauge(euroc_usdc_gauge, addresses.DFX, 15000*1e18, {'from': new_master_account, 'gas_price': gas_strategy})
-        print(dfx.balanceOf(euroc_usdc_gauge) / 1e18)   
+
+        claimable_reward = euroc_usdc_gauge.claimable_reward(master_account, addresses.DFX)
+        assert isclose(claimable_reward, expected_rewards[i], abs_tol=1e16)
+
+        fastforward_chain(num_weeks=1, delta=10)
+
