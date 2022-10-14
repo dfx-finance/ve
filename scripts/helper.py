@@ -22,7 +22,7 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
 ]
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('30 gwei', '35 gwei', 1.3)
+gas_strategy = LinearScalingStrategy('14 gwei', '24 gwei', 1.3)
 
 # Script wallets
 DEPLOY_ACCT_WALLET = os.getenv('DEPLOY_WALLET', 'hardhat')
