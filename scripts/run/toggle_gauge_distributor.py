@@ -15,8 +15,6 @@ def main():
     print((
         'NOTE: This script expects configuration for:\n'
         '\t1. DfxDistributor address\n'
-        '\t2. Total amount of rewards to provide\n'
-        '\t3. New DFX token rewards per second\n'
     ))
 
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)

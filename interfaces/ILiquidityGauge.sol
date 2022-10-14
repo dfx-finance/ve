@@ -29,4 +29,6 @@ interface ILiquidityGauge {
     function accept_transfer_ownership() external;
 
     function name() external view returns (string memory name);
+
+    function user_checkpoint(address _addr) external returns (bool);
 }

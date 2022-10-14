@@ -130,4 +130,6 @@ interface IDfxDistributor {
     function toggleInterfaceKnown(address _delegateGauge) external;
 
     function updateMiningParameters() external;
+
+    function passRewardToGauge(address gaugeAddr, address rewardAddr, uint256 rewardTally) external;
 }
