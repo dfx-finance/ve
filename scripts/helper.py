@@ -22,7 +22,7 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
 ]
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy('14 gwei', '24 gwei', 1.3)
+gas_strategy = LinearScalingStrategy('25 gwei', '70 gwei', 1.3)
 
 # Script wallets
 DEPLOY_ACCT_WALLET = os.getenv('DEPLOY_WALLET', 'hardhat')
@@ -115,9 +115,9 @@ def network_info():
 def get_addresses():
     connected_network, _ = network_info()
 
-    if connected_network == 'hardhat':
-        return addresses.Localhost
+    # if connected_network == 'hardhat':
+    #     return addresses.Localhost
     if connected_network == 'polygon-main':
         return addresses.Polygon
-    if connected_network in ['ethereum', 'mainnet']:
+    if connected_network in ['ethereum', 'mainnet', 'hardhat']:
         return addresses.Ethereum

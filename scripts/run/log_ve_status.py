@@ -49,6 +49,22 @@ def main():
     for label, rewards, apr in gauge_infos:
         print(f'{label}: {(apr * 100):.2f}% (Avail. rewards: {rewards / 1e18})')
 
+    print('--- Original gauges --------------')
+    orig_gauges = [
+        '0x85aD6DCfd14696da299e6a5097DFEf0ACEaE902d',
+        '0xB48cCFcE88E7E321E4A582b62844d814Cf092aD1',
+        '0x2C7275dC37Dd9799776A7d8a121dF338738D0bEe',
+        '0x32b1E7Ca34D1c1A28701ce731B4d2845152197b7',
+        '0x3Bc9016eC6dAac5ac474De1ae3BfDC3c28e724Bf',
+        '0x31696BdbcD03fB06b1F62DD0DEDe9b25AF2F3160',
+        '0x7FFE7048e468b3bf08fD6F6998E34F44883f1923',
+    ]
+    for gauge_addr in orig_gauges:
+        orig_gauge = contracts.gauge(gauge_addr)
+        available_rewards = dfx.balanceOf(orig_gauge)
+        label = orig_gauge.name()
+        print(f'{label}: {(apr * 100):.2f}% (Avail. rewards: {available_rewards / 1e18})')
+
     print(
         f'NOTE: DFX price (${DFX_PRICE}) and LPT price (${LP_PRICE}) are estimated and set as constants. APRs will be off accordingly.')
 
