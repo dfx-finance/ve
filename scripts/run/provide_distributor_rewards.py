@@ -5,7 +5,7 @@ import time
 from scripts import contracts
 from scripts.helper import get_addresses, gas_strategy, load_dfx_token, DEPLOY_ACCT
 
-REWARDS_RATE = 2.00347736805723e17
+REWARDS_RATE = 1.9875488905e17
 TOTAL_DFX_REWARDS = 5_118_750 * 1e18
 
 addresses = get_addresses()
