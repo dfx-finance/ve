@@ -8,7 +8,7 @@ from scripts.helper import get_addresses, gas_strategy, load_dfx_token, DEPLOY_A
 addresses = get_addresses()
 
 DFX_MULTISIG = accounts.at(address=addresses.DFX_MULTISIG, force=True)
-TOPUP_DFX_REWARDS = 1 * 1e18
+TOPUP_DFX_REWARDS = 8586.21120696 * 1e18
 
 
 def send_dfx(dfx, amount, from_account, to_account):
@@ -21,8 +21,6 @@ def main():
     print((
         'NOTE: This script expects configuration for:\n'
         '\t1. DfxDistributor address\n'
-        '\t2. Total amount of rewards to provide\n'
-        '\t3. New DFX token rewards per second\n'
     ))
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
     dfx = load_dfx_token()

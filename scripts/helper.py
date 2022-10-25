@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from functools import reduce
 import json
 import os
 
@@ -115,9 +114,9 @@ def network_info():
 def get_addresses():
     connected_network, _ = network_info()
 
-    # if connected_network == 'hardhat':
-    #     return addresses.Localhost
+    if connected_network == 'hardhat':
+        return addresses.Localhost
     if connected_network == 'polygon-main':
         return addresses.Polygon
-    if connected_network in ['ethereum', 'mainnet', 'hardhat']:
+    if connected_network in ['ethereum', 'mainnet']:
         return addresses.Ethereum
