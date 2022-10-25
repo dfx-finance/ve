@@ -2,8 +2,10 @@
 from brownie import chain
 from brownie.network import gas_price
 
-from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses, DEPLOY_ACCT
+from datetime import datetime
+import pytz
+
+from scripts.helper import gas_strategy, get_addresses
 from utils.constants import WEEK
 
 
@@ -11,18 +13,35 @@ addresses = get_addresses()
 gas_price(gas_strategy)
 
 
+class FastforwardTime:
+    def week(chain_time, n=1):
+        return chain_time + n * WEEK
+
+    def rounded_week(chain_time, n=1, delta=0):
+        return (chain_time + n * WEEK) // WEEK * WEEK + delta
+
+    def hours(chain_time, _hours, delta=0):
+        return chain_time + 60 * 60 * _hours + delta
+
+    def until(target):
+        return int(target.timestamp())
+
+
 def main():
-    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
-
     # fast-forward chain until end of epoch 1
-    t0 = chain.time()
-    t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
+    chain.sleep(0)
+    t0 = int(pytz.UTC.localize(datetime.fromtimestamp(chain.time())).timestamp())
+
+    # endtime = datetime(2023, 10, 25, 16, 0, 0, 0)
+    # t1 = FastforwardTime.until(target=endtime)
+    # t1 = 1800 # 30-mins
+    t1 = FastforwardTime.week(t0)
+
+    print(t0)
     chain.sleep(t1 - t0)
-
-    # recalculate reward rate
-    dfx_distributor.updateMiningParameters(
-        {'from': DEPLOY_ACCT, 'gas_price': gas_strategy})
+    chain.mine()
+    print(datetime.fromtimestamp(chain.time()))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
