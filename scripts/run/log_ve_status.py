@@ -59,7 +59,7 @@ def main():
 
     print(
         (
-            f"Block time: {datetime.fromtimestamp(block_timestamp)}\n"
+            f"Block time (UTC): {datetime.utcfromtimestamp(block_timestamp)}\n"
             f"Distributions: {rewards_enabled}\n"
             f"Distributor mining epoch: {dfx_distributor.miningEpoch()}\n"
             f"Distributor epoch start time: {datetime.fromtimestamp(dfx_distributor.startEpochTime())}\n"
