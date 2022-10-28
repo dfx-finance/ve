@@ -8,6 +8,8 @@ import pytz
 from scripts.helper import gas_strategy, get_addresses
 from utils.constants import WEEK
 
+TIMEZONE = pytz.timezone("America/New_York")
+
 
 addresses = get_addresses()
 gas_price(gas_strategy)
@@ -30,9 +32,9 @@ class FastforwardTime:
 def main():
     # fast-forward chain until end of epoch 1
     chain.sleep(0)
-    t0 = int(pytz.UTC.localize(datetime.fromtimestamp(chain.time())).timestamp())
+    t0 = int(chain.time())
 
-    # endtime = datetime(2023, 10, 25, 16, 0, 0, 0)
+    # endtime = TIMEZONE.localize(datetime(2022, 11, 3, 16, 0, 0, 0))
     # t1 = FastforwardTime.until(target=endtime)
     # t1 = 1800 # 30-mins
     t1 = FastforwardTime.week(t0)
@@ -40,7 +42,7 @@ def main():
     print(t0)
     chain.sleep(t1 - t0)
     chain.mine()
-    print(datetime.fromtimestamp(chain.time()))
+    print(datetime.utcfromtimestamp(chain.time()))
 
 
 if __name__ == "__main__":

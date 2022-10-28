@@ -26,4 +26,10 @@ interface IGaugeController {
     function gauges(uint256 index) external view returns (address);
 
     function change_gauge_weight(address addr, uint256 weight) external;
+
+    function get_gauge_weight(address addr) external view returns (uint256);
+
+    function checkpoint() external;
+
+    function checkpoint_gauge(address addr) external;
 }
