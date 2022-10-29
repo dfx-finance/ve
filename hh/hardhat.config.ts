@@ -17,7 +17,8 @@ const RpcUrls: Record<string, string> = {
 // const ethBlock = 15_742_070; // ammv2 deployed
 // const ethBlock = 15_749_200; // ammv2 redeployed
 // const ethBlock = 15_765_345; // ammv2 seeded
-const ethBlock = 15_816_440; // during epoch 1
+// const ethBlock = 15_816_440; // during epoch 1
+const ethBlock = 15_848_000; // during epoch 2
 
 const BlockNumbers: Record<string, number> = {
   1: ethBlock,

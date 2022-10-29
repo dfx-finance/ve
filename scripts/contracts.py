@@ -24,7 +24,7 @@ elif network.show_active() == "polygon-main":
         addresses.Polygon.DFX_TRYB_USDC_GAUGE,
         addresses.Polygon.DFX_XSGD_USDC_GAUGE,
     ]
-elif network.show_active() == "hardhat":
+elif network.show_active() in ["hardhat", "development"]:
     GAUGE_ADDRESSES = [
         addresses.Localhost.DFX_CADC_USDC_GAUGE,
         addresses.Localhost.DFX_EUROC_USDC_GAUGE,
@@ -34,6 +34,10 @@ elif network.show_active() == "hardhat":
         addresses.Localhost.DFX_XIDR_USDC_GAUGE,
         addresses.Localhost.DFX_XSGD_USDC_GAUGE,
     ]
+
+
+def voting_escrow(address):
+    return brownie.interface.IVotingEscrow(address)
 
 
 def veboost_proxy(address):

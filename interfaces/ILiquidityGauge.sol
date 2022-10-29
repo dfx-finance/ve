@@ -2,6 +2,15 @@
 
 pragma solidity ^0.8.7;
 
+struct Reward {
+    address token;
+    address distributor;
+    uint256 period_finish;
+    uint256 rate;
+    uint256 last_update;
+    uint256 integral;
+}
+
 interface ILiquidityGauge {
     function admin() external view returns (address _addr);
 
@@ -31,4 +40,12 @@ interface ILiquidityGauge {
     function name() external view returns (string memory name);
 
     function user_checkpoint(address _addr) external returns (bool);
+
+    function claimable_reward(address _addr, address _reward) external view returns (uint256);
+
+    function reward_data(address _reward) external view returns (Reward memory);
+
+    function working_balances(address _addr) external view returns (uint256);
+    
+    function working_supply() external view returns (uint256);
 }
