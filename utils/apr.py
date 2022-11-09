@@ -18,36 +18,43 @@ def log_times(distributor, stage):
 def get_euro_usdc_gauge(mock_lp_tokens, three_liquidity_gauges_v4):
     euroc_usdc_lp = mock_lp_tokens[1]
     euroc_usdc_gauge = three_liquidity_gauges_v4[1]
-    assert 'euroc' in euroc_usdc_lp.name().lower()
-    assert 'euroc' in euroc_usdc_gauge.name().lower()
+    assert "euroc" in euroc_usdc_lp.name().lower()
+    assert "euroc" in euroc_usdc_gauge.name().lower()
     return euroc_usdc_lp, euroc_usdc_gauge
 
 
 # mint lp tokens for the users (default: 10,000)
 def mint_lp_tokens(euroc_usdc_lp, users, signer_account, amount=10e21):
     for user in users:
-        euroc_usdc_lp.mint(user, amount, {
-            'from': signer_account, 'gas_price': gas_strategy})
+        euroc_usdc_lp.mint(
+            user, amount, {"from": signer_account, "gas_price": gas_strategy}
+        )
         assert euroc_usdc_lp.balanceOf(user) == amount
 
 
-def mint_vedfx_and_vote(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, voted_gauge, account, amount=1e5):
+def mint_vedfx_and_vote(
+    dfx,
+    gauge_controller,
+    voting_escrow,
+    three_liquidity_gauges_v4,
+    voted_gauge,
+    account,
+    amount=1e5,
+):
     mint_dfx(dfx, amount * 1e18, account)
     lock_timestamp = brownie.chain.time()
-    deposit_to_ve(dfx, voting_escrow, [account],
-                  [1e21], [100], lock_timestamp)
+    deposit_to_ve(dfx, voting_escrow, [account], [1e21], [100], lock_timestamp)
     # Place votes in bps (10000 = 100.00%)
-    submit_ve_vote(gauge_controller, three_liquidity_gauges_v4,
-                   [0, 10000, 0], account)
+    submit_ve_vote(gauge_controller, three_liquidity_gauges_v4, [0, 10000, 0], account)
     assert gauge_controller.vote_user_power(account) == 10000
-    voted_gauge.user_checkpoint(
-        account, {'from': account, 'gas_price': gas_strategy})
+    voted_gauge.user_checkpoint(account, {"from": account, "gas_price": gas_strategy})
 
 
 # Distribute rewards to all registered gauges and return balances
 def distribute_to_gauges(dfx, distributor, gauges, account, assertions):
     distributor.distributeRewardToMultipleGauges(
-        gauges, {'from': account, 'gas_price': gas_strategy})
+        gauges, {"from": account, "gas_price": gas_strategy}
+    )
     balances = {g: dfx.balanceOf(g) for g in gauges}
     for g, expected_balance in assertions.items():
         try:
@@ -74,7 +81,7 @@ def claimable_rewards(dfx, gauge, users):
         amount = gauge.claimable_reward(u, dfx.address)
         rewards[u] = amount
         total += amount
-    rewards['combined'] = dfx.balanceOf(gauge)
+    rewards["combined"] = dfx.balanceOf(gauge)
     return rewards
 
 
@@ -82,12 +89,11 @@ def claim_rewards(gauge, reward_address, users, signer_account):
     rewards = {}
     total = 0
     for u in users:
-        gauge.claim_rewards(
-            u, {'from': signer_account, 'gas_price': gas_strategy})
+        gauge.claim_rewards(u, {"from": signer_account, "gas_price": gas_strategy})
         amount = gauge.claimed_reward(u, reward_address)
         rewards[u] = amount
         total += amount
-    rewards['combined'] = total
+    rewards["combined"] = total
     return rewards
 
 
@@ -102,8 +108,13 @@ def calc_theoretical_rewards(distributor, gauge_weight):
 def calc_earning_weight(lp_balance, lp_total, voting_balance, voting_total):
     lim = lp_balance * TOKENLESS_PRODUCTION / 100
     if voting_total > 0:
-        lim += lp_total * voting_balance / \
-            voting_total * (100 - TOKENLESS_PRODUCTION) / 100
+        lim += (
+            lp_total
+            * voting_balance
+            / voting_total
+            * (100 - TOKENLESS_PRODUCTION)
+            / 100
+        )
     return min(lp_balance, lim)
 
 
@@ -116,7 +127,8 @@ def calc_boosted_apr(voting_escrow, veboost_proxy, gauge, account, available_rew
     voting_total = voting_escrow.totalSupply()
 
     earning_weight = calc_earning_weight(
-        gauge_lp_balance, gauge_lp_total, voting_balance, voting_total)
+        gauge_lp_balance, gauge_lp_total, voting_balance, voting_total
+    )
 
     boosted_rewards_weight = earning_weight / gauge_lp_total
     boosted_rewards = boosted_rewards_weight * available_rewards
@@ -127,7 +139,7 @@ def calc_boosted_apr(voting_escrow, veboost_proxy, gauge, account, available_rew
 
 
 def calc_global_boosted_apr(gauge, available_rewards):
-    gauge_lp_total = gauge.totalSupply()
+    gauge_lp_total = gauge.working_supply()
     yearly_rewards = available_rewards * EPOCHS_PER_YEAR
     if gauge_lp_total:
         return (yearly_rewards * DFX_PRICE) / (gauge_lp_total * LP_PRICE)
@@ -138,25 +150,25 @@ def calc_global_boosted_apr(gauge, available_rewards):
 #     (gauge_lp_total * voting_balance / voting_total * (100-40)/100)
 def calc_required_vedfx(voting_escrow, veboost_proxy, gauge, account):
     gauge_lp_balance = gauge.balanceOf(account)
-    gauge_lp_total = gauge.totalSupply()
+    gauge_lp_total = gauge.working_supply()
     voting_balance = veboost_proxy.adjusted_balance_of(account)
     voting_total = voting_escrow.totalSupply()
 
     earning_weight = calc_earning_weight(
-        gauge_lp_balance, gauge_lp_total, voting_balance, voting_total)
+        gauge_lp_balance, gauge_lp_total, voting_balance, voting_total
+    )
 
     additional_vedfx = 0
     while True:
         if earning_weight < gauge_lp_balance:
-            a = gauge_lp_balance - \
-                (gauge_lp_balance * TOKENLESS_PRODUCTION/100)
-            b = (a / (100-TOKENLESS_PRODUCTION)/100) / \
-                voting_total * gauge_lp_total
+            a = gauge_lp_balance - (gauge_lp_balance * TOKENLESS_PRODUCTION / 100)
+            b = (a / (100 - TOKENLESS_PRODUCTION) / 100) / voting_total * gauge_lp_total
             additional_vedfx += b
             voting_balance += b
             voting_total += b
             earning_weight = calc_earning_weight(
-                gauge_lp_balance, gauge_lp_total, voting_balance, voting_total)
+                gauge_lp_balance, gauge_lp_total, voting_balance, voting_total
+            )
         else:
             break
     return additional_vedfx

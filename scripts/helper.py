@@ -105,6 +105,12 @@ def load_dfx_token():
     return Contract.from_abi("DFX", addrs.DFX, abi)
 
 
+def load_usdc_token():
+    addrs = get_addresses()
+    abi = json.load(open("./tests/abis/Usdc.json"))
+    return Contract.from_abi("USDC", addrs.USDC, abi)
+
+
 def network_info():
     connected_network = show_active()
     is_local_network = connected_network in ["ganache-cli", "hardhat"]

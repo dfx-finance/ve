@@ -20,6 +20,7 @@ class GaugeInfo:
     lpt_price: float = None
     reward_price: int = None
     total_lpt: int = None
+    working_lpt: int = None
     total_rewards: int = None
 
 
@@ -33,8 +34,10 @@ def lpt_price(gauge):
 
 def get_gauge_info(dfx, gauge) -> GaugeInfo:
     info = GaugeInfo()
-    info.total_rewards = dfx.balanceOf(gauge)
+    _, _, _, rawGaugeDfxRate, _, _ = gauge.reward_data(dfx)
+    info.total_rewards = rawGaugeDfxRate * 604800
     info.label = gauge.name()
+    info.working_lpt = gauge.working_supply()
     info.total_lpt = gauge.totalSupply()
     info.lpt_price = lpt_price(gauge)
     info.reward_price = None
@@ -72,7 +75,7 @@ def main():
     gauge_infos = [get_gauge_info(dfx, g) for g in gauges]
     for info in gauge_infos:
         print(
-            f"{info.label}: Supply: {info.total_lpt / 1e18} -- APR: {(info.apr * 100):.2f}% (Avail. rewards: {info.total_rewards / 1e18})"
+            f"{info.label}: Supply: {info.working_lpt / 1e18} ({info.total_lpt / 1e18}) -- APR: {(info.apr * 100):.2f}% (Avail. rewards: {info.total_rewards / 1e18})"
         )
 
     print(

@@ -29,7 +29,7 @@ interface ILiquidityGauge {
         bool _claim_rewards
     ) external;
 
-    function claim_rewards(address _addr) external;
+    function claim_rewards() external;
 
     function claim_rewards(address _addr, address _receiver) external;
 
@@ -48,4 +48,8 @@ interface ILiquidityGauge {
     function working_balances(address _addr) external view returns (uint256);
     
     function working_supply() external view returns (uint256);
+
+    function add_reward(address _reward, address _distributor) external;
+
+    function reward_count() external view returns (uint256);
 }
