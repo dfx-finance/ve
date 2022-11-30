@@ -12,6 +12,8 @@ struct Reward {
 }
 
 interface ILiquidityGauge {
+    function initialize(address _staking_token, address _admin, address _DFX, address _voting_escrow, address _veBoost_proxy, address _distributor) external;
+
     function admin() external view returns (address _addr);
 
     function balanceOf(address _addr) external view returns (uint256 amount);
@@ -44,6 +46,8 @@ interface ILiquidityGauge {
     function claimable_reward(address _addr, address _reward) external view returns (uint256);
 
     function reward_data(address _reward) external view returns (Reward memory);
+
+    function withdraw(uint256 _value, bool _claim_rewards) external;
 
     function working_balances(address _addr) external view returns (uint256);
     
