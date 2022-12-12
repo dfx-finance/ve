@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from datetime import datetime
 
-from brownie import accounts, chain
+from brownie import accounts, chain, web3
 
 from scripts import contracts
 from scripts.helper import get_addresses, gas_strategy
@@ -125,6 +125,24 @@ def fastforward_chain(until: datetime):
 
 def main():
     dfx = contracts.erc20(addresses.DFX)
+
+    for pair, info in GAUGES_INFO.items():
+        logs = web3.eth.get_logs(
+            {
+                "address": "0xF8389313bb9317fd88692AdB657684FA5622b157",
+                "fromBlock": 15747859,
+                "toBlock": "latest",
+                "topics": [
+                    "0x7ecd84343f76a23d2227290e0288da3251b045541698e575a5515af4f04197a3"
+                ],
+            }
+        )
+        print(logs[0])
+        print(len(logs))
+
+        import sys
+
+        sys.exit()
 
     fastforward_chain(datetime(2023, 6, 1))
     for pair, info in GAUGES_INFO.items():

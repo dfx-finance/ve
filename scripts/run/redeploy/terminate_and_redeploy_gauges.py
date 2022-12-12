@@ -325,21 +325,24 @@ def main():
 
     # end_dt_3 = datetime(2022, 11, 26, 0, 0, 30, tzinfo=timezone.utc)
     # fastforward_chain(end_dt_3)
+    #####
+    #####
 
     log_distributor_info()
     log_gauges_info(existing_gauges)
 
-    enable_distributions()
     new_gauges = deploy_proxied_gauges(new_lp_addresses)
     add_to_gauge_controller(new_gauges)
+
+    enable_distributions()
 
     all_gauges = [("ORIG_" + label, addr) for label, addr in existing_gauges] + [
         ("NEW_" + label, addr) for label, addr in new_gauges
     ]
-    end_dt_4 = datetime(2022, 12, 1, 0, 0, 30, tzinfo=timezone.utc)
+    end_dt_4 = datetime(2022, 12, 15, 0, 0, 30, tzinfo=timezone.utc)
     fastforward_chain(end_dt_4)
     distribute_rewards(new_gauges)
-    # update_epoch()
+    # # update_epoch()
     log_distributor_info()
     log_gauges_info(all_gauges)
 
