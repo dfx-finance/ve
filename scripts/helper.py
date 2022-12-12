@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import json
-import os
+import time
 
 from brownie import Contract, network, accounts, config
 from brownie.network import show_active, gas_price
@@ -65,7 +65,7 @@ def upgrade(
     newimplementation_address,
     proxy_admin_contract=None,
     initializer=None,
-    *args
+    *args,
 ):
     transaction = None
     if proxy_admin_contract:
@@ -100,7 +100,7 @@ def load_dfx_token():
 
 def network_info():
     connected_network = show_active()
-    is_local_network = connected_network in ["ganache-cli", "hardhat"]
+    is_local_network = connected_network in ["ganache-cli", "hardhat", "development"]
     if is_local_network:
         gas_price(gas_strategy)
     return connected_network, is_local_network
@@ -115,3 +115,8 @@ def get_addresses():
         return addresses.Polygon
     if connected_network in ["ethereum", "mainnet"]:
         return addresses.Ethereum
+
+
+def write_log(base_fn, output_data):
+    with open(f"./scripts/{base_fn}_{int(time.time())}.json", "w") as output_f:
+        json.dump(output_data, output_f, indent=4)
