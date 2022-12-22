@@ -1,12 +1,15 @@
 #!/usr/bin/env python
-import brownie
+# import brownie
+from brownie import accounts, interface
 
 from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses, DEPLOY_ACCT, PROXY_MULTISIG
+from scripts.helper import gas_strategy, get_addresses
 
 
 addresses = get_addresses()
 
+DEPLOY_ACCT = accounts[0]
+PROXY_MULTISIG = accounts[1]
 NEW_ADMIN_MULTISIG = "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF"
 NEW_GOVERNOR_MULTISIG = NEW_ADMIN_MULTISIG
 NEW_GUARDIAN_MULTISIG = NEW_ADMIN_MULTISIG
@@ -77,7 +80,7 @@ def transfer_all_liquidity_gauges(orig_addr, new_addr):
 
 def transfer_distributor_proxy(orig_addr, new_addr):
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
-    upgradeable_proxy = brownie.interface.IDfxUpgradeableProxy(dfx_distributor.address)
+    upgradeable_proxy = interface.IDfxUpgradeableProxy(dfx_distributor.address)
     upgradeable_proxy.changeAdmin(
         new_addr, {"from": orig_addr, "gas_price": gas_strategy}
     )
@@ -88,7 +91,7 @@ def transfer_distributor_proxy(orig_addr, new_addr):
 
 def transfer_liquidity_gauge_v4_proxy(gauge_addr, orig_addr, new_addr):
     gauge = contracts.gauge(gauge_addr)
-    upgradeable_proxy = brownie.interface.IDfxUpgradeableProxy(gauge.address)
+    upgradeable_proxy = interface.IDfxUpgradeableProxy(gauge.address)
     upgradeable_proxy.changeAdmin(
         new_addr, {"from": orig_addr, "gas_price": gas_strategy}
     )

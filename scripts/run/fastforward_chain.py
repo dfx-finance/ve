@@ -2,13 +2,10 @@
 from brownie import chain
 from brownie.network import gas_price
 
-from datetime import datetime
-import pytz
+from datetime import datetime, timezone
 
 from scripts.helper import gas_strategy, get_addresses
 from utils.constants import WEEK
-
-TIMEZONE = pytz.timezone("America/New_York")
 
 
 addresses = get_addresses()
@@ -34,7 +31,7 @@ def main():
     chain.sleep(0)
     t0 = int(chain.time())
 
-    # endtime = TIMEZONE.localize(datetime(2022, 11, 3, 16, 0, 0, 0))
+    # endtime = datetime(2022, 11, 3, 20, 0, 0, 0, tzinfo=timezone.utc)
     # t1 = FastforwardTime.until(target=endtime)
     # t1 = 1800 # 30-mins
     # t1 = FastforwardTime.week(t0)

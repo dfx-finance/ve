@@ -2,11 +2,12 @@
 from brownie import accounts
 
 from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy, load_dfx_token, DEPLOY_ACCT
+from scripts.helper import get_addresses, gas_strategy, load_dfx_token
 
 
 addresses = get_addresses()
 
+DEPLOY_ACCT = accounts[0]
 DFX_MULTISIG = accounts.at(address=addresses.DFX_MULTISIG, force=True)
 TOPUP_DFX_REWARDS = 4674.6575342466 * 1e18  # 1,706,250.00 / (365/7) epochs / 7 gauges
 
