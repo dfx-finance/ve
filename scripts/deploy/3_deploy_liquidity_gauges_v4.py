@@ -10,14 +10,14 @@ from scripts.helper import get_addresses, network_info, gas_strategy
 addresses = get_addresses()
 connected_network, is_local_network = network_info()
 
+DEPLOY_ACCT = accounts[0]
+PROXY_MULTISIG = accounts[7]
+
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
 
 
 output_data = {"gauges": {"amm": {}}}
-
-DEPLOY_ACCT = accounts[0]
-PROXY_MULTISIG = accounts[7]
 
 
 def main():
@@ -30,8 +30,7 @@ def main():
             "\t3. GaugeController address"
         )
     )
-    should_verify = not is_local_network
-    # should_verify = False
+    should_verify = False if is_local_network else True
 
     veboost_proxy = contracts.veboost_proxy(addresses.VE_BOOST_PROXY)
     gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
@@ -86,7 +85,7 @@ def main():
         ) as output_f:
             json.dump(output_data, output_f, indent=4)
 
-        if connected_network != "hardhat":
+        if not is_local_network:
             print("Sleeping after deploy....")
             time.sleep(3)
 
@@ -102,7 +101,3 @@ def main():
         f"./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json", "w"
     ) as output_f:
         json.dump(output_data, output_f, indent=4)
-
-
-if __name__ == "__main__":
-    main()
