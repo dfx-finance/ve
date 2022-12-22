@@ -22,7 +22,8 @@ const RpcUrls: Record<string, string> = {
 // const ethBlock = 15_941_646; // pre-attack
 // const ethBlock = 15_941_971; // post-attack
 // const ethBlock = 15_983_915; // last DfxDistributor update
-const ethBlock = 16_240_837; // 2022-12-22 14:27:35 UTC
+// const ethBlock = 16_240_837; // 2022-12-22 14:27:35 UTC
+const ethBlock = 16_242_140; // 2022-12-22 18:49:23 UTC
 
 const BlockNumbers: Record<string, number> = {
   1: ethBlock,

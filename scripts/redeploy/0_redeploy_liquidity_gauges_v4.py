@@ -5,7 +5,13 @@ import time
 from brownie import accounts, DfxUpgradeableProxy
 
 from scripts import contracts
-from scripts.helper import get_addresses, network_info, write_json_log, gas_strategy
+from scripts.helper import (
+    get_addresses,
+    network_info,
+    verify_gas_strategy,
+    write_json_log,
+    gas_strategy,
+)
 
 addresses = get_addresses()
 connected_network, is_local_network = network_info()
@@ -80,6 +86,8 @@ def main():
             "\t2. DfxDistributor address\n"
         )
     )
+
+    verify_gas_strategy()
 
     print(f"--- Deploying Liquidity Gauges (v4) contract to {connected_network} ---")
     deploy_proxied_gauges(LP_ADDRESSES)

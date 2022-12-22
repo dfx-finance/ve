@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from datetime import datetime
 import json
+import sys
 import time
 
 from brownie import accounts, chain, config, network, web3, Contract
@@ -11,6 +12,10 @@ from dotenv import load_dotenv
 from scripts import addresses, contracts
 
 load_dotenv()
+
+# Setting gas price is always necessary for deploy
+# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
+gas_strategy = LinearScalingStrategy("17 gwei", "30 gwei", 1.3)
 
 SECONDS_PER_YEAR = 365 * 24 * 60 * 60
 NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = [
@@ -24,9 +29,6 @@ LOCAL_BLOCKCHAIN_ENVIRONMENTS = NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS + [
     "binance-fork",
     "matic-fork",
 ]
-# Setting gas price is always necessary for deploy
-# https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy("32 gwei", "40 gwei", 1.3)
 
 
 def get_account(number=None):
@@ -63,6 +65,16 @@ def load_dfx_token():
     addrs = get_addresses()
     abi = json.load(open("./tests/abis/Dfx.json"))
     return Contract.from_abi("DFX", addrs.DFX, abi)
+
+
+def verify_gas_strategy():
+    print(
+        f"Gas range: {int(gas_strategy.initial_gas_price / 1e9)} -> {int(gas_strategy.max_gas_price / 1e9)}"
+    )
+    if not input("Confirm? (y/n)  ").lower().strip() == "y":
+        print("Canceled")
+        sys.exit(1)
+    print("Gas strategy verified!")
 
 
 ###

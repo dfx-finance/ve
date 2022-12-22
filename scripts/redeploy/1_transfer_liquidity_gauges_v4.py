@@ -4,7 +4,7 @@ from brownie import accounts, interface
 from scripts import contracts
 from scripts.helper import gas_strategy, get_addresses, network_info
 
-is_local_network = network_info()
+_, is_local_network = network_info()
 addresses = get_addresses()
 
 DEPLOY_ACCT = accounts[0] if is_local_network else accounts.load("deployve")

@@ -23,7 +23,8 @@ GAUGE_ADDRESSES = [
 
 
 def accept_liqudity_gauge_v4_transfer(proxied_gauges):
-    for gauge in proxied_gauges:
+    for _, gauge_addr in proxied_gauges:
+        gauge = contracts.gauge(gauge_addr)
         gauge.accept_transfer_ownership(
             {"from": DFX_MULTISIG_ACCT, "gas_price": gas_strategy}
         )
@@ -65,5 +66,6 @@ def main():
     if is_local_network:
         accounts[0].transfer(DFX_MULTISIG_ACCT, "2 ether", gas_price=gas_strategy)
 
+    accept_liqudity_gauge_v4_transfer(GAUGE_ADDRESSES)
     add_to_gauge_controller(GAUGE_ADDRESSES)
     enable_distributions()
