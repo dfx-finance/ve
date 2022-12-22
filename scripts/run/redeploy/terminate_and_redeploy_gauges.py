@@ -1,92 +1,21 @@
 #!/usr/bin/env python
 from datetime import datetime, timezone
 
-from brownie import accounts, chain, web3, DfxUpgradeableProxy
+from brownie import accounts, DfxUpgradeableProxy
 
 from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy
+from scripts.helper import (
+    get_addresses,
+    gas_strategy,
+    log_distributor_info,
+    log_gauges_info,
+)
+from utils.chain import fastforward_chain
 
 addresses = get_addresses()
 HARDHAT_ACCT = accounts.load("hardhat")
 MULTISIG_ACCT = accounts.at(addresses.DFX_MULTISIG, force=True)
 PROXY_MULTISIG_ACCT = accounts[7]  # a random account
-
-SECONDS_PER_DAY = 24 * 60 * 60
-SECONDS_PER_WEEK = 7 * 24 * 60 * 60
-SECONDS_PER_YEAR = 365 * 24 * 60 * 60
-
-###
-### Logging
-###
-def log_distributor_info():
-    dfx = contracts.erc20(addresses.DFX)
-    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
-
-    block_num = web3.eth.block_number
-    block_timestamp = chain[block_num]["timestamp"]
-
-    rewards_enabled = "on" if dfx_distributor.distributionsOn() else "off"
-    distributor_dfx_balance = dfx.balanceOf(dfx_distributor.address)
-    rate = dfx_distributor.rate()
-
-    print("--- Distributor Info -------------------------")
-    print(
-        f"Block time (UTC): {datetime.utcfromtimestamp(block_timestamp)} ({block_num})\n"
-        f"Distributions: {rewards_enabled}\n"
-        f"Distributor mining epoch: {dfx_distributor.miningEpoch()}\n"
-        f"Distributor epoch start time: {datetime.fromtimestamp(dfx_distributor.startEpochTime())}\n"
-        f"Distributor balance (DFX): {dfx_distributor.address} ({distributor_dfx_balance / 1e18})\n"
-        f"Distributor rate (DFX per second): {rate} ({rate / 1e18})\n"
-        f"Distributor rate (DFX per year): {rate * SECONDS_PER_YEAR} ({rate * SECONDS_PER_YEAR / 1e18})\n"
-    )
-
-
-def log_gauges_info(gauge_addresses):
-    dfx = contracts.erc20(addresses.DFX)
-    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
-
-    print("--- Gauges Info -------------------------")
-    weights = [gauge_controller.get_gauge_weight(addr) for _, addr in gauge_addresses]
-    total_weight = sum(weights)
-    for i, weight in enumerate(weights):
-        label, addr = gauge_addresses[i]
-        g = contracts.gauge(addr)
-        raw_dfx_rate = g.reward_data(addresses.DFX)[3]
-        undistributed_dfx_rewards = (raw_dfx_rate * 604800) / 1e18
-        rewards = [f"{undistributed_dfx_rewards} DFX"]
-        dfx_balance = dfx.balanceOf(g) / 1e18
-
-        weight_pct = weight / total_weight * 100 if total_weight else 0
-        print(
-            f"{label} gauge weight: {weight_pct:.2f}% ({(' / ').join(rewards)}) (DFX balance: {dfx_balance})"
-        )
-    print("")
-
-
-def log_gauge_weights(gauge_addresses):
-    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
-
-    print("--- Gauges Weights -------------------------")
-    weights = [gauge_controller.get_gauge_weight(addr) for _, addr in gauge_addresses]
-    for i, weight in enumerate(weights):
-        label, addr = gauge_addresses[i]
-        print(f"{label} gauge weight: {weight}")
-
-
-###
-### Hardhat utilities
-###
-def fastforward_chain(until: datetime):
-    chain.sleep(0)
-    t0 = int(chain.time())
-    chain.sleep(int(until.timestamp()) - t0)
-    chain.mine()
-    t1 = int(chain.time())
-
-    orig = datetime.fromtimestamp(t0)
-    new = datetime.fromtimestamp(t1)
-    print("--- Fast-forward Chain -------------------------")
-    print(f"Fastforwarded chain: {orig} --> {new}\n")
 
 
 ###

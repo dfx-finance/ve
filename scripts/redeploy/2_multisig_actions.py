@@ -11,18 +11,25 @@ connected_network, is_local_network = network_info()
 DFX_MULTISIG_ACCT = accounts.at(
     "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF", force=True
 )
-DFX_PROXY_MULTISIG_ACCT = accounts.at(
-    "0x26f539A0fE189A7f228D7982BF10Bc294FA9070c", force=True
-)
-NEW_GAUGE_ADDRESSES = [
-    ("CADC_USDC", "0xc6B407503dE64956Ad3cF5Ab112cA4f56AA13517"),
-    ("EUROC_USDC", "0x3a622DB2db50f463dF562Dc5F341545A64C580fc"),
-    ("GYEN_USDC", "0x6A47346e722937B60Df7a1149168c0E76DD6520f"),
-    ("NZDS_USDC", "0x7A28cf37763279F774916b85b5ef8b64AB421f79"),
-    ("TRYB_USDC", "0x2BB8B93F585B43b06F3d523bf30C203d3B6d4BD4"),
-    ("XIDR_USDC", "0xB7ca895F81F20e05A5eb11B05Cbaab3DAe5e23cd"),
-    ("XSGD_USDC", "0xd0EC100F1252a53322051a95CF05c32f0C174354"),
+GAUGE_ADDRESSES = [
+    ("CADC_USDC", addresses.DFX_CADC_USDC_GAUGE),
+    ("EUROC_USDC", addresses.DFX_EUROC_USDC_GAUGE),
+    ("GYEN_USDC", addresses.DFX_GYEN_USDC_GAUGE),
+    ("NZDS_USDC", addresses.DFX_NZDS_USDC_GAUGE),
+    ("TRYB_USDC", addresses.DFX_TRYB_USDC_GAUGE),
+    ("XIDR_USDC", addresses.DFX_XIDR_USDC_GAUGE),
+    ("XSGD_USDC", addresses.DFX_XSGD_USDC_GAUGE),
 ]
+
+
+def accept_liqudity_gauge_v4_transfer(proxied_gauges):
+    for gauge in proxied_gauges:
+        gauge.accept_transfer_ownership(
+            {"from": DFX_MULTISIG_ACCT, "gas_price": gas_strategy}
+        )
+        print(
+            f"{gauge.name()} LiquidityGaugeV4 transfer success: {gauge.admin() == DFX_MULTISIG_ACCT}"
+        )
 
 
 def add_to_gauge_controller(gauge_addresses):
@@ -58,9 +65,5 @@ def main():
     if is_local_network:
         accounts[0].transfer(DFX_MULTISIG_ACCT, "2 ether", gas_price=gas_strategy)
 
-    add_to_gauge_controller(NEW_GAUGE_ADDRESSES)
+    add_to_gauge_controller(GAUGE_ADDRESSES)
     enable_distributions()
-
-
-if __name__ == "__main__":
-    main()
