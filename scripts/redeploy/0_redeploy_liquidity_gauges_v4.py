@@ -89,5 +89,5 @@ def main():
 
     verify_gas_strategy()
 
-    print(f"--- Deploying Liquidity Gauges (v4) contract to {connected_network} ---")
+    print(f"--- Deploying Liquidity Gauges (v4) contracts to {connected_network} ---")
     deploy_proxied_gauges(LP_ADDRESSES)
