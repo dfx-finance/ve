@@ -15,7 +15,7 @@ load_dotenv()
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy("17 gwei", "30 gwei", 1.3)
+gas_strategy = LinearScalingStrategy("40 gwei", "45 gwei", 1.3)
 
 SECONDS_PER_YEAR = 365 * 24 * 60 * 60
 NON_FORKED_LOCAL_BLOCKCHAIN_ENVIRONMENTS = [
