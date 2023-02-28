@@ -7,9 +7,9 @@ interface IGaugeController {
 
     function gauge_types(address addr) external view returns (int128);
 
-    function gauge_relative_weight_write(address addr, uint256 timestamp) external returns (uint256);
+    function gauge_relative_weight_write(address addr) external returns (uint256);
 
-    function gauge_relative_weight(address addr, uint256 timestamp) external view returns (uint256);
+    function gauge_relative_weight(address addr) external view returns (uint256);
 
     function add_gauge(address addr, int128 gauge_type) external;
 
@@ -32,4 +32,10 @@ interface IGaugeController {
     function checkpoint() external;
 
     function checkpoint_gauge(address addr) external;
+
+    function get_total_weight() external view returns (uint256);
+
+    function time_total() external view returns (uint256);
+
+    function points_total(uint256) external view returns (uint256);
 }

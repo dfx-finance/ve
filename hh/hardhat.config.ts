@@ -18,7 +18,11 @@ const RpcUrls: Record<string, string> = {
 // const ethBlock = 15_749_200; // ammv2 redeployed
 // const ethBlock = 15_765_345; // ammv2 seeded
 // const ethBlock = 15_816_440; // during epoch 1
-const ethBlock = 15_848_000; // during epoch 2
+// const ethBlock = 15_848_000; // during epoch 2
+// const ethBlock = 15_941_646; // pre-attack
+// const ethBlock = 15_941_971; // post-attack
+// const ethBlock = 15_983_915; // last DfxDistributor update
+const ethBlock = 16_685_597; // ammv2.1 seeded, gauges staked
 
 const BlockNumbers: Record<string, number> = {
   1: ethBlock,
@@ -38,7 +42,6 @@ const config: HardhatUserConfig = {
         url: RpcUrls[chainId] || "http://127.0.0.1:8545",
         blockNumber: BlockNumbers[chainId],
       },
-      blockGasLimit: 24000000,
       allowUnlimitedContractSize: true,
       hardfork: "london",
     },

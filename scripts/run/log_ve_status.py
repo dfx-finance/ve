@@ -21,17 +21,33 @@ class GaugeInfo:
     reward_price: int = None
     total_lpt: int = None
     total_rewards: int = None
+    weight: int = None
 
 
+# fetch all gauge addresses which are not flagged as a killedGauge
+def active_gauges(gauge_controller, dfx_distributor):
+    num_gauges = gauge_controller.n_gauges()
+    all_gauge_addresses = [gauge_controller.gauges(i) for i in range(0, num_gauges)]
+    gauge_addresses = []
+    for addr in all_gauge_addresses:
+        print(addr, dfx_distributor.killedGauges(addr))
+        if dfx_distributor.killedGauges(addr) == False:
+            gauge_addresses.append(addr)
+    return gauge_addresses
+
+
+# TODO: implement calculating LPT price
 def lpt_price(gauge):
-    lpt_addr = gauge.staking_token()
-    lpt = contracts.dfx_curve(lpt_addr)
-    underlying_0, underlying_1 = lpt.numeraires(0), lpt.numeraires(1)
-    print(gauge.name(), "->", underlying_0, underlying_1)
-    base = contracts.erc20(underlying_0)
+    # lpt_addr = gauge.staking_token()
+    # lpt = contracts.dfx_curve(lpt_addr)
+    # underlying_0, underlying_1 = lpt.numeraires(0), lpt.numeraires(1)
+    print(f"{gauge.name()} ({gauge.address})")
+    # base = contracts.erc20(underlying_0)
 
 
+# create object containing a variety of gauge stats
 def get_gauge_info(dfx, gauge) -> GaugeInfo:
+    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
     info = GaugeInfo()
     info.total_rewards = dfx.balanceOf(gauge)
     info.label = gauge.name()
@@ -41,12 +57,17 @@ def get_gauge_info(dfx, gauge) -> GaugeInfo:
     info.apr = math.inf
     if info.total_lpt:
         info.apr = calc_global_boosted_apr(gauge, info.total_rewards)
+    info.weight = gauge_controller.gauge_relative_weight(gauge.address)
     return info
 
 
 def main():
+    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
-    gauges = contracts.gauges()
+
+    # Fetch enabled gauge addresses
+    gauge_addresses = active_gauges(gauge_controller, dfx_distributor)
+    gauges = [contracts.gauge(addr) for addr in gauge_addresses]
 
     block_num = web3.eth.block_number
     block_timestamp = chain[block_num]["timestamp"]
@@ -72,7 +93,7 @@ def main():
     gauge_infos = [get_gauge_info(dfx, g) for g in gauges]
     for info in gauge_infos:
         print(
-            f"{info.label}: Supply: {info.total_lpt / 1e18} -- APR: {(info.apr * 100):.2f}% (Avail. rewards: {info.total_rewards / 1e18})"
+            f"{info.label}: Supply: {info.total_lpt / 1e18} -- APR: {(info.apr * 100):.2f}% (Avail. rewards: {info.total_rewards / 1e18}) | Weight: {info.weight}"
         )
 
     print(
