@@ -24,6 +24,19 @@ class GaugeInfo:
     weight: int = None
 
 
+# fetch all gauge addresses which are not flagged as a killedGauge
+def active_gauges(gauge_controller, dfx_distributor):
+    num_gauges = gauge_controller.n_gauges()
+    all_gauge_addresses = [gauge_controller.gauges(i) for i in range(0, num_gauges)]
+    gauge_addresses = []
+    for addr in all_gauge_addresses:
+        print(addr, dfx_distributor.killedGauges(addr))
+        if dfx_distributor.killedGauges(addr) == False:
+            gauge_addresses.append(addr)
+    return gauge_addresses
+
+
+# TODO: implement calculating LPT price
 def lpt_price(gauge):
     # lpt_addr = gauge.staking_token()
     # lpt = contracts.dfx_curve(lpt_addr)
@@ -32,6 +45,7 @@ def lpt_price(gauge):
     # base = contracts.erc20(underlying_0)
 
 
+# create object containing a variety of gauge stats
 def get_gauge_info(dfx, gauge) -> GaugeInfo:
     gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
     info = GaugeInfo()
@@ -48,8 +62,12 @@ def get_gauge_info(dfx, gauge) -> GaugeInfo:
 
 
 def main():
+    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
-    gauges = contracts.gauges()
+
+    # Fetch enabled gauge addresses
+    gauge_addresses = active_gauges(gauge_controller, dfx_distributor)
+    gauges = [contracts.gauge(addr) for addr in gauge_addresses]
 
     block_num = web3.eth.block_number
     block_timestamp = chain[block_num]["timestamp"]

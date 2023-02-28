@@ -34,4 +34,8 @@ interface IGaugeController {
     function checkpoint_gauge(address addr) external;
 
     function get_total_weight() external view returns (uint256);
+
+    function time_total() external view returns (uint256);
+
+    function points_total(uint256) external view returns (uint256);
 }
