@@ -22,7 +22,8 @@ const RpcUrls: Record<string, string> = {
 // const ethBlock = 15_941_646; // pre-attack
 // const ethBlock = 15_941_971; // post-attack
 // const ethBlock = 15_983_915; // last DfxDistributor update
-const ethBlock = 16_685_597; // ammv2.1 seeded, gauges staked
+// const ethBlock = 16_685_597; // ammv2.1 seeded, gauges staked
+const ethBlock = 16_723_375; // gbpt deployed
 
 const BlockNumbers: Record<string, number> = {
   1: ethBlock,
