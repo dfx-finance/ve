@@ -172,4 +172,4 @@ _Networks:_
    - Automated task: https://app.gelato.network/task/0x162f6a580ca19af3cebc99152b9a7df26289b05933334c8d7bcd413f293fd444?chainId=1
 2. Update mining params
    - Fridays @ 00:35 UTC
-   - Automated task:
+   - Automated task: https://app.gelato.network/task/0x4f74788bbf6f3aa81424c71bf9eb7d7ba4d8d0ead8caad1bdb8194e106ca1939?chainId=1
