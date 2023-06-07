@@ -163,3 +163,13 @@ _Networks:_
   ```bash
   $ brownie run run/fastforward_chain.py
   ```
+
+## Distributions & Updates
+
+1. Reward distributions happen in 2 parts
+   - ~80% from DfxDistributor / ~20% manually distributed to each gauge from Safe
+   - Thursdays @ 00:00 UTC
+   - Automated task: https://app.gelato.network/task/0x162f6a580ca19af3cebc99152b9a7df26289b05933334c8d7bcd413f293fd444?chainId=1
+2. Update mining params
+   - Fridays @ 00:35 UTC
+   - Automated task:

@@ -31,11 +31,11 @@ def main():
     chain.sleep(0)
     t0 = int(chain.time())
 
-    # endtime = datetime(2022, 11, 3, 20, 0, 0, 0, tzinfo=timezone.utc)
-    # t1 = FastforwardTime.until(target=endtime)
+    endtime = datetime(2023, 3, 2, 0, 0, 0, 0, tzinfo=timezone.utc)
+    t1 = FastforwardTime.until(target=endtime)
     # t1 = 1800 # 30-mins
     # t1 = FastforwardTime.week(t0)
-    t1 = FastforwardTime.hours(t0, 24)
+    # t1 = FastforwardTime.hours(t0, 24)
 
     print(t0)
     chain.sleep(t1 - t0)
