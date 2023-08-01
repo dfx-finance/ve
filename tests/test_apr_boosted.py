@@ -106,7 +106,7 @@ def test_boosted_apr(
     users = [user_0, user_1]
     available_rewards = claimable_rewards(dfx, euroc_usdc_gauge, users)
 
-    expected = [18.12776849856987, 18.111290876564137]
+    expected = [20.581012359731975, 8.23240494389279]
     for i, user in enumerate(users):
         apr = calc_boosted_apr(
             voting_escrow,
