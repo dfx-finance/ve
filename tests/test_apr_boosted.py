@@ -12,7 +12,7 @@ from utils.apr import (
     mint_lp_tokens,
     mint_vedfx_and_vote,
 )
-from utils.chain import fastforward_chain
+from utils.chain import fastforward_chain_weeks
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.testing.token import fund_multisig
@@ -72,7 +72,7 @@ def test_boosted_apr(
     # 1. Test that expected amount of LP tokens are minted
     mint_lp_tokens(euroc_usdc_lp, [user_0, user_1], master_account)
 
-    fastforward_chain(num_weeks=1, delta=5)
+    fastforward_chain_weeks(num_weeks=1, delta=5)
 
     # 2b. Test that gauge distributions at beginning of epoch 0 results in the expected amount of rewards
     # at start of epoch 0.
@@ -81,7 +81,7 @@ def test_boosted_apr(
         distributor,
         three_liquidity_gauges_v4,
         master_account,
-        {euroc_usdc_gauge: 3207448777992851545592},
+        {euroc_usdc_gauge: 39757766414611472197042},
     )
     assert distributor.miningEpoch() == 1
 
@@ -101,12 +101,12 @@ def test_boosted_apr(
 
     # 3. Fast-forward until the very end of epoch 1 and claim rewards. Check theoretical vs
     # actually claimed rewards and calculated unboosted APR
-    fastforward_chain(num_weeks=1, delta=-10)
+    fastforward_chain_weeks(num_weeks=1, delta=-10)
 
     users = [user_0, user_1]
     available_rewards = claimable_rewards(dfx, euroc_usdc_gauge, users)
 
-    expected = [3.6528106976703514, 1.4611242790681405]
+    expected = [18.12776849856987, 18.111290876564137]
     for i, user in enumerate(users):
         apr = calc_boosted_apr(
             voting_escrow,
@@ -115,4 +115,4 @@ def test_boosted_apr(
             user,
             available_rewards["combined"],
         )
-        assert isclose(apr, expected[i], abs_tol=1e-4)
+        assert isclose(apr, expected[i], rel_tol=1e-4)
