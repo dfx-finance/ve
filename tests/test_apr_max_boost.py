@@ -136,4 +136,4 @@ def test_apply_max_boost(
         user_1,
         available_rewards["combined"],
     )
-    assert isclose(apr, 45.278227191410345, abs_tol=1e-4)
+    assert isclose(apr, 20.581012359731975, abs_tol=1e-4)

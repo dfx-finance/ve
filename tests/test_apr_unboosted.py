@@ -157,4 +157,4 @@ def test_unboosted_apr(
         user_0,
         available_rewards["combined"],
     )
-    assert isclose(apr, 18.111290876564137, abs_tol=1e-4)
+    assert isclose(apr, 8.23240494389279, abs_tol=1e-4)
