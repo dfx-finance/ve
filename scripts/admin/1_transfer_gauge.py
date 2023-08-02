@@ -2,7 +2,7 @@
 from brownie import accounts, interface
 
 from utils import contracts
-from utils.gas import gas_strategy
+from utils.gas import gas_strategy, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
 from utils.account import (
     DEPLOY_ACCT,
@@ -42,6 +42,9 @@ def transfer_gauge_proxy(gauge_addr):
 
 
 def main():
+    if not is_local_network:
+        verify_gas_strategy()
+
     gauge_addr = addresses.DFX_GBPT_USDC_GAUGE
 
     print(f"Transfering liquidity gauge to {DFX_MULTISIG_ACCT}...")

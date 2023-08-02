@@ -5,7 +5,7 @@ import json
 import time
 
 from utils.account import DEPLOY_ACCT
-from utils.gas import gas_strategy
+from utils.gas import gas_strategy, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
 
 DEFAULT_GAUGE_TYPE_NAME = "DFX AMM Liquidity"
@@ -30,6 +30,8 @@ def main():
             "\t1. VotingEscrow (VeDFX) contract address"
         )
     )
+    if not is_local_network:
+        verify_gas_strategy()
 
     # 1. Deploy veBoostProxy
     print(f"--- Deploying VeBoostProxy contract to {connected_network} ---")

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-from brownie import accounts
-
 from utils import contracts
-from utils.gas import gas_strategy
+from utils.gas import gas_strategy, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
 
 addresses = get_network_addresses()
@@ -12,6 +10,9 @@ DFX_MULTISIG_ACCT = "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF"
 
 
 def main():
+    if not is_local_network:
+        verify_gas_strategy()
+
     gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
 
     gauge = contracts.gauge(addresses.DFX_GBPT_USDC_GAUGE)

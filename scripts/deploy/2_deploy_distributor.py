@@ -6,7 +6,7 @@ from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
 from utils import contracts
 from utils.account import DEPLOY_ACCT
-from utils.gas import gas_strategy
+from utils.gas import gas_strategy, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
 
 REWARDS_RATE = 0
@@ -29,6 +29,8 @@ def main():
             "\t4. Governor and Guardian addresses"
         )
     )
+    if not is_local_network:
+        verify_gas_strategy()
     should_verify = not is_local_network
     # should_verify = False
 

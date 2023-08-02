@@ -11,6 +11,7 @@ DEPLOY_ACCT = accounts[0]
 DEPLOY_PROXY_ACCT = accounts[1]
 
 if not is_local_network:
+    print("Loading live wallets [deployve, deployve-proxyadmin]...")
     DEPLOY_ACCT = accounts.load("deployve")
     DEPLOY_PROXY_ACCT = accounts.load("deployve-proxyadmin")
 
