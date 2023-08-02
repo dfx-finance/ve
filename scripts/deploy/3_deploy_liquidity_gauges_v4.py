@@ -2,17 +2,16 @@
 import json
 import time
 
-from brownie import accounts, DfxUpgradeableProxy, LiquidityGaugeV4
+from brownie import DfxUpgradeableProxy, LiquidityGaugeV4
 
 from utils import contracts
+from utils.account import DEPLOY_ACCT, impersonate
 from utils.gas import gas_strategy
+from utils.helper import fund_multisig
 from utils.network import get_network_addresses, network_info
 
 addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
-
-DEPLOY_ACCT = accounts[0]
-PROXY_MULTISIG = accounts[7]
 
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
@@ -31,6 +30,9 @@ def main():
             "\t3. GaugeController address"
         )
     )
+    if is_local_network:
+        fund_multisig(DEPLOY_ACCT)
+
     should_verify = False if is_local_network else True
 
     veboost_proxy = contracts.veboost_proxy(addresses.VE_BOOST_PROXY)
@@ -51,7 +53,7 @@ def main():
     # deploy gauge logic
     gauge = LiquidityGaugeV4.deploy({"from": DEPLOY_ACCT, "gas_price": gas_strategy})
 
-    if connected_network != "hardhat":
+    if not is_local_network:
         print("Sleeping after deploy....")
         time.sleep(10)
 
@@ -64,13 +66,13 @@ def main():
             lp_addr,
             DEPLOY_ACCT,
             addresses.DFX,
-            addresses.VOTE_ESCROW,
+            addresses.VEDFX,
             veboost_proxy.address,
             dfx_distributor.address,
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
-            PROXY_MULTISIG,
+            addresses.DFX_MULTISIG_1,
             gauge_initializer_calldata,
             {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
             publish_source=should_verify,
@@ -80,25 +82,31 @@ def main():
             "calldata": gauge_initializer_calldata,
             "proxy": dfx_upgradeable_proxy.address,
         }
-        with open(
-            f"./scripts/deployed_liquidity_gauges_v4_{label}_{int(time.time())}.json",
-            "w",
-        ) as output_f:
-            json.dump(output_data, output_f, indent=4)
-
         if not is_local_network:
+            # log gauge info
+            with open(
+                f"./scripts/deployed_liquidity_gauges_v4_{label}_{int(time.time())}.json",
+                "w",
+            ) as output_f:
+                json.dump(output_data, output_f, indent=4)
+
+            # grace period
             print("Sleeping after deploy....")
             time.sleep(3)
 
         print("--- Add gauge to GaugeController ---")
+        admin = (
+            impersonate(addresses.DFX_MULTISIG_0) if is_local_network else DEPLOY_ACCT
+        )
         gauge_controller.add_gauge(
             dfx_upgradeable_proxy.address,
             DEFAULT_GAUGE_TYPE,
             DEFAULT_GAUGE_WEIGHT,
-            {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
+            {"from": admin, "gas_price": gas_strategy},
         )
 
-    with open(
-        f"./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json", "w"
-    ) as output_f:
-        json.dump(output_data, output_f, indent=4)
+    if not is_local_network:
+        with open(
+            f"./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json", "w"
+        ) as output_f:
+            json.dump(output_data, output_f, indent=4)

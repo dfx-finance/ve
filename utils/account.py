@@ -7,12 +7,12 @@ from .network import network_info
 connected_network, is_local_network = network_info()
 
 # Constants
-DEPLOY_ACCT = accounts[0] if is_local_network else accounts.load("deployve")
-DEPLOY_PROXY_ACCT = (
-    accounts[1] if is_local_network else accounts.load("deployve-proxyadmin")
-)
-DFX_MULTISIG_ACCT = "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF"
-DFX_PROXY_MULTISIG_ACCT = "0x26f539A0fE189A7f228D7982BF10Bc294FA9070c"
+DEPLOY_ACCT = accounts[0]
+DEPLOY_PROXY_ACCT = accounts[1]
+
+if not is_local_network:
+    DEPLOY_ACCT = accounts.load("deployve")
+    DEPLOY_PROXY_ACCT = accounts.load("deployve-proxyadmin")
 
 
 def get_account(number=None):
@@ -24,3 +24,7 @@ def get_account(number=None):
         account = accounts.add(config["wallets"]["from_key"])
         return account
     return None
+
+
+def impersonate(addr):
+    return accounts.at(addr, force=True)

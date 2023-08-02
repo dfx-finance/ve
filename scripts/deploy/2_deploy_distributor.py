@@ -5,15 +5,9 @@ import time
 from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
 from utils import contracts
-from utils.account import (
-    DEPLOY_ACCT,
-    DFX_MULTISIG_ACCT,
-    DFX_PROXY_MULTISIG_ACCT,
-)
+from utils.account import DEPLOY_ACCT
 from utils.gas import gas_strategy
 from utils.network import get_network_addresses, network_info
-
-GUARDIAN_MULTISIG = ""
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
@@ -53,21 +47,22 @@ def main():
         REWARDS_RATE,
         PREV_DISTRIBUTED_REWARDS,
         # needs another multisig to deal with access control behind proxy (ideally 2)
-        DFX_MULTISIG_ACCT,  # governor
-        GUARDIAN_MULTISIG,  # guardian
+        addresses.DFX_MULTISIG_0,  # governor
+        addresses.DFX_MULTISIG_0,  # guardian
         ZERO_ADDRESS,  # delegate gauge for pulling type 2 gauge rewards
     )
     dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
-        DFX_PROXY_MULTISIG_ACCT,
+        addresses.DFX_MULTISIG_1,
         distributor_initializer_calldata,
         {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
         publish_source=should_verify,
     )
     output_data["distributor"]["proxy"] = dfx_upgradable_proxy.address
 
-    # Write output to file
-    with open(
-        f"./scripts/deployed_distributor_{int(time.time())}.json", "w"
-    ) as output_f:
-        json.dump(output_data, output_f, indent=4)
+    if not is_local_network:
+        # Write output to file
+        with open(
+            f"./scripts/deployed_distributor_{int(time.time())}.json", "w"
+        ) as output_f:
+            json.dump(output_data, output_f, indent=4)

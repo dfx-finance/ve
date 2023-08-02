@@ -2,6 +2,7 @@
 from brownie import accounts, chain
 
 from utils import contracts
+from utils.account import impersonate
 from utils.network import get_network_addresses
 
 
@@ -12,7 +13,7 @@ DAY = 24 * 60 * 60
 
 
 def main():
-    tester = accounts.at(address=TEST_ADDR, force=True)
+    tester = impersonate(TEST_ADDR)
     gauges = contracts.gauges()
     cadc_usdc_lpt = contracts.erc20(addresses.DFX_CADC_USDC_LP)
     cadc_gauge = gauges[0]
