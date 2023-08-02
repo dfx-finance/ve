@@ -3,7 +3,6 @@ import brownie
 from datetime import datetime
 import math
 
-from .chain import gas_strategy
 from .constants import (
     WEEK,
     EPOCHS_PER_YEAR,
@@ -11,6 +10,7 @@ from .constants import (
     DFX_PRICE,
     LP_PRICE,
 )
+from .gas import gas_strategy
 from .helper import mint_dfx
 from .ve import deposit_to_ve, submit_ve_vote
 
