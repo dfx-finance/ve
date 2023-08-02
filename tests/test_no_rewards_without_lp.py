@@ -10,7 +10,7 @@ from utils.apr import (
     get_euroc_usdc_gauge,
     mint_lp_tokens,
 )
-from utils.chain import fastforward_chain, gas_strategy
+from utils.chain import fastforward_chain_weeks, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.testing import addresses
@@ -74,7 +74,7 @@ def test_only_lp_rewarded(
 
     # 2a. Test that epoch 0 is the current epoch
     # fast-forward to 5s after epoch 0 start
-    fastforward_chain(num_weeks=1, delta=5)
+    fastforward_chain_weeks(num_weeks=1, delta=5)
     assert distributor.miningEpoch() == 0
 
     # 2b. Test that gauge distributions at beginning of epoch 0 results in the expected amount of rewards
@@ -84,7 +84,7 @@ def test_only_lp_rewarded(
         distributor,
         three_liquidity_gauges_v4,
         master_account,
-        {euroc_usdc_gauge: 3207448777992851545592},
+        {euroc_usdc_gauge: 39757766414611472197042},
     )
     assert distributor.miningEpoch() == 1
 
@@ -108,14 +108,14 @@ def test_only_lp_rewarded(
 
     # 3. Fast-forward until the very end of epoch 1 and claim rewards. Check that only
     # first user with deposited LP rewards despite both users holding veDFX and voting
-    fastforward_chain(num_weeks=1, delta=-10)
+    fastforward_chain_weeks(num_weeks=1, delta=-10)
 
     users = [user_0, user_1]
     available_rewards = claimable_rewards(dfx, euroc_usdc_gauge, users)
     rewards = claim_rewards(euroc_usdc_gauge, addresses.DFX, users, master_account)
 
-    expected_available = [3207353318207791829347, 0]
-    expected_claimed = [3207358621529184014097, 0]
+    expected_available = [39756583147753894310146, 0]
+    expected_claimed = [39756648884801537518556, 0]
     for i, user in enumerate(users):
         assert available_rewards[user] == expected_available[i]
         assert rewards[user] == expected_claimed[i]

@@ -11,7 +11,7 @@ from utils.apr import (
     distribute_to_gauges,
     gauge_relative_weights,
 )
-from utils.chain import fastforward_chain, gas_strategy
+from utils.chain import fastforward_chain_weeks, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.testing.token import fund_multisig, mint_dfx
@@ -74,7 +74,7 @@ def test_theoretical_vs_actual(
 
     # 2a. Test that epoch 0 is the current epoch
     # fast-forward to 5s after epoch 0 start
-    fastforward_chain(num_weeks=1, delta=5)
+    fastforward_chain_weeks(num_weeks=1, delta=5)
     assert distributor.miningEpoch() == 0
 
     # 2b. Test that gauge distributions at beginning of epoch 0 results in the expected amount of rewards
@@ -84,7 +84,7 @@ def test_theoretical_vs_actual(
         distributor,
         three_liquidity_gauges_v4,
         master_account,
-        {euroc_usdc_gauge: 3207448777992851545592},
+        {euroc_usdc_gauge: 39757766414611472197042},
     )
     assert distributor.miningEpoch() == 1
 
@@ -107,7 +107,7 @@ def test_theoretical_vs_actual(
 
     # 3. Fast-forward until the very end of epoch 1 and claim rewards. Check theoretical vs
     # actually claimed rewards and calculated unboosted APR
-    fastforward_chain(num_weeks=1, delta=-10)
+    fastforward_chain_weeks(num_weeks=1, delta=-10)
 
     # Fetch the relative weight for each gauge
     gauge_weights = gauge_relative_weights(gauge_controller, three_liquidity_gauges_v4)

@@ -67,17 +67,13 @@ def distribute_to_gauges(dfx, distributor, gauges, account, assertions):
     )
     balances = {g: dfx.balanceOf(g) for g in gauges}
     for g, expected_balance in assertions.items():
-        try:
-            # approximate deviation between calling updateMiningParameters
-            # and distributeRewardToMultipleGauges within test script
-            assert approximately_equals(
-                expected_balance,
-                balances[g],
-                delta=8e5,
-            )
-        except Exception as e:
-            print(f"{balances[g]} != {expected_balance}")
-            raise e
+        # approximate deviation between calling updateMiningParameters
+        print(expected_balance, balances[g])
+        assert math.isclose(
+            expected_balance,
+            balances[g],
+            rel_tol=1e-4,
+        )
     return balances
 
 

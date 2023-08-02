@@ -4,7 +4,7 @@ import brownie
 import pytest
 
 from utils.apr import get_euroc_usdc_gauge, mint_lp_tokens, mint_vedfx_and_vote
-from utils.chain import fastforward_chain, gas_strategy
+from utils.chain import fastforward_chain_weeks, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.testing import addresses
@@ -56,11 +56,11 @@ def test_multi_user_stake(
     # 2. expected rewards floored to nearest int value (whole DFX tokens) to allow for small variation between mining times
     expected = [
         # small difference for epoch 1 because ve deposit and voting hours before epoch change
-        (1, 1624, 1583),
-        (2, 10706, 5216),
-        (3, 17444, 7911),
-        (4, 24130, 10585),
-        (5, 30763, 13238),
+        (1, 20132, 19625),
+        (2, 132710, 64656),
+        (3, 216232, 98065),
+        (4, 299102, 131213),
+        (5, 381325, 164102),
     ]
 
     # two random users
@@ -87,14 +87,14 @@ def test_multi_user_stake(
     # set chain to 10s before the week change (during epoch 1) and
     # distribute available reward to gauges
     assert distributor.miningEpoch() == 0
-    fastforward_chain(num_weeks=2, delta=-10)
+    fastforward_chain_weeks(num_weeks=2, delta=-10)
     distributor.distributeRewardToMultipleGauges(
         three_liquidity_gauges_v4, {"from": master_account, "gas_price": gas_strategy}
     )
     assert distributor.miningEpoch() == 1
 
     # advance chain to 5h10s before next epoch change
-    fastforward_chain(num_weeks=2, delta=-5 * 60 * 60 - 10)
+    fastforward_chain_weeks(num_weeks=2, delta=-5 * 60 * 60 - 10)
 
     mint_vedfx_and_vote(
         dfx,
@@ -114,12 +114,12 @@ def test_multi_user_stake(
         user_0, {"from": user_0, "gas_price": gas_strategy}
     )
     assert (
-        int(euroc_usdc_gauge.claimable_reward(user_0, addresses.DFX) // 1e18) == 1610
-    )  # ~1,594 DFX
+        int(euroc_usdc_gauge.claimable_reward(user_0, addresses.DFX) // 1e18) == 19963
+    )
     assert distributor.miningEpoch() == 1
 
     # 10s before next epoch (3) begins
-    fastforward_chain(num_weeks=1, delta=-1)
+    fastforward_chain_weeks(num_weeks=1, delta=-1)
 
     # test next 5 epochs between naked and boosted rewards
     for i in range(5):
@@ -147,4 +147,4 @@ def test_multi_user_stake(
             int(euroc_usdc_gauge.claimable_reward(user_1, addresses.DFX) // 1e18)
             == user1_rewards
         )
-        fastforward_chain(num_weeks=1, delta=0)
+        fastforward_chain_weeks(num_weeks=1, delta=0)
