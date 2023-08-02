@@ -73,7 +73,7 @@ def test_distribute_rewards(
     )
     gauge_controller.change_gauge_weight(
         three_liquidity_gauges_v4[1],
-        1.1 * 1e18,
+        2 * 1e18,
         {"from": master_account, "gas_price": gas_strategy},
     )
 

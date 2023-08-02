@@ -2,44 +2,44 @@
 # 1. Stop distribution to all gauges
 #    - Rewards within gauge will remain available to _any_ user who continues to stake through following epoch
 # 2. Withdraw all DFX ERC20 from distributor gauge to multisig
-from brownie import accounts
 from brownie.network import gas_price
 
 from utils import contracts
+from utils.account import DEPLOY_ACCT, impersonate
 from utils.gas import gas_strategy
+from utils.helper import fund_multisigs
 from utils.network import get_network_addresses
 
 
 gas_price(gas_strategy)
 addresses = get_network_addresses()
 
-DEPLOY_ACCT = accounts[0]
-DFX_MULTISIG = accounts.at(address=addresses.DFX_MULTISIG, force=True)
-
 
 def main():
+    fund_multisigs(DEPLOY_ACCT)
+    admin = impersonate(addresses.DFX_MULTISIG_0)
+
     dfx = contracts.load_dfx_token()
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     # disable distributions
-    dfx_distributor.toggleDistributions(
-        {"from": DEPLOY_ACCT, "gas_price": gas_strategy}
-    )
+    dfx_distributor.toggleDistributions({"from": admin, "gas_price": gas_strategy})
 
     # set rate to 0
-    dfx_distributor.setRate(0, {"from": DEPLOY_ACCT, "gas_price": gas_strategy})
+    dfx_distributor.setRate(0, {"from": admin, "gas_price": gas_strategy})
 
     distributor_bal = dfx.balanceOf(dfx_distributor.address)
-    multisig_starting_bal = dfx.balanceOf(DFX_MULTISIG)
+    multisig_starting_bal = dfx.balanceOf(admin)
     dfx_distributor.recoverERC20(
         dfx.address,
-        addresses.DFX_MULTISIG,
+        admin,
         distributor_bal,
-        {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
+        {"from": admin, "gas_price": gas_strategy},
     )
-    multisig_ending_bal = dfx.balanceOf(addresses.DFX_MULTISIG)
-    print(multisig_starting_bal)
-    print(multisig_ending_bal)
+    multisig_ending_bal = dfx.balanceOf(admin)
+    print(
+        "DFX rewards recovered:", (multisig_ending_bal - multisig_starting_bal) / 1e18
+    )
 
 
 if __name__ == "__main__":

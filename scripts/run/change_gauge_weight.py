@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-from brownie import accounts
-
 from utils import contracts
+from utils.account import DEPLOY_ACCT, impersonate
+from utils.gauges import active_gauges
+from utils.helper import fund_multisigs
 from utils.network import get_network_addresses
 from utils.gas import gas_strategy
-
-DEPLOY_ACCT = accounts[0]
 
 
 addresses = get_network_addresses()
@@ -30,8 +29,8 @@ def main():
     )
 
     # provide multisig with ether
-    DEPLOY_ACCT.transfer(addresses.DFX_MULTISIG, "5 ether", gas_price=gas_strategy)
-    DFX_MULTISIG = accounts.at(address=addresses.DFX_MULTISIG, force=True)
+    fund_multisigs(DEPLOY_ACCT)
+    admin = impersonate(addresses.DFX_MULTISIG_0)
 
     gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
 
@@ -43,13 +42,16 @@ def main():
     print(f"Total weight at {time_total}: {total_weight}")
 
     for gauge_addr in gauge_addresses:
+        if gauge_addr == "0x45C38b5126eB70e8B0A2c2e9FE934625641bF063":
+            print("skipping NZDS/USDC gauge (method broken?)...\n\n")
+            continue
         gauge_controller.change_gauge_weight(
             gauge_addr,
-            10e18,
-            {"from": DFX_MULTISIG, "gas_price": gas_strategy},
+            1e18,
+            {"from": admin, "gas_price": gas_strategy},
         )
 
-    gauge_controller.checkpoint({"from": DFX_MULTISIG, "gas_price": gas_strategy})
+    gauge_controller.checkpoint({"from": admin, "gas_price": gas_strategy})
     total_weight = gauge_controller.points_total(time_total)
     print(f"Total weight at {time_total}: {total_weight}")
 
