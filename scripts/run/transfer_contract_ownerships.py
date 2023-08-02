@@ -2,17 +2,15 @@
 # import brownie
 from brownie import accounts, interface
 
-from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses
+from utils import contracts
+from utils.account import DEPLOY_ACCT, DFX_MULTISIG_ACCT
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 
-DEPLOY_ACCT = accounts[0]
-PROXY_MULTISIG = accounts[1]
 NEW_ADMIN_MULTISIG = "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF"
-NEW_GOVERNOR_MULTISIG = NEW_ADMIN_MULTISIG
-NEW_GUARDIAN_MULTISIG = NEW_ADMIN_MULTISIG
 NEW_PROXY_MULTISIG = "0x26f539A0fE189A7f228D7982BF10Bc294FA9070c"
 
 
@@ -110,13 +108,14 @@ def main():
     transfer_veboost_admin(DEPLOY_ACCT, NEW_ADMIN_MULTISIG)
     transfer_gauge_controller_admin(DEPLOY_ACCT, NEW_ADMIN_MULTISIG)
     # guardian must be migrated first, then governor
-    transfer_distributor_guardian(DEPLOY_ACCT, NEW_GUARDIAN_MULTISIG)
-    transfer_distributor_governor(DEPLOY_ACCT, NEW_GOVERNOR_MULTISIG)
+    # DEV: these should be different multisigs in production
+    transfer_distributor_guardian(DEPLOY_ACCT, NEW_ADMIN_MULTISIG)
+    transfer_distributor_governor(DEPLOY_ACCT, NEW_ADMIN_MULTISIG)
     transfer_all_liquidity_gauges(DEPLOY_ACCT, NEW_ADMIN_MULTISIG)
 
     print("Transfer upgradeable proxy admins...")
-    transfer_distributor_proxy(PROXY_MULTISIG, NEW_PROXY_MULTISIG)
-    transfer_all_gauge_proxies(PROXY_MULTISIG, NEW_PROXY_MULTISIG)
+    transfer_distributor_proxy(DFX_MULTISIG_ACCT, NEW_PROXY_MULTISIG)
+    transfer_all_gauge_proxies(DFX_MULTISIG_ACCT, NEW_PROXY_MULTISIG)
 
 
 if __name__ == "__main__":

@@ -2,17 +2,13 @@
 import json
 import time
 
-from brownie import accounts
+from utils import contracts
+from utils.account import DEPLOY_ACCT
+from utils.constants import EMISSION_RATE, TOTAL_DFX_REWARDS
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 
-from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy, load_dfx_token
-
-addresses = get_addresses()
-
-DEPLOY_ACCT = accounts[0]
-
-REWARDS_RATE = 1.9875488905e17
-TOTAL_DFX_REWARDS = 5_118_750 * 1e18
+addresses = get_network_addresses()
 
 
 output_data = {
@@ -39,7 +35,7 @@ def main():
             "\t3. New DFX token rewards per second\n"
         )
     )
-    dfx = load_dfx_token()
+    dfx = contracts.load_dfx_token()
 
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
@@ -51,13 +47,13 @@ def main():
 
     # Set rate to distribute 1,000,000 rewards (see spreadsheet)
     dfx_distributor.setRate(
-        REWARDS_RATE, {"from": DEPLOY_ACCT, "gas_price": gas_strategy}
+        EMISSION_RATE, {"from": DEPLOY_ACCT, "gas_price": gas_strategy}
     )
 
     output_data["distributor"] = {
         "proxy": dfx_distributor.address,
         "rewardsSupplied": TOTAL_DFX_REWARDS,
-        "rewardsRate": REWARDS_RATE,
+        "rewardsRate": EMISSION_RATE,
         "totalRewards": dfx.balanceOf(dfx_distributor),
     }
     with open(f"./scripts/provided_rewards_{int(time.time())}.json", "w") as output_f:

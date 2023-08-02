@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 from brownie import accounts, interface
 
-from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses, network_info
+from utils import contracts
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses, network_info
 
 _, is_local_network = network_info()
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 DEPLOY_ACCT = accounts[0] if is_local_network else accounts.load("deployve")
 DEPLOY_PROXY_ACCT = (

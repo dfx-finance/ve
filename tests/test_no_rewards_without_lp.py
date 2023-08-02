@@ -1,21 +1,26 @@
 #!/usr/bin/env python
 import brownie
 from brownie import accounts
+import math
 import pytest
 
 from utils.apr import (
+    calc_theoretical_rewards,
     claim_rewards,
     claimable_rewards,
     distribute_to_gauges,
+    gauge_relative_weights,
     get_euroc_usdc_gauge,
     mint_lp_tokens,
 )
 from utils.chain import fastforward_chain_weeks, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.testing import addresses
-from utils.testing.token import fund_multisig, mint_dfx
+from utils.helper import fund_multisig, mint_dfx
+from utils.network import get_network_addresses
 from utils.ve import deposit_to_ve, submit_ve_vote
+
+addresses = get_network_addresses()
 
 
 # handle setup logic required for each unit test
@@ -114,8 +119,15 @@ def test_only_lp_rewarded(
     available_rewards = claimable_rewards(dfx, euroc_usdc_gauge, users)
     rewards = claim_rewards(euroc_usdc_gauge, addresses.DFX, users, master_account)
 
-    expected_available = [39756583147753894310146, 0]
-    expected_claimed = [39756648884801537518556, 0]
+    # 4. Calculate theoretical rewards to be received vs actually available and claimed by user
+    gauge_weights = gauge_relative_weights(gauge_controller, three_liquidity_gauges_v4)
+    _, expected_gauge_rewards = calc_theoretical_rewards(
+        distributor, gauge_weights[euroc_usdc_gauge]
+    )
+    expected_available = [expected_gauge_rewards, 0]
+    expected_claimed = [expected_gauge_rewards, 0]
     for i, user in enumerate(users):
-        assert available_rewards[user] == expected_available[i]
-        assert rewards[user] == expected_claimed[i]
+        assert math.isclose(
+            available_rewards[user], expected_available[i], rel_tol=1e-4
+        )
+        assert math.isclose(rewards[user], expected_claimed[i], rel_tol=1e-4)

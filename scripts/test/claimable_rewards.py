@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from brownie import accounts, chain
 
-from scripts import contracts
-from scripts.helper import get_addresses
+from utils import contracts
+from utils.network import get_network_addresses
 
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 TEST_ADDR = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"  # any user address
 DAY = 24 * 60 * 60

@@ -6,7 +6,7 @@ import pytest
 from utils.chain import fastforward_chain_weeks, gas_strategy
 from utils.constants import EMISSION_RATE
 from utils.gauges import setup_distributor, setup_gauge_controller
-from utils.testing.token import fund_multisig
+from utils.helper import fund_multisig
 
 
 # handle setup logic required for each unit test

@@ -5,19 +5,20 @@
 from brownie import accounts
 from brownie.network import gas_price
 
-from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses, load_dfx_token
+from utils import contracts
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 
 
 gas_price(gas_strategy)
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 DEPLOY_ACCT = accounts[0]
 DFX_MULTISIG = accounts.at(address=addresses.DFX_MULTISIG, force=True)
 
 
 def main():
-    dfx = load_dfx_token()
+    dfx = contracts.load_dfx_token()
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     # disable distributions

@@ -3,11 +3,12 @@ from datetime import datetime
 
 from brownie import accounts, chain, web3
 
-from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy
+from utils import contracts
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 
 HARDHAT_ACCT = accounts.load("hardhat")
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 GAUGES_INFO = {
     "CADC/USDC": {
@@ -106,6 +107,7 @@ GAUGES_INFO = {
         ],
     },
 }
+
 
 ###
 ### Hardhat utilities

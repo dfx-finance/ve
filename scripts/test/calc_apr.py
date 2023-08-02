@@ -8,11 +8,12 @@ from datetime import datetime
 
 from brownie import chain
 
-from scripts import contracts
-from scripts.helper import get_addresses
+from utils import contracts
 from utils.constants import DFX_PRICE, TOKENLESS_PRODUCTION
+from utils.gauges import active_gauges
+from utils.network import get_network_addresses
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 TEST_ADDR = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"  # any user address
 DAY = 24 * 60 * 60
@@ -63,7 +64,13 @@ def get_user_apr(gauge, lpt_user, lpt_total, dfx_price, lpt_price):
 
 
 def main():
-    gauge = contracts.gauges()[GAUGE_IDX]
+    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
+    dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
+    gauges = [
+        contracts.gauge(addr)
+        for addr in active_gauges(gauge_controller, dfx_distributor)
+    ]
+    gauge = gauges[GAUGE_IDX]
 
     chain.sleep(0)
     chain_dt = datetime.fromtimestamp(chain.time())

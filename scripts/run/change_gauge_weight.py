@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 from brownie import accounts
 
-from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy
+from utils import contracts
+from utils.network import get_network_addresses
+from utils.gas import gas_strategy
 
 DEPLOY_ACCT = accounts[0]
 
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 gauge_addresses = [
     addresses.DFX_CADC_USDC_GAUGE,

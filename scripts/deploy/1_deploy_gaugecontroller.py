@@ -4,12 +4,13 @@ import eth_abi
 import json
 import time
 
-from scripts.helper import get_addresses, network_info, gas_strategy
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses, network_info
 
 DEFAULT_GAUGE_TYPE_NAME = "DFX AMM Liquidity"
 DEFAULT_TYPE_WEIGHT = 1e18
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 connected_network, _ = network_info()
 
 output_data = {

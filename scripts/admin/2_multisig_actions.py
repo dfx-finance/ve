@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 from brownie import accounts
 
-from scripts import contracts
-from scripts.helper import get_addresses, network_info, gas_strategy
+from utils import contracts
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses, network_info
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
 DFX_MULTISIG_ACCT = "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF"

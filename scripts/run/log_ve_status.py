@@ -3,15 +3,13 @@ from brownie import chain, web3
 from datetime import datetime
 import math
 
-from scripts import contracts
-from scripts.helper import get_addresses, load_dfx_token
+from utils import contracts
 from utils.apr import calc_global_boosted_apr
-from utils.constants import DFX_PRICE, LP_PRICE
+from utils.constants import DFX_PRICE, LP_PRICE, SECONDS_PER_YEAR
+from utils.network import get_network_addresses
 
 
-SECONDS_PER_YEAR = 365 * 24 * 60 * 60
-
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 
 class GaugeInfo:
@@ -72,7 +70,7 @@ def main():
     block_num = web3.eth.block_number
     block_timestamp = chain[block_num]["timestamp"]
 
-    dfx = load_dfx_token()
+    dfx = contracts.load_dfx_token()
 
     rewards_enabled = "on" if dfx_distributor.distributionsOn() else "off"
     distributor_dfx_balance = dfx.balanceOf(dfx_distributor.address)

@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 from datetime import datetime, timezone
-
 from brownie import accounts, chain
-from scripts import contracts
-from scripts.helper import (
-    gas_strategy,
-    get_addresses,
-    log_distributor_info,
-    log_gauges_info,
-)
+
+from utils import contracts
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
+from utils.log import log_distributor_info, log_gauges_info
 from utils.chain import fastforward_chain
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 GAUGE_ADDRESSES = [
     ("CADC_USDC", addresses.DFX_CADC_USDC_GAUGE),

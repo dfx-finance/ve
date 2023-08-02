@@ -4,13 +4,21 @@ import time
 
 from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
-from scripts import contracts
-from scripts.helper import get_addresses, network_info, gas_strategy
+from utils import contracts
+from utils.account import (
+    DEPLOY_ACCT,
+    DFX_MULTISIG_ACCT,
+    DFX_PROXY_MULTISIG_ACCT,
+)
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses, network_info
+
+GUARDIAN_MULTISIG = ""
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
 output_data = {"distributor": {"logic": None, "proxy": None}}
@@ -45,13 +53,13 @@ def main():
         REWARDS_RATE,
         PREV_DISTRIBUTED_REWARDS,
         # needs another multisig to deal with access control behind proxy (ideally 2)
-        GOVERNOR_MULTISIG,  # governor
+        DFX_MULTISIG_ACCT,  # governor
         GUARDIAN_MULTISIG,  # guardian
         ZERO_ADDRESS,  # delegate gauge for pulling type 2 gauge rewards
     )
     dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
-        PROXY_MULTISIG,
+        DFX_PROXY_MULTISIG_ACCT,
         distributor_initializer_calldata,
         {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
         publish_source=should_verify,

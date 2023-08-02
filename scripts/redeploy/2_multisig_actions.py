@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 from brownie import accounts
 
-from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses, network_info
+from utils import contracts
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses, network_info
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
 

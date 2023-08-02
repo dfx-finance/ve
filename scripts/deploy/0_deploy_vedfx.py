@@ -5,12 +5,13 @@ import eth_abi
 import json
 import time
 
-from scripts.helper import gas_strategy, get_addresses, network_info, DEPLOY_ACCT
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses, network_info
 
 
 gas_price(gas_strategy)
 connected_network, _ = network_info()
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 
 def main():

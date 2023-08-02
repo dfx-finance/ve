@@ -3,11 +3,16 @@ import brownie
 from datetime import datetime
 import math
 
-from .bignum import approximately_equals
-from .chain import gas_strategy
-from .constants import WEEK, EPOCHS_PER_YEAR, TOKENLESS_PRODUCTION, DFX_PRICE, LP_PRICE
-from .testing.token import mint_dfx
-from .ve import deposit_to_ve, submit_ve_vote
+from utils.chain import gas_strategy
+from utils.constants import (
+    WEEK,
+    EPOCHS_PER_YEAR,
+    TOKENLESS_PRODUCTION,
+    DFX_PRICE,
+    LP_PRICE,
+)
+from utils.helper import mint_dfx
+from utils.ve import deposit_to_ve, submit_ve_vote
 
 
 # Print current chain time and epoch
@@ -68,7 +73,6 @@ def distribute_to_gauges(dfx, distributor, gauges, account, assertions):
     balances = {g: dfx.balanceOf(g) for g in gauges}
     for g, expected_balance in assertions.items():
         # approximate deviation between calling updateMiningParameters
-        print(expected_balance, balances[g])
         assert math.isclose(
             expected_balance,
             balances[g],
@@ -110,8 +114,8 @@ def claim_rewards(gauge, reward_address, users, signer_account):
 
 
 def calc_theoretical_rewards(distributor, gauge_weight):
-    global_rewards = distributor.rate() * WEEK
-    gauge_rewards = global_rewards * gauge_weight / 1e18
+    global_rewards = int(distributor.rate() * WEEK)
+    gauge_rewards = int(global_rewards * gauge_weight / 1e18)
     return global_rewards, gauge_rewards
 
 

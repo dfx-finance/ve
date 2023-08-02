@@ -2,14 +2,12 @@
 import json
 import time
 
-from brownie import accounts
+from utils import contracts
+from utils.account import DEPLOY_ACCT
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 
-from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy
-
-addresses = get_addresses()
-
-DEPLOY_ACCT = accounts[0]
+addresses = get_network_addresses()
 
 
 def main():

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 from math import isclose
-import brownie
-from brownie import accounts
 import pytest
 
+import brownie
+from brownie import accounts
 from utils.apr import (
     distribute_to_gauges,
     calc_boosted_apr,
@@ -12,11 +12,14 @@ from utils.apr import (
     get_euroc_usdc_gauge,
     mint_lp_tokens,
 )
-from utils.chain import fastforward_chain_weeks, gas_strategy
+from utils.chain import fastforward_chain_weeks
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.testing import addresses
-from utils.testing.token import fund_multisig
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
+from utils.helper import fund_multisig
+
+addresses = get_network_addresses()
 
 
 # handle setup logic required for each unit test
