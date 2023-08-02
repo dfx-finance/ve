@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-from brownie import accounts, VeDFX
+from brownie import VeDFX
 from brownie.network import gas_price
 import eth_abi
 import json
 import time
 
+from utils.account import DEPLOY_ACCT
 from utils.gas import gas_strategy
 from utils.network import get_network_addresses, network_info
 
@@ -28,7 +29,7 @@ def main():
         "Vote-escrowed DFX",
         "veDFX",
         "veDFX_1.0.0",
-        {"from": acct, "gas_price": gas_strategy},
+        {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
     )
     output_data["veDFX"] = vedfx.address
     output_data["veDFXParams"] = vedfx_params
