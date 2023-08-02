@@ -5,6 +5,7 @@ from .constants import (
     DEFAULT_GAUGE_WEIGHT,
     TOTAL_DFX_REWARDS,
 )
+from . import contracts
 from .gas import gas_strategy
 from .helper import mint_dfx, send_dfx
 
@@ -58,4 +59,6 @@ def active_gauges(gauge_controller, dfx_distributor):
     for addr in all_gauge_addresses:
         if dfx_distributor.killedGauges(addr) == False:
             gauge_addresses.append(addr)
-    return gauge_addresses
+
+    gauges = [contracts.gauge(addr) for addr in gauge_addresses]
+    return gauges

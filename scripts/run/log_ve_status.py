@@ -28,7 +28,6 @@ def active_gauges(gauge_controller, dfx_distributor):
     all_gauge_addresses = [gauge_controller.gauges(i) for i in range(0, num_gauges)]
     gauge_addresses = []
     for addr in all_gauge_addresses:
-        print(addr, dfx_distributor.killedGauges(addr))
         if dfx_distributor.killedGauges(addr) == False:
             gauge_addresses.append(addr)
     return gauge_addresses
@@ -39,8 +38,9 @@ def lpt_price(gauge):
     # lpt_addr = gauge.staking_token()
     # lpt = contracts.dfx_curve(lpt_addr)
     # underlying_0, underlying_1 = lpt.numeraires(0), lpt.numeraires(1)
-    print(f"{gauge.name()} ({gauge.address})")
+    # print(f"{gauge.name()} ({gauge.address})")
     # base = contracts.erc20(underlying_0)
+    pass
 
 
 # create object containing a variety of gauge stats
@@ -53,6 +53,7 @@ def get_gauge_info(dfx, gauge) -> GaugeInfo:
     info.lpt_price = lpt_price(gauge)
     info.reward_price = None
     info.apr = math.inf
+
     if info.total_lpt:
         info.apr = calc_global_boosted_apr(gauge, info.total_rewards)
     info.weight = gauge_controller.gauge_relative_weight(gauge.address)

@@ -9,6 +9,8 @@ interface IGaugeController {
 
     function gauge_relative_weight_write(address addr, uint256 time) external returns (uint256);
 
+    function gauge_relative_weight(address addr) external view returns (uint256);
+
     function gauge_relative_weight(address addr, uint256 time) external view returns (uint256);
 
     function add_gauge(address addr, int128 gauge_type) external;
