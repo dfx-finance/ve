@@ -1,6 +1,6 @@
 from brownie.network import show_active, gas_price
 
-from .constants_addresses import Localhost, Polygon, Ethereum
+from .constants_addresses import Localhost, Polygon, Ethereum, Testnet
 from .gas import gas_strategy
 
 
@@ -15,9 +15,10 @@ def network_info():
 def get_network_addresses():
     connected_network, _ = network_info()
 
-    if connected_network in ["hardhat", "development"]:
-        return Localhost
-    if connected_network == "polygon-main":
-        return Polygon
     if connected_network in ["ethereum", "mainnet"]:
         return Ethereum
+    if connected_network == "polygon-main":
+        return Polygon
+    if connected_network in ["hardhat", "development"]:
+        return Localhost
+    return Testnet

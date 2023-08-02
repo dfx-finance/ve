@@ -4,8 +4,10 @@ import json
 import pytest
 
 from utils.chain import fastforward_chain_weeks
-from utils.testing import addresses
-from utils.token import gas_strategy
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
+
+addresses = get_network_addresses()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -54,7 +56,7 @@ def dfx():
 def voting_escrow():
     # Load existing DFX ERC20 from mainnet fork
     abi = json.load(open("./tests/abis/veDfx.json"))
-    yield Contract.from_abi("veDFX", addresses.veDFX, abi)
+    yield Contract.from_abi("veDFX", addresses.VEDFX, abi)
 
 
 @pytest.fixture(scope="module")
@@ -107,12 +109,12 @@ def distributor(
         0,
         # should consider using another multisig to deal with access control
         new_master_account,
-        addresses.DFX_MULTISIG,
+        addresses.DFX_MULTISIG_0,
         ZERO_ADDRESS,
     )
     proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
-        addresses.DFX_MULTISIG,
+        addresses.DFX_MULTISIG_0,
         distributor_initializer_calldata,
         {"from": master_account, "gas_price": gas_strategy},
     )
@@ -159,15 +161,15 @@ def three_liquidity_gauges_v4(
         # deploy gauge behind proxy
         gauge_initializer_calldata = gauge.initialize.encode_input(
             lp_token,
-            addresses.DFX_MULTISIG,
+            addresses.DFX_MULTISIG_0,
             addresses.DFX,
-            addresses.veDFX,
+            addresses.VEDFX,
             veboost_proxy,
             distributor,
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
-            addresses.DFX_MULTISIG,
+            addresses.DFX_MULTISIG_0,
             gauge_initializer_calldata,
             {"from": master_account, "gas_price": gas_strategy},
         )
