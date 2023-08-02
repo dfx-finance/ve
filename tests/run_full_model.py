@@ -5,7 +5,7 @@ import pytest
 
 from utils.chain import fastforward_chain_weeks, gas_strategy
 from utils.constants import EMISSION_RATE, WEEK
-from utils.helper import fund_multisig
+from utils.helper import fund_multisigs
 from utils.gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
 
 
@@ -19,7 +19,7 @@ def setup(
     master_account,
     new_master_account,
 ):
-    fund_multisig(master_account)
+    fund_multisigs(master_account)
 
     # setup gauges and distributor
     setup_gauge_controller(gauge_controller, three_liquidity_gauges_v4, master_account)

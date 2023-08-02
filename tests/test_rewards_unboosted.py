@@ -3,11 +3,12 @@ import brownie
 from math import isclose
 import pytest
 
-from utils.chain import fastforward_chain_weeks, gas_strategy
+from utils.chain import fastforward_chain_weeks
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
+from utils.gas import gas_strategy
 from utils.network import get_network_addresses
-from utils.helper import assert_tokens_balance, fund_multisig
+from utils.helper import assert_tokens_balance, fund_multisigs
 
 addresses = get_network_addresses()
 
@@ -22,7 +23,7 @@ def setup(
     master_account,
     new_master_account,
 ):
-    fund_multisig(master_account)
+    fund_multisigs(master_account)
 
     # setup gauges and distributor
     setup_gauge_controller(gauge_controller, three_liquidity_gauges_v4, master_account)

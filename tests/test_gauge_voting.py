@@ -5,10 +5,10 @@ from brownie import chain, history
 import brownie
 import pytest
 
-from utils.chain import gas_strategy
 from utils.constants import WEEK
 from utils.gauges import setup_gauge_controller
-from utils.helper import fund_multisig, mint_dfx, send_dfx
+from utils.gas import gas_strategy
+from utils.helper import fund_multisigs, mint_dfx, send_dfx
 from utils.ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data
 
 
@@ -17,7 +17,7 @@ from utils.ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data
 def setup(
     dfx, gauge_controller, three_liquidity_gauges_v4, master_account, user_accounts
 ):
-    fund_multisig(master_account)
+    fund_multisigs(master_account)
     setup_gauge_controller(gauge_controller, three_liquidity_gauges_v4, master_account)
 
     # Distribute coins

@@ -7,7 +7,7 @@ from brownie import DfxUpgradeableProxy, LiquidityGaugeV4
 from utils import contracts
 from utils.account import DEPLOY_ACCT, impersonate
 from utils.gas import gas_strategy, verify_gas_strategy
-from utils.helper import fund_multisig
+from utils.helper import fund_multisigs
 from utils.network import get_network_addresses, network_info
 
 addresses = get_network_addresses()
@@ -33,7 +33,7 @@ def main():
     if not is_local_network:
         verify_gas_strategy()
     if is_local_network:
-        fund_multisig(DEPLOY_ACCT)
+        fund_multisigs(DEPLOY_ACCT)
 
     should_verify = False if is_local_network else True
 

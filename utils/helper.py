@@ -10,8 +10,9 @@ load_dotenv()
 addresses = get_network_addresses()
 
 
-def fund_multisig(account):
+def fund_multisigs(account):
     account.transfer(addresses.DFX_MULTISIG_0, "10 ether", gas_price=gas_strategy)
+    account.transfer(addresses.DFX_MULTISIG_1, "10 ether", gas_price=gas_strategy)
 
 
 def mint_dfx(dfx, amount, account):

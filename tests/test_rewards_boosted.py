@@ -4,10 +4,11 @@ import brownie
 import pytest
 
 from utils.apr import get_euroc_usdc_gauge, mint_lp_tokens, mint_vedfx_and_vote
-from utils.chain import fastforward_chain_weeks, gas_strategy
+from utils.chain import fastforward_chain_weeks
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.helper import fund_multisig
+from utils.gas import gas_strategy
+from utils.helper import fund_multisigs
 from utils.network import get_network_addresses
 
 
@@ -24,7 +25,7 @@ def setup(
     master_account,
     new_master_account,
 ):
-    fund_multisig(master_account)
+    fund_multisigs(master_account)
 
     # setup gauges and distributor
     setup_gauge_controller(gauge_controller, three_liquidity_gauges_v4, master_account)
