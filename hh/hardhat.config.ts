@@ -13,7 +13,7 @@ const RpcUrls: Record<string, string> = {
 // const ethBlock = 14_572_523; // curve dfxCad/cadc staking deployed
 // const ethBlock = 14_725_000; // veDFX deployed
 // const ethBlock = 15_051_000; // euroc/usdc pool deployed
-// const ethBlock = 15_504_570; // ve deployed
+const ethBlock = 15_504_570; // ve deployed
 // const ethBlock = 15_742_070; // ammv2 deployed
 // const ethBlock = 15_749_200; // ammv2 redeployed
 // const ethBlock = 15_765_345; // ammv2 seeded
@@ -24,7 +24,6 @@ const RpcUrls: Record<string, string> = {
 // const ethBlock = 15_983_915; // last DfxDistributor update
 // const ethBlock = 16_685_597; // ammv2.1 seeded, gauges staked
 // const ethBlock = 16_723_375; // gbpt deployed
-const ethBlock = 16737081;
 
 const BlockNumbers: Record<string, number> = {
   1: ethBlock,

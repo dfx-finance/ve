@@ -7,9 +7,9 @@ interface IGaugeController {
 
     function gauge_types(address addr) external view returns (int128);
 
-    function gauge_relative_weight_write(address addr) external returns (uint256);
+    function gauge_relative_weight_write(address addr, uint256 time) external returns (uint256);
 
-    function gauge_relative_weight(address addr) external view returns (uint256);
+    function gauge_relative_weight(address addr, uint256 time) external view returns (uint256);
 
     function add_gauge(address addr, int128 gauge_type) external;
 
@@ -19,8 +19,8 @@ interface IGaugeController {
 
     function commit_transfer_ownership(address account) external;
 
-    function accept_transfer_ownership() external;    
-    
+    function accept_transfer_ownership() external;
+
     function n_gauges() external view returns (int128);
 
     function gauges(uint256 index) external view returns (address);
