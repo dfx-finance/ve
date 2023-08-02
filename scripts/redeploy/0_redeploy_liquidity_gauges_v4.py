@@ -2,24 +2,19 @@
 import os
 import time
 
-from brownie import accounts, DfxUpgradeableProxy
+from brownie import DfxUpgradeableProxy
 
-from scripts import contracts
-from scripts.helper import (
-    get_addresses,
-    network_info,
-    verify_gas_strategy,
-    write_json_log,
-    gas_strategy,
-)
+from utils import contracts
+from utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT
+from utils.gas import verify_gas_strategy, gas_strategy
+from utils.log import write_json_log
+from utils.network import get_network_addresses, network_info
 
-addresses = get_addresses()
+
+addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
-DEPLOY_ACCT = accounts[0] if is_local_network else accounts.load("deployve")
-DEPLOY_PROXY_ACCT = (
-    accounts[1] if is_local_network else accounts.load("deployve-proxyadmin")
-)
+
 LP_ADDRESSES = [
     ("CADC_USDC", addresses.DFX_CADC_USDC_LP),
     ("EUROC_USDC", addresses.DFX_EUROC_USDC_LP),
@@ -45,7 +40,7 @@ def deploy_proxied_gauges(lp_addresses):
             lp_addr,
             DEPLOY_ACCT,
             addresses.DFX,
-            addresses.VOTE_ESCROW,
+            addresses.VEDFX,
             addresses.VE_BOOST_PROXY,
             addresses.DFX_DISTRIBUTOR,
         )
@@ -64,17 +59,20 @@ def deploy_proxied_gauges(lp_addresses):
             "calldata": gauge_initializer_calldata,
             "proxy": dfx_upgradeable_proxy.address,
         }
-        log_fp = write_json_log(f"deployed_liquidity_gauges_v4_{label}", _data)
-        log_fps.append(log_fp)
+        if not is_local_network:
+            log_fp = write_json_log(f"deployed_liquidity_gauges_v4_{label}", _data)
+            log_fps.append(log_fp)
         output_data[label] = _data
 
         # sleep between deployments if using ethereum mainnet
         if not is_local_network:
             print("Sleeping after deploy....")
             time.sleep(3)
-    write_json_log("redeployed_liquidity_gauges_v4", output_data)
-    for fp in log_fps:
-        os.remove(fp)
+
+    if not is_local_network:
+        write_json_log("redeployed_liquidity_gauges_v4", output_data)
+        for fp in log_fps:
+            os.remove(fp)
     return proxied_gauges
 
 
@@ -87,7 +85,8 @@ def main():
         )
     )
 
-    verify_gas_strategy()
+    if not is_local_network:
+        verify_gas_strategy()
 
     print(f"--- Deploying Liquidity Gauges (v4) contracts to {connected_network} ---")
     deploy_proxied_gauges(LP_ADDRESSES)

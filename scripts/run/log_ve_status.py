@@ -3,15 +3,13 @@ from brownie import chain, web3
 from datetime import datetime
 import math
 
-from scripts import contracts
-from scripts.helper import get_addresses, load_dfx_token
+from utils import contracts
 from utils.apr import calc_global_boosted_apr
-from utils.constants import DFX_PRICE, LP_PRICE
+from utils.constants import DFX_PRICE, LP_PRICE, SECONDS_PER_YEAR
+from utils.network import get_network_addresses
 
 
-SECONDS_PER_YEAR = 365 * 24 * 60 * 60
-
-addresses = get_addresses()
+addresses = get_network_addresses()
 
 
 class GaugeInfo:
@@ -30,7 +28,6 @@ def active_gauges(gauge_controller, dfx_distributor):
     all_gauge_addresses = [gauge_controller.gauges(i) for i in range(0, num_gauges)]
     gauge_addresses = []
     for addr in all_gauge_addresses:
-        print(addr, dfx_distributor.killedGauges(addr))
         if dfx_distributor.killedGauges(addr) == False:
             gauge_addresses.append(addr)
     return gauge_addresses
@@ -41,8 +38,9 @@ def lpt_price(gauge):
     # lpt_addr = gauge.staking_token()
     # lpt = contracts.dfx_curve(lpt_addr)
     # underlying_0, underlying_1 = lpt.numeraires(0), lpt.numeraires(1)
-    print(f"{gauge.name()} ({gauge.address})")
+    # print(f"{gauge.name()} ({gauge.address})")
     # base = contracts.erc20(underlying_0)
+    pass
 
 
 # create object containing a variety of gauge stats
@@ -55,6 +53,7 @@ def get_gauge_info(dfx, gauge) -> GaugeInfo:
     info.lpt_price = lpt_price(gauge)
     info.reward_price = None
     info.apr = math.inf
+
     if info.total_lpt:
         info.apr = calc_global_boosted_apr(gauge, info.total_rewards)
     info.weight = gauge_controller.gauge_relative_weight(gauge.address)
@@ -72,7 +71,7 @@ def main():
     block_num = web3.eth.block_number
     block_timestamp = chain[block_num]["timestamp"]
 
-    dfx = load_dfx_token()
+    dfx = contracts.load_dfx_token()
 
     rewards_enabled = "on" if dfx_distributor.distributionsOn() else "off"
     distributor_dfx_balance = dfx.balanceOf(dfx_distributor.address)

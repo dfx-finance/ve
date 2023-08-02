@@ -1,18 +1,13 @@
 #!/usr/bin/env python
-from brownie import accounts, chain
 from brownie.network import gas_price
 
-from datetime import datetime, timezone
+from utils import contracts
+from utils.account import DEPLOY_ACCT
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 
-from scripts import contracts
-from scripts.helper import gas_strategy, get_addresses
-from utils.constants import WEEK
-
-
-addresses = get_addresses()
+addresses = get_network_addresses()
 gas_price(gas_strategy)
-
-DEPLOY_ACCT = accounts[0]
 
 
 def main():

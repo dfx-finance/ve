@@ -4,10 +4,11 @@ import time
 
 from brownie import accounts, DfxUpgradeableProxy, LiquidityGaugeV4
 
-from scripts import contracts
-from scripts.helper import get_addresses, network_info, gas_strategy
+from utils import contracts
+from utils.gas import gas_strategy, verify_gas_strategy
+from utils.network import get_network_addresses, network_info
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
 DEPLOY_ACCT = accounts[0] if is_local_network else accounts.load("deployve")
@@ -25,6 +26,9 @@ output_data = {"gauges": {"amm": {}}}
 
 
 def main():
+    if not is_local_network:
+        verify_gas_strategy()
+
     should_verify = False if is_local_network else True
 
     veboost_proxy = contracts.veboost_proxy(addresses.VE_BOOST_PROXY)

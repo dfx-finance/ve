@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 import brownie
+import json
+
+from .network import get_network_addresses
 
 
 def voting_escrow(address):
@@ -28,3 +31,9 @@ def dfx_curve(address):
 
 def erc20(address):
     return brownie.interface.IERC20(address)
+
+
+def load_dfx_token():
+    addrs = get_network_addresses()
+    abi = json.load(open("./tests/abis/Dfx.json"))
+    return brownie.Contract.from_abi("DFX", addrs.DFX, abi)

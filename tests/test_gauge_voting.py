@@ -5,20 +5,20 @@ from brownie import chain, history
 import brownie
 import pytest
 
-from utils.chain import gas_strategy
 from utils.constants import WEEK
 from utils.gauges import setup_gauge_controller
-from utils.testing.token import fund_multisig, mint_dfx
-from utils.token import send_dfx
+from utils.gas import gas_strategy
+from utils.helper import fund_multisigs, mint_dfx, send_dfx
 from utils.ve import deposit_to_ve, submit_ve_votes, calculate_ve_slope_data
 
 
 # handle setup logic required for each unit test
-@pytest.fixture(scope='module', autouse=True)
-def setup(dfx, gauge_controller, three_liquidity_gauges_v4, master_account, user_accounts):
-    fund_multisig(master_account)
-    setup_gauge_controller(
-        gauge_controller, three_liquidity_gauges_v4, master_account)
+@pytest.fixture(scope="module", autouse=True)
+def setup(
+    dfx, gauge_controller, three_liquidity_gauges_v4, master_account, user_accounts
+):
+    fund_multisigs(master_account)
+    setup_gauge_controller(gauge_controller, three_liquidity_gauges_v4, master_account)
 
     # Distribute coins
     mint_dfx(dfx, 1e24, master_account)
@@ -28,7 +28,7 @@ def setup(dfx, gauge_controller, three_liquidity_gauges_v4, master_account, user
         send_dfx(dfx, 5e22, master_account, acct)
 
 
-@pytest.fixture(scope='module', autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def teardown():
     yield
     brownie.chain.reset()
@@ -41,8 +41,10 @@ def teardown():
 # )
 # # strategy will run this test 50(?) times by default, at least 3 is necessary to generate non-0 values
 # @settings(max_examples=3)
-def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, user_accounts):
-    '''
+def test_gauge_weight_vote(
+    dfx, gauge_controller, voting_escrow, three_liquidity_gauges_v4, user_accounts
+):
+    """
     Test that gauge weights correctly adjust over time.
 
     Strategies
@@ -50,16 +52,19 @@ def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity
     st_deposits : [int, int, int]
         Number of coins to be deposited per account
     st_length : [int, int, int]
-        Policy duration in weeks    
+        Policy duration in weeks
     st_votes : [(int, int), (int, int), (int, int)]
         (vote for gauge 0, vote for gauge 1) for each account, in units of 10%
 
     TODO: Curve tests simulate 3 user accounts whereas this currently only performs 1. Add
           additional accounts when 1 is working successfully.
-    '''
+    """
     # Provide default values when decorator strategy is commented out
-    st_deposits = [1000000000000000000079,
-                   1000000000000000000150, 1000000000000000008880]
+    st_deposits = [
+        1000000000000000000079,
+        1000000000000000000150,
+        1000000000000000008880,
+    ]
     st_length = [58, 87, 86]
     st_votes = [[4, 3], [1, 4], [0, 3]]
 
@@ -67,17 +72,17 @@ def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity
     t0 = chain.time()
     t1 = (t0 + 2 * WEEK) // WEEK * WEEK - 10
     chain.sleep(t1 - t0)
-    print('Original chain time:', t0)
-    print('New chain time:', chain.time())
+    print("Original chain time:", t0)
+    print("New chain time:", chain.time())
 
     # Deposit for voting
     timestamp = t1
-    deposit_to_ve(dfx, voting_escrow, user_accounts,
-                  st_deposits, st_length, timestamp)
+    deposit_to_ve(dfx, voting_escrow, user_accounts, st_deposits, st_length, timestamp)
 
     # Place votes in bps (10000 = 100.00%)
     votes = submit_ve_votes(
-        gauge_controller, three_liquidity_gauges_v4, user_accounts, st_votes)
+        gauge_controller, three_liquidity_gauges_v4, user_accounts, st_votes
+    )
 
     # Vote power assertions - everyone used all voting power
     for acct in user_accounts:
@@ -85,7 +90,8 @@ def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity
 
     # Calculate slope data, build model functions for calcuating max duration and theoretical weight
     slope_data = calculate_ve_slope_data(
-        voting_escrow, user_accounts, st_length, timestamp)
+        voting_escrow, user_accounts, st_length, timestamp
+    )
 
     max_duration = max(duration for _, duration in slope_data)
 
@@ -100,22 +106,24 @@ def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity
     while history[-1].timestamp < timestamp + 1.5 * max_duration:
         for i in range(3):
             gauge_controller.checkpoint_gauge(
-                three_liquidity_gauges_v4[i], {'from': user_accounts[2], 'gas_price': gas_strategy})
+                three_liquidity_gauges_v4[i],
+                {"from": user_accounts[2], "gas_price": gas_strategy},
+            )
 
         # % of duration into lock (rounded down to latest epoch week) / max. lock duration
-        relative_time = (history[-1].timestamp // WEEK *
-                         WEEK - timestamp) / max_duration
+        relative_time = (
+            history[-1].timestamp // WEEK * WEEK - timestamp
+        ) / max_duration
 
-        weights = [gauge_controller.gauge_relative_weight(
-            three_liquidity_gauges_v4[i]) / 1e18 for i in range(3)]
+        weights = [
+            gauge_controller.gauge_relative_weight(three_liquidity_gauges_v4[i]) / 1e18
+            for i in range(3)
+        ]
         if relative_time < 1:
             theoretical_weights = [
-                sum((votes[i][0] / 10000) * models(i, relative_time)
-                    for i in range(3)),
-                sum((votes[i][1] / 10000) * models(i, relative_time)
-                    for i in range(3)),
-                sum((votes[i][2] / 10000) * models(i, relative_time)
-                    for i in range(3)),
+                sum((votes[i][0] / 10000) * models(i, relative_time) for i in range(3)),
+                sum((votes[i][1] / 10000) * models(i, relative_time) for i in range(3)),
+                sum((votes[i][2] / 10000) * models(i, relative_time) for i in range(3)),
             ]
             theoretical_weights = [
                 w and (w / sum(theoretical_weights)) for w in theoretical_weights
@@ -123,14 +131,16 @@ def test_gauge_weight_vote(dfx, gauge_controller, voting_escrow, three_liquidity
         else:
             theoretical_weights = [0] * 3
 
-        print((
-            f'Relative time: {relative_time}'
-            f'\n\tWeights:\t\t{weights}'
-            f'\n\tTheoretical Weights:\t{theoretical_weights}'
-        ))
+        print(
+            (
+                f"Relative time: {relative_time}"
+                f"\n\tWeights:\t\t{weights}"
+                f"\n\tTheoretical Weights:\t{theoretical_weights}"
+            )
+        )
         if relative_time != 1:
             for i in range(3):
-                assert(
+                assert (
                     abs(weights[i] - theoretical_weights[i])
                     <= (history[-1].timestamp - timestamp) / WEEK + 1
                 )  # 1 s per week?

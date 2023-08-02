@@ -4,11 +4,13 @@ from brownie.network import gas_price
 
 from datetime import datetime, timezone
 
-from scripts.helper import gas_strategy, get_addresses
+from utils.chain import fastforward_chain
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 from utils.constants import WEEK
 
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 gas_price(gas_strategy)
 
 
@@ -28,19 +30,13 @@ class FastforwardTime:
 
 def main():
     # fast-forward chain until end of epoch 1
-    chain.sleep(0)
-    t0 = int(chain.time())
-
     endtime = datetime(2023, 3, 2, 0, 0, 0, 0, tzinfo=timezone.utc)
     t1 = FastforwardTime.until(target=endtime)
     # t1 = 1800 # 30-mins
     # t1 = FastforwardTime.week(t0)
     # t1 = FastforwardTime.hours(t0, 24)
 
-    print(t0)
-    chain.sleep(t1 - t0)
-    chain.mine()
-    print(datetime.utcfromtimestamp(chain.time()))
+    fastforward_chain(t1)
 
 
 if __name__ == "__main__":

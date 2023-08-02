@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 from brownie import accounts
 
-from scripts import contracts
-from scripts.helper import get_addresses, gas_strategy
+from utils import contracts
+from utils.gas import gas_strategy
+from utils.network import get_network_addresses
 
 DEPLOY_ACCT = accounts[0]
 
 
-addresses = get_addresses()
+addresses = get_network_addresses()
+
 
 # fetch all gauge addresses which are not flagged as a killedGauge
 def active_gauges(gauge_controller, dfx_distributor):

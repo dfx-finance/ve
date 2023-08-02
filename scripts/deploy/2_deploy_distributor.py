@@ -4,13 +4,15 @@ import time
 
 from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
-from scripts import contracts
-from scripts.helper import get_addresses, network_info, gas_strategy
+from utils import contracts
+from utils.account import DEPLOY_ACCT
+from utils.gas import gas_strategy, verify_gas_strategy
+from utils.network import get_network_addresses, network_info
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
 output_data = {"distributor": {"logic": None, "proxy": None}}
@@ -27,6 +29,8 @@ def main():
             "\t4. Governor and Guardian addresses"
         )
     )
+    if not is_local_network:
+        verify_gas_strategy()
     should_verify = not is_local_network
     # should_verify = False
 
@@ -45,21 +49,22 @@ def main():
         REWARDS_RATE,
         PREV_DISTRIBUTED_REWARDS,
         # needs another multisig to deal with access control behind proxy (ideally 2)
-        GOVERNOR_MULTISIG,  # governor
-        GUARDIAN_MULTISIG,  # guardian
+        addresses.DFX_MULTISIG_0,  # governor
+        addresses.DFX_MULTISIG_0,  # guardian
         ZERO_ADDRESS,  # delegate gauge for pulling type 2 gauge rewards
     )
     dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
-        PROXY_MULTISIG,
+        addresses.DFX_MULTISIG_1,
         distributor_initializer_calldata,
         {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
         publish_source=should_verify,
     )
     output_data["distributor"]["proxy"] = dfx_upgradable_proxy.address
 
-    # Write output to file
-    with open(
-        f"./scripts/deployed_distributor_{int(time.time())}.json", "w"
-    ) as output_f:
-        json.dump(output_data, output_f, indent=4)
+    if not is_local_network:
+        # Write output to file
+        with open(
+            f"./scripts/deployed_distributor_{int(time.time())}.json", "w"
+        ) as output_f:
+            json.dump(output_data, output_f, indent=4)

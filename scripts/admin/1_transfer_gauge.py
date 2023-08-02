@@ -1,18 +1,19 @@
 #!/usr/bin/env python
-from brownie import accounts, interface, LiquidityGaugeV4
+from brownie import accounts, interface
 
-from scripts import contracts
-from scripts.helper import get_addresses, network_info, gas_strategy
+from utils import contracts
+from utils.gas import gas_strategy, verify_gas_strategy
+from utils.network import get_network_addresses, network_info
+from utils.account import (
+    DEPLOY_ACCT,
+    DEPLOY_PROXY_ACCT,
+    DFX_MULTISIG_ACCT,
+    DFX_PROXY_MULTISIG_ACCT,
+)
 
-addresses = get_addresses()
+addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
-DEPLOY_ACCT = accounts[0] if is_local_network else accounts.load("deployve")
-DEPLOY_PROXY_ACCT = (
-    accounts[1] if is_local_network else accounts.load("deployve-proxyadmin")
-)
-DFX_MULTISIG_ACCT = "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF"
-DFX_PROXY_MULTISIG_ACCT = "0x26f539A0fE189A7f228D7982BF10Bc294FA9070c"
 
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
@@ -41,6 +42,9 @@ def transfer_gauge_proxy(gauge_addr):
 
 
 def main():
+    if not is_local_network:
+        verify_gas_strategy()
+
     gauge_addr = addresses.DFX_GBPT_USDC_GAUGE
 
     print(f"Transfering liquidity gauge to {DFX_MULTISIG_ACCT}...")

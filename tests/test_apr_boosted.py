@@ -14,8 +14,8 @@ from utils.apr import (
 )
 from utils.chain import fastforward_chain_weeks
 from utils.constants import EMISSION_RATE
+from utils.helper import fund_multisigs
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.testing.token import fund_multisig
 
 
 # handle setup logic required for each unit test
@@ -28,7 +28,7 @@ def setup(
     master_account,
     new_master_account,
 ):
-    fund_multisig(master_account)
+    fund_multisigs(master_account)
 
     # setup gauges and distributor
     setup_gauge_controller(gauge_controller, three_liquidity_gauges_v4, master_account)
@@ -98,6 +98,8 @@ def test_boosted_apr(
         euroc_usdc_gauge,
         user_0,
     )
+
+    print(user_0)
 
     # 3. Fast-forward until the very end of epoch 1 and claim rewards. Check theoretical vs
     # actually claimed rewards and calculated unboosted APR

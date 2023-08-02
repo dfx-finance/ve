@@ -4,11 +4,15 @@ import brownie
 import pytest
 
 from utils.apr import get_euroc_usdc_gauge, mint_lp_tokens, mint_vedfx_and_vote
-from utils.chain import fastforward_chain_weeks, gas_strategy
+from utils.chain import fastforward_chain_weeks
 from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.testing import addresses
-from utils.testing.token import fund_multisig
+from utils.gas import gas_strategy
+from utils.helper import fund_multisigs
+from utils.network import get_network_addresses
+
+
+addresses = get_network_addresses()
 
 
 # handle setup logic required for each unit test
@@ -21,7 +25,7 @@ def setup(
     master_account,
     new_master_account,
 ):
-    fund_multisig(master_account)
+    fund_multisigs(master_account)
 
     # setup gauges and distributor
     setup_gauge_controller(gauge_controller, three_liquidity_gauges_v4, master_account)
@@ -74,6 +78,7 @@ def test_multi_user_stake(
 
     # Mint 10,000 of LP tokens are minted
     mint_lp_tokens(euroc_usdc_lp, [user_0, user_1], master_account)
+    print(euroc_usdc_lp.balanceOf(user_0), euroc_usdc_lp.balanceOf(user_1))
 
     # deposit tokens to gauge
     deposit_lp_tokens(euroc_usdc_lp, euroc_usdc_gauge, user_0)
