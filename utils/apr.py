@@ -3,16 +3,16 @@ import brownie
 from datetime import datetime
 import math
 
-from utils.chain import gas_strategy
-from utils.constants import (
+from .chain import gas_strategy
+from .constants import (
     WEEK,
     EPOCHS_PER_YEAR,
     TOKENLESS_PRODUCTION,
     DFX_PRICE,
     LP_PRICE,
 )
-from utils.helper import mint_dfx
-from utils.ve import deposit_to_ve, submit_ve_vote
+from .helper import mint_dfx
+from .ve import deposit_to_ve, submit_ve_vote
 
 
 # Print current chain time and epoch

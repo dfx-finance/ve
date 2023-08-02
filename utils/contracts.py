@@ -2,7 +2,7 @@
 import brownie
 import json
 
-from scripts.utils.network import get_network_addresses
+from .network import get_network_addresses
 
 
 def voting_escrow(address):

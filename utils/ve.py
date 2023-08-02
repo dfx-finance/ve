@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from utils.chain import gas_strategy
-from utils.constants import WEEK
+from .gas import gas_strategy
+from .constants import WEEK
 
 
 def deposit_to_ve(dfx, voting_escrow, user_accounts, st_deposits, st_length, timestamp):

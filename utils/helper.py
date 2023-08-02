@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from dotenv import load_dotenv
 
-from utils.gas import gas_strategy
-from utils.network import get_network_addresses
+from .gas import gas_strategy
+from .network import get_network_addresses
 
 
 load_dotenv()

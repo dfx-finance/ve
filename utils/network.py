@@ -1,7 +1,7 @@
 from brownie.network import show_active, gas_price
 
-from scripts.utils.constants_addresses import Localhost, Polygon, Ethereum
-from scripts.utils.gas import gas_strategy
+from .constants_addresses import Localhost, Polygon, Ethereum
+from .gas import gas_strategy
 
 
 def network_info():

@@ -4,7 +4,7 @@ from datetime import datetime
 from brownie import chain
 from brownie.network.gas.strategies import LinearScalingStrategy
 
-from utils.constants import WEEK
+from .constants import WEEK
 
 
 # Fast-forwards chain state to delta (seconds) after (or before if negative)

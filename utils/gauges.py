@@ -1,14 +1,12 @@
 #!/usr/bin/env python
-import brownie
-
-from utils.constants import (
+from .constants import (
     DEFAULT_TYPE_WEIGHT,
     DEFAULT_GAUGE_TYPE,
     DEFAULT_GAUGE_WEIGHT,
     TOTAL_DFX_REWARDS,
 )
-from utils.gas import gas_strategy
-from utils.helper import mint_dfx, send_dfx
+from .gas import gas_strategy
+from .helper import mint_dfx, send_dfx
 
 
 def setup_gauge_controller(gauge_controller, gauges, master_account):

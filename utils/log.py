@@ -4,9 +4,9 @@ import json
 import time
 
 from brownie import chain, web3
-from scripts.utils import contracts
-from scripts.utils.constants import SECONDS_PER_YEAR
-from scripts.utils.network import get_network_addresses
+from . import contracts
+from .constants import SECONDS_PER_YEAR
+from .network import get_network_addresses
 
 
 ### File
