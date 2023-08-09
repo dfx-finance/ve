@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from brownie import accounts
 
+from fork.utils.account import DEPLOY_ACCT, impersonate
 from utils import contracts
-from utils.account import DEPLOY_ACCT, impersonate
 from utils.gauges import active_gauges
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs

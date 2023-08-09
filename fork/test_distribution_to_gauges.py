@@ -3,8 +3,8 @@ import brownie
 from datetime import datetime
 import pytest
 
+from fork.constants import EMISSION_RATE
 from utils.chain import fastforward_chain_weeks
-from utils.constants import EMISSION_RATE
 from utils.gauges import setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs

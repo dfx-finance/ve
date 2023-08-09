@@ -6,13 +6,13 @@ from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 import json
 import time
 
-from utils import contracts
-from utils.account import (
+from fork.utils.account import (
     DEPLOY_ACCT,
     DEPLOY_PROXY_ACCT,
     DFX_MULTISIG_ACCT,
     DFX_PROXY_MULTISIG_ACCT,
 )
+from utils import contracts
 from utils.gas import gas_strategy
 from utils.network import get_network_addresses, network_info
 

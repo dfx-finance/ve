@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-from .gas import gas_strategy
 from .constants import WEEK
+from .gas import gas_strategy
 
 
-def deposit_to_ve(dfx, voting_escrow, user_accounts, st_deposits, st_length, timestamp):
+def deposit_to_ve(dfx, veDFX, user_accounts, st_deposits, st_length, timestamp):
     for i, acct in enumerate(user_accounts):
-        dfx.approve(
-            voting_escrow, st_deposits[i], {"from": acct, "gas_price": gas_strategy}
-        )
+        dfx.approve(veDFX, st_deposits[i], {"from": acct, "gas_price": gas_strategy})
 
-        voting_escrow.create_lock(
+        veDFX.create_lock(
             st_deposits[i],
             timestamp + (st_length[i] * WEEK),
             {"from": acct, "gas_price": gas_strategy},

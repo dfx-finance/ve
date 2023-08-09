@@ -4,7 +4,7 @@ import eth_abi
 import json
 import time
 
-from utils.account import DEPLOY_ACCT
+from fork.utils.account import DEPLOY_ACCT
 from utils.gas import gas_strategy, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
 

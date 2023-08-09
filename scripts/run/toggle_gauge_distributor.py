@@ -2,8 +2,8 @@
 import json
 import time
 
+from fork.utils.account import DEPLOY_ACCT
 from utils import contracts
-from utils.account import DEPLOY_ACCT
 from utils.gas import gas_strategy
 from utils.network import get_network_addresses
 

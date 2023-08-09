@@ -39,24 +39,24 @@ def get_euroc_usdc_gauge(mock_lp_tokens, three_liquidity_gauges_v4):
 
 
 # mint lp tokens for the users (default: 10,000)
-def mint_lp_tokens(euroc_usdc_lp, users, signer_account, amount=10e21):
+def mint_lp_tokens(lpt, users, signer_account, amount=10e21):
     for user in users:
-        euroc_usdc_lp.mint(
-            user, amount, {"from": signer_account, "gas_price": gas_strategy}
-        )
-        assert euroc_usdc_lp.balanceOf(user) == amount
+        lpt.mint(user, amount, {"from": signer_account, "gas_price": gas_strategy})
+        assert lpt.balanceOf(user) == amount
 
 
+# DEV: doing too much; deprecate
 def mint_vedfx_and_vote(
     dfx,
     gauge_controller,
     voting_escrow,
     three_liquidity_gauges_v4,
     voted_gauge,
+    master_account,
     account,
     amount=1e5,
 ):
-    mint_dfx(dfx, amount * 1e18, account)
+    mint_dfx(dfx, amount * 1e18, account, master_account)
     lock_timestamp = brownie.chain.time()
     deposit_to_ve(dfx, voting_escrow, [account], [1e21], [100], lock_timestamp)
     # Place votes in bps (10000 = 100.00%)

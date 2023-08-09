@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 from brownie import accounts, interface
 
+from fork.utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT
 from utils import contracts
 from utils.gas import gas_strategy, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
-from utils.account import (
-    DEPLOY_ACCT,
-    DEPLOY_PROXY_ACCT,
-    DFX_MULTISIG_ACCT,
-    DFX_PROXY_MULTISIG_ACCT,
-)
 
 addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
+
+DFX_MULTISIG_ACCT = "0x27E843260c71443b4CC8cB6bF226C3f77b9695AF"
+DFX_PROXY_MULTISIG_ACCT = "0x26f539A0fE189A7f228D7982BF10Bc294FA9070c"
 
 
 DEFAULT_GAUGE_TYPE = 0

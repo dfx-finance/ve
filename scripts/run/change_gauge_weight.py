@@ -1,6 +1,6 @@
 #!/usr/bin/env python
+from fork.utils.account import DEPLOY_ACCT, impersonate
 from utils import contracts
-from utils.account import DEPLOY_ACCT, impersonate
 from utils.gauges import active_gauges
 from utils.helper import fund_multisigs
 from utils.network import get_network_addresses

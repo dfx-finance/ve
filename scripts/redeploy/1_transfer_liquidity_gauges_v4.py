@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import brownie
 
+from fork.utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT, impersonate
 from utils import contracts
-from utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT, impersonate
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs
 from utils.network import get_network_addresses, network_info

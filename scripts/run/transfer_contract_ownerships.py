@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # import brownie
-from brownie import accounts, interface
+from brownie import interface
 
+from fork.utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT
 from utils import contracts
-from utils.account import DEPLOY_ACCT, DFX_MULTISIG_ACCT
 from utils.gas import gas_strategy
 from utils.network import get_network_addresses
 
@@ -114,8 +114,8 @@ def main():
     transfer_all_liquidity_gauges(DEPLOY_ACCT, NEW_ADMIN_MULTISIG)
 
     print("Transfer upgradeable proxy admins...")
-    transfer_distributor_proxy(DFX_MULTISIG_ACCT, NEW_PROXY_MULTISIG)
-    transfer_all_gauge_proxies(DFX_MULTISIG_ACCT, NEW_PROXY_MULTISIG)
+    transfer_distributor_proxy(DEPLOY_PROXY_ACCT, NEW_PROXY_MULTISIG)
+    transfer_all_gauge_proxies(DEPLOY_PROXY_ACCT, NEW_PROXY_MULTISIG)
 
 
 if __name__ == "__main__":

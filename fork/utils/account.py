@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from brownie import accounts, config, network
 
-from .constants import LOCAL_BLOCKCHAIN_ENVIRONMENTS
-from .network import network_info
+from fork.constants import LOCAL_BLOCKCHAIN_ENVIRONMENTS
+from utils.network import network_info
 
 connected_network, is_local_network = network_info()
 

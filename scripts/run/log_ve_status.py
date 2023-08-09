@@ -4,8 +4,8 @@ from datetime import datetime
 import math
 
 from utils import contracts
-from utils.apr import calc_global_boosted_apr
 from utils.constants import DFX_PRICE, LP_PRICE, SECONDS_PER_YEAR
+from utils.apr import calc_global_boosted_apr
 from utils.network import get_network_addresses
 
 

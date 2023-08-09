@@ -1,6 +1,14 @@
 # Testing
 
-## Forking Mainnet
+## Run Tests
+
+Run a specific test file with debug messages:
+
+```bash
+$ brownie test tests/<test_script_name>.py -s
+```
+
+### Forking Mainnet (for testing live contracts)
 
 Tests use the hardhat node configured in the `hh` directory.
 
@@ -43,14 +51,6 @@ $ npx hardhat node
 
 \*NOTE: Some developers may run into authentication issues with `brownie pm install` or other `brownie` commands. If so, you may add `GITHUB_TOKEN` to a `.env` file. The `.env.example` has an example and links to relevant documentation.
 
-## Run Tests
-
-Run a specific test file with debug messages:
-
-```bash
-$ brownie test tests/<test_script_name>.py -s
-```
-
 ### Test Files
 
 - `./tests/test_apr_unboosted.py`:
@@ -65,11 +65,3 @@ $ brownie test tests/<test_script_name>.py -s
 - `./tests/test_rewards_two_distributors.py`:
 - `./tests/test_theoretical_vs_actual.py`:
 - `./tests/run_full_model.py`:
-
-### Other
-
-- Fast-forward local node (e.g., to advance epoch)
-
-  ```bash
-  $ brownie run run/fastforward_chain.py
-  ```

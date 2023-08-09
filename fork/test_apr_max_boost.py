@@ -4,15 +4,16 @@ from brownie import accounts
 from math import isclose
 import pytest
 
+from fork.constants import EMISSION_RATE
 from utils.apr import (
-    calc_theoretical_rewards,
+    calc_boosted_apr,
+    calc_required_vedfx,
+    claimable_rewards,
+    distribute_to_gauges,
     get_euroc_usdc_gauge,
     mint_lp_tokens,
-    distribute_to_gauges,
-    gauge_relative_weights,
 )
 from utils.chain import fastforward_chain_weeks
-from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs, mint_dfx
@@ -51,7 +52,7 @@ def teardown():
     brownie.chain.reset()
 
 
-def test_theoretical_vs_actual(
+def test_apply_max_boost(
     dfx,
     mock_lp_tokens,
     voting_escrow,
@@ -80,7 +81,7 @@ def test_theoretical_vs_actual(
 
     # 2b. Test that gauge distributions at beginning of epoch 0 results in the expected amount of rewards
     # at start of epoch 0.
-    gauge_reward_balances = distribute_to_gauges(
+    distribute_to_gauges(
         dfx,
         distributor,
         three_liquidity_gauges_v4,
@@ -94,11 +95,11 @@ def test_theoretical_vs_actual(
     deposit_lp_tokens(euroc_usdc_lp, euroc_usdc_gauge, user_1)
 
     # 2d. Lock DFX for veDFX for user0 and vote for gauge
-    mint_dfx(dfx, 5e22, user_0)
-    mint_dfx(dfx, 5e22, user_1)
+    mint_dfx(dfx, 5e24, user_0)
+    mint_dfx(dfx, 5e24, user_1)
     lock_timestamp = brownie.chain.time()
     deposit_to_ve(dfx, voting_escrow, [user_0], [1e21], [100], lock_timestamp)
-    deposit_to_ve(dfx, voting_escrow, [user_1], [4.35e20], [208], lock_timestamp)
+
     # Place votes in bps (10000 = 100.00%)
     submit_ve_vote(gauge_controller, three_liquidity_gauges_v4, [0, 10000, 0], user_0)
     assert gauge_controller.vote_user_power(user_0) == 10000
@@ -106,23 +107,34 @@ def test_theoretical_vs_actual(
         user_0, {"from": user_0, "gas_price": gas_strategy}
     )
 
-    # 3. Fast-forward until the very end of epoch 1 and claim rewards. Check theoretical vs
-    # actually claimed rewards and calculated unboosted APR
+    # 3. Fast-forward until the very end of epoch 1 and claim rewards.
     fastforward_chain_weeks(num_weeks=1, delta=-10)
+    assert distributor.miningEpoch() == 1
 
-    # Fetch the relative weight for each gauge
-    gauge_weights = gauge_relative_weights(gauge_controller, three_liquidity_gauges_v4)
+    # retrieve veDFX needed to achieve max boost
+    additional_vedfx = calc_required_vedfx(
+        voting_escrow, veboost_proxy, euroc_usdc_gauge, user_1
+    )
+    # veDFX needed for max boost
+    assert isclose(additional_vedfx, 4.8436137865170105e20, rel_tol=1e-4)
 
-    # Theoretical rewards:
-    theoretical_global_rewards, theoretical_gauge_rewards = calc_theoretical_rewards(
-        distributor, gauge_weights[euroc_usdc_gauge]
+    # 4. Deposit needed veDFX (484.361) and test max APR is achieved (~460.18%)
+    lock_timestamp = brownie.chain.time()
+    deposit_to_ve(
+        dfx, voting_escrow, [user_1], [4.8436137865170105e20], [208], lock_timestamp
     )
 
-    # Actual rewards:
-    total_gauge_balances = sum(
-        [gauge_reward_balances[g] for g in three_liquidity_gauges_v4]
+    additional_vedfx = calc_required_vedfx(
+        voting_escrow, veboost_proxy, euroc_usdc_gauge, user_1
     )
-    gauge_balance = gauge_reward_balances[euroc_usdc_gauge]
+    assert additional_vedfx == 0  # veDFX needed for max boost
 
-    assert isclose(theoretical_global_rewards, total_gauge_balances, abs_tol=1e14)
-    assert isclose(theoretical_gauge_rewards, gauge_balance, abs_tol=1e14)
+    available_rewards = claimable_rewards(dfx, euroc_usdc_gauge, [user_0, user_1])
+    apr = calc_boosted_apr(
+        voting_escrow,
+        veboost_proxy,
+        euroc_usdc_gauge,
+        user_1,
+        available_rewards["combined"],
+    )
+    assert isclose(apr, 20.581012359731975, abs_tol=1e-4)

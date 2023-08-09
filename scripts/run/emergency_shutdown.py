@@ -4,8 +4,8 @@
 # 2. Withdraw all DFX ERC20 from distributor gauge to multisig
 from brownie.network import gas_price
 
+from fork.utils.account import DEPLOY_ACCT, impersonate
 from utils import contracts
-from utils.account import DEPLOY_ACCT, impersonate
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs
 from utils.network import get_network_addresses
