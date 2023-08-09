@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-from brownie import accounts
-
 from utils import contracts
-from utils.account import DEPLOY_ACCT, DFX_MULTISIG_ACCT
+from fork.utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT
 from utils.gas import gas_strategy
 from utils.network import get_network_addresses
 
@@ -34,14 +32,14 @@ def main():
     dfx.approve(
         dfx_distributor,
         1_000_000_000 * 1e18,
-        {"from": DFX_MULTISIG_ACCT, "gas_price": gas_strategy},
+        {"from": DEPLOY_PROXY_ACCT, "gas_price": gas_strategy},
     )
     for gauge in contracts.gauges():
         dfx_distributor.passRewardToGauge(
             gauge,
             dfx,
             TOPUP_DFX_REWARDS,
-            {"from": DFX_MULTISIG_ACCT, "gas_price": gas_strategy},
+            {"from": DEPLOY_PROXY_ACCT, "gas_price": gas_strategy},
         )
 
 

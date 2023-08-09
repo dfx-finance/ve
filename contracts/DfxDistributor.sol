@@ -32,7 +32,7 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     uint256 public constant RATE_REDUCTION_COEFFICIENT = 1007827884862117171; // 1.5 ^ (1/52) * 10**18
 
     /// @notice Base used for computation
-    uint256 public constant BASE = 10**18;
+    uint256 public constant BASE = 10 ** 18;
 
     /// @notice Maps the address of a gauge to the last time this gauge received rewards
     mapping(address => uint256) public lastTimeGaugePaid;
@@ -285,7 +285,10 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     /// @param rewardTally Amount of tokens to send to gauge
     /// @dev This is a DFX-custom function to easily pass-through manual reward distributions
     /// to gauge contracts
-    function passRewardToGauge(address gaugeAddr, address rewardTokenAddr, uint256 rewardTally) external onlyRole(GOVERNOR_ROLE) {
+    function passRewardToGauge(address gaugeAddr, address rewardTokenAddr, uint256 rewardTally)
+        external
+        onlyRole(GOVERNOR_ROLE)
+    {
         IERC20(rewardTokenAddr).safeTransferFrom(msg.sender, address(this), rewardTally);
         ILiquidityGauge(gaugeAddr).deposit_reward_token(address(rewardTokenAddr), rewardTally);
         emit RewardDistributed(gaugeAddr, rewardTally);
@@ -307,11 +310,7 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     /// @dev Added to support recovering LP Rewards and other mistaken tokens
     /// from other systems to be distributed to holders
     /// @dev This function could also be used to recover DFX tokens in case the rate got smaller
-    function recoverERC20(
-        address tokenAddress,
-        address to,
-        uint256 amount
-    ) external onlyRole(GOVERNOR_ROLE) {
+    function recoverERC20(address tokenAddress, address to, uint256 amount) external onlyRole(GOVERNOR_ROLE) {
         // If the token is the DFX token, we need to make sure that governance is not going to withdraw
         // too many tokens and that it'll be able to sustain the weekly distribution forever
         // This check assumes that `distributeReward` has been called for gauges and that there are no gauges
@@ -321,8 +320,8 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
             // The amount distributed till the end is `rate * WEEK / (1 - RATE_REDUCTION_FACTOR)` where
             // `RATE_REDUCTION_FACTOR = BASE / RATE_REDUCTION_COEFFICIENT` which translates to:
             require(
-                currentBalance >=
-                    ((rate * RATE_REDUCTION_COEFFICIENT) * WEEK) / (RATE_REDUCTION_COEFFICIENT - BASE) + amount,
+                currentBalance
+                    >= ((rate * RATE_REDUCTION_COEFFICIENT) * WEEK) / (RATE_REDUCTION_COEFFICIENT - BASE) + amount,
                 "4"
             );
         }
@@ -346,11 +345,10 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     /// @dev If `gaugeAddr` is the zero address, this function updates the delegate gauge common to all gauges with type >= 2
     /// @dev The `toggleInterface` parameter has been added for convenience to save one transaction when adding a gauge delegate
     /// which supports the `notifyReward` interface
-    function setDelegateGauge(
-        address gaugeAddr,
-        address _delegateGauge,
-        bool toggleInterface
-    ) external onlyRole(GOVERNOR_ROLE) {
+    function setDelegateGauge(address gaugeAddr, address _delegateGauge, bool toggleInterface)
+        external
+        onlyRole(GOVERNOR_ROLE)
+    {
         if (gaugeAddr != address(0)) {
             delegateGauges[gaugeAddr] = _delegateGauge;
         } else {

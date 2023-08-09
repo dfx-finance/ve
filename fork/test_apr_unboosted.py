@@ -4,20 +4,22 @@ from brownie import accounts
 from math import isclose
 import pytest
 
+from fork.constants import EMISSION_RATE
 from utils.apr import (
-    calc_boosted_apr,
-    calc_required_vedfx,
-    claimable_rewards,
     distribute_to_gauges,
+    calc_boosted_apr,
+    claim_rewards,
+    claimable_rewards,
     get_euroc_usdc_gauge,
     mint_lp_tokens,
 )
 from utils.chain import fastforward_chain_weeks
-from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
-from utils.helper import fund_multisigs, mint_dfx
-from utils.ve import deposit_to_ve, submit_ve_vote
+from utils.network import get_network_addresses
+from utils.helper import fund_multisigs
+
+addresses = get_network_addresses()
 
 
 # handle setup logic required for each unit test
@@ -52,12 +54,35 @@ def teardown():
     brownie.chain.reset()
 
 
-def test_apply_max_boost(
+def compare_available_rewards(dfx, gauge, users, expected_rewards, expected_sizes):
+    available_rewards = claimable_rewards(dfx, gauge, users)
+
+    # Compare user's share (as 0.0-1.0 ratio) of rewards
+    for i, user in enumerate(users):
+        expected_user_rewards = int(expected_rewards * expected_sizes[i])
+        # Check w/in 99.99% of estimate
+        assert isclose(available_rewards[user], expected_user_rewards, rel_tol=1e-4)
+
+    return available_rewards
+
+
+def compare_claimed_rewards(
+    gauge, users, signer_account, expected_rewards, expected_sizes
+):
+    rewards = claim_rewards(gauge, addresses.DFX, users, signer_account)
+    for i, user in enumerate(users):
+        expected_user_rewards = int(expected_rewards * expected_sizes[i])
+        # Check w/in 99.99% of estimate
+        assert isclose(rewards[user], expected_user_rewards, rel_tol=1e-4)
+    return rewards
+
+
+def test_unboosted_apr(
     dfx,
     mock_lp_tokens,
-    voting_escrow,
     gauge_controller,
     distributor,
+    voting_escrow,
     veboost_proxy,
     three_liquidity_gauges_v4,
     master_account,
@@ -81,12 +106,28 @@ def test_apply_max_boost(
 
     # 2b. Test that gauge distributions at beginning of epoch 0 results in the expected amount of rewards
     # at start of epoch 0.
+
+    # update mining params for first week's distribution
+    # NOTE: this will be called within distributor if this hasn't been called yet
+    distributor.updateMiningParameters(
+        {"from": master_account, "gas_price": gas_strategy}
+    )
+
+    week_rate = distributor.rate()
+    week_seconds = 3600 * 24 * 7
+    tx = gauge_controller.gauge_relative_weight_write(
+        euroc_usdc_gauge,
+        {"from": master_account, "gas_price": gas_strategy},
+    )
+    gauge_weight = tx.return_value
+    expected_rewards = int((week_rate * gauge_weight * week_seconds) / 1e18)
+
     distribute_to_gauges(
         dfx,
         distributor,
         three_liquidity_gauges_v4,
         master_account,
-        {euroc_usdc_gauge: 39757766414611472197042},
+        {euroc_usdc_gauge: expected_rewards},
     )
     assert distributor.miningEpoch() == 1
 
@@ -94,47 +135,29 @@ def test_apply_max_boost(
     deposit_lp_tokens(euroc_usdc_lp, euroc_usdc_gauge, user_0)
     deposit_lp_tokens(euroc_usdc_lp, euroc_usdc_gauge, user_1)
 
-    # 2d. Lock DFX for veDFX for user0 and vote for gauge
-    mint_dfx(dfx, 5e24, user_0)
-    mint_dfx(dfx, 5e24, user_1)
-    lock_timestamp = brownie.chain.time()
-    deposit_to_ve(dfx, voting_escrow, [user_0], [1e21], [100], lock_timestamp)
-
-    # Place votes in bps (10000 = 100.00%)
-    submit_ve_vote(gauge_controller, three_liquidity_gauges_v4, [0, 10000, 0], user_0)
-    assert gauge_controller.vote_user_power(user_0) == 10000
-    euroc_usdc_gauge.user_checkpoint(
-        user_0, {"from": user_0, "gas_price": gas_strategy}
-    )
-
-    # 3. Fast-forward until the very end of epoch 1 and claim rewards.
+    # 3. Fast-forward until the very end of epoch 1 and claim rewards. Check available rewards, claimed rewards
+    # and unboosted APR
     fastforward_chain_weeks(num_weeks=1, delta=-10)
-    assert distributor.miningEpoch() == 1
 
-    # retrieve veDFX needed to achieve max boost
-    additional_vedfx = calc_required_vedfx(
-        voting_escrow, veboost_proxy, euroc_usdc_gauge, user_1
+    available_rewards = compare_available_rewards(
+        dfx,
+        euroc_usdc_gauge,
+        [user_0, user_1],
+        expected_rewards,
+        expected_sizes=[0.5, 0.5],
     )
-    # veDFX needed for max boost
-    assert isclose(additional_vedfx, 4.8436137865170105e20, rel_tol=1e-4)
-
-    # 4. Deposit needed veDFX (484.361) and test max APR is achieved (~460.18%)
-    lock_timestamp = brownie.chain.time()
-    deposit_to_ve(
-        dfx, voting_escrow, [user_1], [4.8436137865170105e20], [208], lock_timestamp
+    compare_claimed_rewards(
+        euroc_usdc_gauge,
+        [user_0, user_1],
+        master_account,
+        expected_rewards,
+        expected_sizes=[0.5, 0.5],
     )
-
-    additional_vedfx = calc_required_vedfx(
-        voting_escrow, veboost_proxy, euroc_usdc_gauge, user_1
-    )
-    assert additional_vedfx == 0  # veDFX needed for max boost
-
-    available_rewards = claimable_rewards(dfx, euroc_usdc_gauge, [user_0, user_1])
     apr = calc_boosted_apr(
         voting_escrow,
         veboost_proxy,
         euroc_usdc_gauge,
-        user_1,
+        user_0,
         available_rewards["combined"],
     )
-    assert isclose(apr, 20.581012359731975, abs_tol=1e-4)
+    assert isclose(apr, 8.23240494389279, abs_tol=1e-4)

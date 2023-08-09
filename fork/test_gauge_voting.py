@@ -5,7 +5,7 @@ from brownie import chain, history
 import brownie
 import pytest
 
-from utils.constants import WEEK
+from fork.constants import WEEK
 from utils.gauges import setup_gauge_controller
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs, mint_dfx, send_dfx

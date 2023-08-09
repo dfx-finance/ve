@@ -3,9 +3,9 @@ from brownie import accounts, chain
 import brownie
 import pytest
 
+from fork.constants import EMISSION_RATE
 from utils.apr import get_euroc_usdc_gauge, mint_lp_tokens, mint_vedfx_and_vote
 from utils.chain import fastforward_chain_weeks
-from utils.constants import EMISSION_RATE
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs

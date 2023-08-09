@@ -5,9 +5,9 @@ from brownie.network import gas_price
 from datetime import datetime, timezone
 
 from utils.chain import fastforward_chain
+from utils.constants import WEEK
 from utils.gas import gas_strategy
 from utils.network import get_network_addresses
-from utils.constants import WEEK
 
 
 addresses = get_network_addresses()
