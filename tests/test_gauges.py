@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from brownie import chain
+import math
 import pytest
 
 from utils.apr import mint_lp_tokens
@@ -53,87 +54,84 @@ def teardown():
     chain.reset()
 
 
-# ##
-# ## Tests
-# ##
-# def test_single_user_unboosted(
-#     DFX,
-#     gauge_controller,
-#     distributor,
-#     three_lpts,
-#     three_gauges,
-#     deploy_account,
-#     multisig_0,
-# ):
-#     fastforward_chain_weeks(num_weeks=0, delta=10)
+##
+## Tests
+##
+def test_single_user_unboosted(
+    DFX,
+    gauge_controller,
+    distributor,
+    three_lpts,
+    three_gauges,
+    deploy_account,
+    multisig_0,
+):
+    fastforward_chain_weeks(num_weeks=0, delta=10)
 
-#     lpt, gauge = three_lpts[1], three_gauges[1]
+    lpt, gauge = three_lpts[1], three_gauges[1]
 
-#     # deposit tokens to gauge
-#     deposit_lp_tokens(lpt, gauge, deploy_account)
+    # deposit tokens to gauge
+    deposit_lp_tokens(lpt, gauge, deploy_account)
 
-#     # artificially set gauge weight for our gauge
-#     gauge_controller.change_gauge_weight(
-#         gauge, 1 * 1e18, {"from": multisig_0, "gas_price": gas_strategy}
-#     )
+    # artificially set gauge weight for our gauge
+    gauge_controller.change_gauge_weight(
+        gauge, 1 * 1e18, {"from": multisig_0, "gas_price": gas_strategy}
+    )
 
-#     expected_rewards = [
-#         0,
-#         40319999999999600000000,
-#         80326831132198400000000,
-#         120022925805816400000000,
-#         159410697537344800000000,
-#     ]
-#     for i in range(5):
-#         fastforward_chain_weeks(num_weeks=0, delta=10)
-#         distributor.distributeRewardToMultipleGauges(
-#             three_gauges,
-#             {"from": multisig_0, "gas_price": gas_strategy},
-#         )
+    expected_rewards = [
+        0,
+        39696094673618000000000,
+        79083866405146400000000,
+        118165709965088000000000,
+        156944001523560400000000,
+    ]
+    for i in range(5):
+        fastforward_chain_weeks(num_weeks=0, delta=10)
+        distributor.distributeRewardToMultipleGauges(
+            three_gauges,
+            {"from": multisig_0, "gas_price": gas_strategy},
+        )
 
-#         assert math.isclose(
-#             gauge.claimable_reward(deploy_account, DFX),
-#             expected_rewards[i],
-#             rel_tol=1e-2,
-#         )
-
-
-# def test_single_user_claim(
-#     DFX,
-#     gauge_controller,
-#     distributor,
-#     three_lpts,
-#     three_gauges,
-#     deploy_account,
-#     multisig_0,
-# ):
-#     test_single_user_unboosted(
-#         DFX,
-#         gauge_controller,
-#         distributor,
-#         three_lpts,
-#         three_gauges,
-#         deploy_account,
-#         multisig_0,
-#     )
-
-#     gauge = three_gauges[1]
-#     starting_dfx_balance = DFX.balanceOf(deploy_account)
-
-#     # claim staking reward
-#     reward_amount = gauge.claimable_reward(deploy_account, DFX)
-#     gauge.claim_rewards(
-#         deploy_account, {"from": deploy_account, "gas_price": gas_strategy}
-#     )
-#     # Test estimated and claimed rewards are similar to 0.1 DFX from raw 1e18 amount
-#     assert math.isclose(
-#         DFX.balanceOf(deploy_account) - starting_dfx_balance,
-#         reward_amount,
-#         rel_tol=1e-6,
-#     )
+        assert math.isclose(
+            gauge.claimable_reward(deploy_account, DFX),
+            expected_rewards[i],
+            rel_tol=1e-2,
+        )
 
 
-from datetime import datetime
+def test_single_user_claim(
+    DFX,
+    gauge_controller,
+    distributor,
+    three_lpts,
+    three_gauges,
+    deploy_account,
+    multisig_0,
+):
+    test_single_user_unboosted(
+        DFX,
+        gauge_controller,
+        distributor,
+        three_lpts,
+        three_gauges,
+        deploy_account,
+        multisig_0,
+    )
+
+    gauge = three_gauges[1]
+    starting_dfx_balance = DFX.balanceOf(deploy_account)
+
+    # claim staking reward
+    reward_amount = gauge.claimable_reward(deploy_account, DFX)
+    gauge.claim_rewards(
+        deploy_account, {"from": deploy_account, "gas_price": gas_strategy}
+    )
+    # Test estimated and claimed rewards are similar to 0.1 DFX from raw 1e18 amount
+    assert math.isclose(
+        DFX.balanceOf(deploy_account) - starting_dfx_balance,
+        reward_amount,
+        rel_tol=1e-6,
+    )
 
 
 def test_multi_user_boosted(
@@ -161,7 +159,7 @@ def test_multi_user_boosted(
 
     # (epoch 1) set chain to 10s before the week change and
     # distribute available reward to gauges
-    fastforward_chain_weeks(num_weeks=1, delta=-10, log=True)
+    fastforward_chain_weeks(num_weeks=1, delta=-10)
     distributor.distributeRewardToMultipleGauges(
         three_gauges, {"from": multisig_0, "gas_price": gas_strategy}
     )
