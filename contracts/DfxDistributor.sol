@@ -242,6 +242,14 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     function _toggleInterfaceKnown(address _delegateGauge) internal {
         bool isInterfaceKnownMem = isInterfaceKnown[_delegateGauge];
         isInterfaceKnown[_delegateGauge] = !isInterfaceKnownMem;
+
+        // We give a full approval for the delegate to receive rewards on behalf of gauges
+        if (isInterfaceKnownMem) {
+            rewardToken.safeApprove(_delegateGauge, type(uint256).max);
+        } else {
+            rewardToken.safeApprove(_delegateGauge, 0);
+        }
+
         emit InterfaceKnownToggled(_delegateGauge, !isInterfaceKnownMem);
     }
 
