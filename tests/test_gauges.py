@@ -148,7 +148,7 @@ def test_multi_user_boosted(
 ):
     lpt, gauge = three_lpts[1], three_gauges[1]
 
-    # Mint 10,000 of LP tokens are minted
+    # Mint 10,000 LP tokens
     mint_lp_tokens(lpt, [user_0, user_1], deploy_account)
 
     # deposit tokens to gauge
