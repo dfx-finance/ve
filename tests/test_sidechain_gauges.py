@@ -93,7 +93,6 @@ def test_l2_gauges(
         RootGaugeCctp,
         DfxUpgradeableProxy,
         DFX,
-        gauge_controller,
         distributor,
         deploy_account,
         multisig_0,
@@ -141,7 +140,6 @@ def deploy_l2_gauge(
     RootGaugeCctp,
     DfxUpgradeableProxy,
     dfx,
-    gauge_controller,
     distributor,
     deploy_account,
     multisig_0,
@@ -156,7 +154,6 @@ def deploy_l2_gauge(
     gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
         "l2-gauge",
         dfx,
-        gauge_controller,
         distributor,
         42161,
         "0x0000000000000000000000000000000000000001",

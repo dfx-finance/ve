@@ -1,7 +1,7 @@
 # @version 0.3.3
 """
 @title Root-Chain Gauge CCTP Transfer
-@author Curve Finance
+@author DFX Finance
 @license MIT
 @notice Receives total allocated weekly DFX emission
         mints and sends to L2 gauge
@@ -46,7 +46,6 @@ def __init__():
 def initialize(
     _symbol: String[26],
     _DFX: address,
-    _controller: address,
     _distributor: address,
     _destinationChain: uint256,
     _destination: address,
@@ -56,7 +55,6 @@ def initialize(
     @notice Contract initializer
     @param _symbol Gauge base symbol
     @param _DFX Address of the DFX token
-    @param _controller Address of the mainnet gauge controller
     @param _distributor Address of the mainnet rewards distributor
     @param _destinationChain Chain ID of the chain with the destination gauge
     @param _destination Address of the destination gauge on the sidechain
@@ -69,7 +67,6 @@ def initialize(
     self.symbol = concat(_symbol, "-gauge")    
 
     self.DFX = _DFX
-    self.controller = _controller
     self.distributor = _distributor
     self.destinationChain = _destinationChain
     self.destination = _destination # destination address on l2
@@ -78,14 +75,14 @@ def initialize(
     self.period = block.timestamp / WEEK - 1
 
 @external
-def update_destination(_addr: address):
-    pass
+def update_destination(_newDestination: address):
+    assert msg.sender == self.admin
+
+    self.destination = _newDestination
 
 @external
 def notifyReward(gauge: address, amount: uint256):
     assert msg.sender == self.distributor
-
-    # gauge_type: uint256 = GaugeController(self.controller).gauge_types(gauge)
 
     # CCTP logic here
     token: ERC20 = ERC20(self.DFX)

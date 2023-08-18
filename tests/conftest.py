@@ -64,6 +64,13 @@ def veDFX(VeDFX, DFX, deploy_account):
 
 
 @pytest.fixture(scope="function")
+def DFX_OFT(DFX_, deploy_account):
+    yield DFX_.deploy(
+        1000000 * 1e18, {"from": deploy_account, "gas_price": gas_strategy}
+    )
+
+
+@pytest.fixture(scope="function")
 def three_lpts(ERC20LP, deploy_account):
     test_lps = [
         ("DFX CADC-USDC LP Token", "cadcUsdc"),
