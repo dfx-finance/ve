@@ -4,3 +4,4 @@ compiler:
     remappings:
       - "@openzeppelin=OpenZeppelin/openzeppelin-contracts@4.5.0"
       - "@openzeppelinUpgradeable=OpenZeppelin/openzeppelin-contracts-upgradeable@4.5.0"
+      - "@chainlink=./node_modules/@chainlink/"
