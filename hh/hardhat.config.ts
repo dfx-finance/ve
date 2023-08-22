@@ -5,10 +5,9 @@ import "@nomicfoundation/hardhat-toolbox";
 const chainId = 1;
 
 const RpcUrls: Record<string, string> = {
-  1: "https://eth-mainnet.g.alchemy.com/v2/1kJC91jDERDpdr_ykBgAdyjYAG-Iw0D0" as string,
-  1337: "https://eth-mainnet.g.alchemy.com/v2/1kJC91jDERDpdr_ykBgAdyjYAG-Iw0D0" as string,
-  11155111:
-    "https://eth-sepolia.g.alchemy.com/v2/MvoACHmO6DkI2ZVMI4fjD1r8EGVdUEHb" as string,
+  1: process.env.ETH_RPC_URL as string,
+  1337: process.env.ETH_RPC_URL as string,
+  11155111: process.env.SEPOLIA_ETH_RPC_URL as string,
 };
 
 // const ethBlock = 14_443_000; // dfxCad deployed

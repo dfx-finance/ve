@@ -139,14 +139,14 @@ contract DFXTokenTransfer is OwnerIsCreator {
         uint256 _amount
     ) external returns (bytes32 messageId) {
         Client.EVM2AnyMessage memory evm2AnyMessage = _buildCCIPMessage(
-            0x33Af579F8faFADa29d98922A825CFC0228D7ce39,
-            0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05,
-            1,
+            _receiver,
+            _token,
+            _amount,
             address(0)
         );
 
         // Get the fee required to send the message
-        uint256 fees = router.getFee(0x97a657c9, evm2AnyMessage);
+        uint256 fees = router.getFee(_destinationChainSelector, evm2AnyMessage);
 
         if (fees > address(this).balance)
             revert NotEnoughBalance(address(this).balance, fees);
@@ -155,18 +155,21 @@ contract DFXTokenTransfer is OwnerIsCreator {
         IERC20(_token).approve(address(router), _amount);
 
         // Send the message through the router and store the returned message ID
-        messageId = router.ccipSend(_destinationChainSelector, evm2AnyMessage);
+        messageId = router.ccipSend{value: fees}(
+            _destinationChainSelector,
+            evm2AnyMessage
+        );
 
         // Emit an event with message details
-        // emit TokensTransferred(
-        //     messageId,
-        //     _destinationChainSelector,
-        //     _receiver,
-        //     _token,
-        //     _amount,
-        //     address(0),
-        //     fees
-        // );
+        emit TokensTransferred(
+            messageId,
+            _destinationChainSelector,
+            _receiver,
+            _token,
+            _amount,
+            address(0),
+            fees
+        );
 
         // Return the message ID
         return messageId;
@@ -251,9 +254,12 @@ contract DFXTokenTransfer is OwnerIsCreator {
         // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
         Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
             receiver: abi.encode(_receiver), // ABI-encoded receiver address
-            data: "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000", // No data
+            data: "", // No data
             tokenAmounts: tokenAmounts, // The amount and type of token being transferred
-            extraArgs: "0x97a657c90000000000000000000000000000000000000000000000000000000000030d400000000000000000000000000000000000000000000000000000000000000000",
+            extraArgs: Client._argsToBytes(
+                // Additional arguments, setting gas limit to 0 as we are not sending any data and non-strict sequencing mode
+                Client.EVMExtraArgsV1({gasLimit: 0, strict: false})
+            ),
             // Set the feeToken to a feeTokenAddress, indicating specific asset will be used for fees
             feeToken: _feeTokenAddress
         });
