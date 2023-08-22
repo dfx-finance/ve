@@ -34,6 +34,11 @@ interface VotingEscrow:
     def get_last_user_slope(addr: address) -> int128: view
     def locked__end(addr: address) -> uint256: view
 
+interface tokenTransfer:
+    def transferTokensPayNative(destinationChainSelector: uint64, receiver : address, token: address, amount: uint256) -> bytes32: payable
+    def test(destinationChainSelector: uint64, receiver : address, token: address, amount: uint256) -> bytes32: payable
+
+
 
 event CommitOwnership:
     admin: address
@@ -112,6 +117,7 @@ time_sum: public(uint256[1000000000])  # type_id -> last scheduled time (next we
 
 points_total: public(HashMap[uint256, uint256])  # time -> total weight
 time_total: public(uint256)  # last scheduled time
+msgSent: public(address)  # last scheduled time
 
 points_type_weight: public(HashMap[int128, HashMap[uint256, uint256]])  # type_id -> time -> type weight
 time_type_weight: public(uint256[1000000000])  # type_id -> last scheduled time (next week)
@@ -478,15 +484,113 @@ def _change_gauge_weight(addr: address, weight: uint256):
     log NewGaugeWeight(addr, block.timestamp, weight, _total_weight)
 
 
+
+
+
+
+
 @external
-def change_gauge_weight(addr: address, weight: uint256):
+def ccip_send(addr: address, weight: uint256) -> bytes32:
     """
     @notice Change weight of gauge `addr` to `weight`
     @param addr `GaugeController` contract address
     @param weight New Gauge weight
     """
-    assert msg.sender == self.admin
-    self._change_gauge_weight(addr, weight)
+
+    receiver: address = 0x33Af579F8faFADa29d98922A825CFC0228D7ce39
+    token: address = 0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05
+    selector :uint64 = convert(0x97a657c9, uint64)
+    amount: uint256 =  convert(1, uint256)
+
+    #transfer_msg: bytes32 = tokenTransfer(addr).(selector, receiver, token, amount)
+    transfer_msg: bytes32 = tokenTransfer(addr).test(selector, receiver, token, amount)
+
+
+    return transfer_msg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @external
+# def change_gauge_weight(addr: address, weight: uint256) -> address:
+#     """
+#     @notice Change weight of gauge `addr` to `weight`
+#     @param addr `GaugeController` contract address
+#     @param weight New Gauge weight
+#     """
+
+#     escrow: address = 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
+#     receiver: address = 0x33Af579F8faFADa29d98922A825CFC0228D7ce39
+#     token: address = 0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05
+#     selector :uint64 = convert(0x97a657c9, uint64)
+#     amount: uint256 =  convert(1, uint256)
+
+#     lock_end: address = tokenTransfer(addr).transferTokensPayNative(selector, receiver, token, amount)
+
+#     self.msgSent = lock_end
+
+#     return lock_end
+
+#     #self._change_gauge_weight(addr, weight)
 
 
 @external

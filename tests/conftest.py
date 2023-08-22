@@ -69,6 +69,13 @@ def DFX_OFT(DFX_, deploy_account):
         1000000 * 1e18, {"from": deploy_account, "gas_price": gas_strategy}
     )
 
+@pytest.fixture(scope="function")
+def DFXTokenTransfer(DFXTokenTransfer, deploy_account):
+    yield DFXTokenTransfer.deploy(
+      "0xD0daae2231E9CB96b94C8512223533293C3693Bf", "0x779877A7B0D9E8603169DdbD7836e478b4624789", {"from": deploy_account, "gas_price": gas_strategy}
+    )
+
+
 
 @pytest.fixture(scope="function")
 def three_lpts(ERC20LP, deploy_account):
