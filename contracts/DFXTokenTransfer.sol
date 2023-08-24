@@ -137,7 +137,7 @@ contract DFXTokenTransfer is OwnerIsCreator {
         address _receiver,
         address _token,
         uint256 _amount
-    ) external returns (bytes32 messageId) {
+    ) external returns (uint256 messageId) {
         Client.EVM2AnyMessage memory evm2AnyMessage = _buildCCIPMessage(
             _receiver,
             _token,
@@ -146,33 +146,36 @@ contract DFXTokenTransfer is OwnerIsCreator {
         );
 
         // Get the fee required to send the message
-        uint256 fees = router.getFee(_destinationChainSelector, evm2AnyMessage);
+        //uint256 fees = router.getFee(_destinationChainSelector, evm2AnyMessage);
+        uint256 fees = 360431377777777;
 
-        if (fees > address(this).balance)
-            revert NotEnoughBalance(address(this).balance, fees);
+        // if (fees > address(this).balance)
+        //     revert NotEnoughBalance(address(this).balance, fees);
 
         // approve the Router to spend tokens on contract's behalf. It will spend the amount of the given token
-        IERC20(_token).approve(address(router), _amount);
+        //IERC20(_token).approve(address(router), _amount);
 
         // Send the message through the router and store the returned message ID
-        messageId = router.ccipSend{value: fees}(
-            _destinationChainSelector,
-            evm2AnyMessage
-        );
+        // messageId = router.ccipSend{value: fees}(
+        //     _destinationChainSelector,
+        //     evm2AnyMessage
+        // );
+
+        return address(this).balance;
 
         // Emit an event with message details
-        emit TokensTransferred(
-            messageId,
-            _destinationChainSelector,
-            _receiver,
-            _token,
-            _amount,
-            address(0),
-            fees
-        );
+        // emit TokensTransferred(
+        //     messageId,
+        //     _destinationChainSelector,
+        //     _receiver,
+        //     _token,
+        //     _amount,
+        //     address(0),
+        //     fees
+        // );
 
-        // Return the message ID
-        return messageId;
+        // // // Return the message ID
+        // return messageId;
     }
 
     /// @notice Transfer tokens to receiver on the destination chain.

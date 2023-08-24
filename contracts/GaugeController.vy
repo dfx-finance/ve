@@ -36,7 +36,7 @@ interface VotingEscrow:
 
 interface tokenTransfer:
     def transferTokensPayNative(destinationChainSelector: uint64, receiver : address, token: address, amount: uint256) -> bytes32: payable
-    def test(destinationChainSelector: uint64, receiver : address, token: address, amount: uint256) -> bytes32: payable
+    def test(destinationChainSelector: uint64, receiver : address, token: address, amount: uint256) -> uint256: payable
 
 
 
@@ -490,23 +490,22 @@ def _change_gauge_weight(addr: address, weight: uint256):
 
 
 @external
-def ccip_send(addr: address, weight: uint256) -> bytes32:
-    """
-    @notice Change weight of gauge `addr` to `weight`
-    @param addr `GaugeController` contract address
-    @param weight New Gauge weight
-    """
+@payable
+def ccip_send(addr: address) -> uint256:
 
     receiver: address = 0x33Af579F8faFADa29d98922A825CFC0228D7ce39
-    token: address = 0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05
-    selector :uint64 = convert(0x97a657c9, uint64)
+    token: address = 0x0000000000000000000000000000000000000000
+    selector :uint64 = 6101244977088475029
     amount: uint256 =  convert(1, uint256)
 
+
+
+
     #transfer_msg: bytes32 = tokenTransfer(addr).(selector, receiver, token, amount)
-    transfer_msg: bytes32 = tokenTransfer(addr).test(selector, receiver, token, amount)
+    msg.sender.transfer(addr, 1000)
+    # transfer_msg: uint256 = tokenTransfer(addr).test(selector, receiver, token, amount)
 
-
-    return transfer_msg
+    return 1000
 
 
 

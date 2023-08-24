@@ -12,7 +12,7 @@ from utils.chain import (
 )
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
-from utils.helper import fund_multisigs, mint_dfx
+from utils.helper import fund_multisigs, mint_dfx, fund_multisigs1
 from utils.ve import deposit_to_ve, submit_ve_vote
 from .constants import EMISSION_RATE, TOTAL_DFX_REWARDS
 
@@ -30,7 +30,6 @@ def setup(
 ):
 
     fund_multisigs(deploy_account, [multisig_0])
-
     # setup gauges and distributor
     #setup_gauge_controller(gauge_controller, three_gauges, multisig_0)
 
@@ -62,11 +61,12 @@ def teardown():
 def test_ccip(
     gauge_controller,
     multisig_0,
-    DFXTokenTransfer
+    DFXTokenTransfer,
+    deploy_account
 ):
-    addy = gauge_controller.ccip_send(
-        DFXTokenTransfer, 1 * 1e18, {"from": multisig_0, "gas_price": 1190958123232}
-    )
+    fund_multisigs1(deploy_account, DFXTokenTransfer)
+
+    addy = gauge_controller.ccip_send(DFXTokenTransfer,  {"gas_price": 1190958123232})
 
 
     print("Msg Sent")

@@ -14,6 +14,9 @@ def fund_multisigs(funder, multisig_accounts):
     for multisig_account in multisig_accounts:
         funder.transfer(multisig_account, "10 ether", gas_price=gas_strategy)
 
+def fund_multisigs1(funder, addy):
+    funder.transfer(addy, "10 ether", gas_price=gas_strategy)
+
 
 def mint_dfx(dfx, amount, account, master_account):
     dfx.mint(account, amount, {"from": master_account, "gas_price": gas_strategy})

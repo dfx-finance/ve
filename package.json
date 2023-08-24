@@ -1,8 +1,21 @@
 {
   "name": "dfx-ve",
+  "scripts": {
+    "generateTypes": "typechain --target ethers-v5 --out-dir typechain-types './build/contracts/*.json'"
+  },
   "devDependencies": {
     "@chainlink/contracts": "^0.6.1",
     "@chainlink/contracts-ccip": "^0.7.6",
-    "hardhat": "^2.17.1"
+    "@typechain/hardhat": "^9.0.0",
+    "@typechain/truffle-v5": "^8.0.6",
+    "hardhat": "^2.17.1",
+    "typechain": "^8.3.1"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@openzeppelin/contracts": "^4.9.3",
+    "@openzeppelin/contracts-upgradeable": "^4.9.3",
+    "@typechain/ethers-v5": "^11.1.1",
+    "ethers": "^5.7.1"
   }
 }
