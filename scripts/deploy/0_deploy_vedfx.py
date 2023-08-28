@@ -11,7 +11,7 @@ from utils.network import get_network_addresses, network_info
 
 
 gas_price(gas_strategy)
-connected_network, _ = network_info()
+connected_network, is_local_network = network_info()
 addresses = get_network_addresses()
 
 

@@ -91,6 +91,13 @@ def gauge_controller(GaugeController, DFX, veDFX, deploy_account, multisig_0):
 
 
 @pytest.fixture(scope="function")
+def boostV2(veDFX, BoostV2, deploy_account):
+    yield BoostV2.deploy(
+        ZERO_ADDRESS, veDFX, {"from": deploy_account, "gas_price": gas_strategy}
+    )
+
+
+@pytest.fixture(scope="function")
 def veboost_proxy(VeBoostProxy, veDFX, deploy_account, multisig_0):
     yield VeBoostProxy.deploy(
         veDFX,
