@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import chain, Contract, ZERO_ADDRESS
+from brownie import chain
 import pytest
 
 from utils.chain import (
@@ -8,15 +8,11 @@ from utils.chain import (
     # fastforward_chain_anvil as fastforward_chain,
     # fastforward_chain_weeks_anvil as fastforward_chain_weeks,
 )
-from utils.constants import (
-    # DEFAULT_TYPE_WEIGHT,
-    # DEFAULT_GAUGE_TYPE,
-    DEFAULT_GAUGE_WEIGHT,
-)
 from utils.gauges import setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs
 from .constants import EMISSION_RATE, TOTAL_DFX_REWARDS
+from .helpers_sidechain_gauges import add_to_gauge_controller
 
 
 # handle setup logic required for each unit test
@@ -56,16 +52,13 @@ def teardown():
     chain.reset()
 
 
-def test_l2_gauges(
-    RootGaugeCctp,
-    DfxUpgradeableProxy,
+def test_l2_gauge_timetravel(
     DFX,
     gauge_controller,
     distributor,
     three_gauges,
-    deploy_account,
+    l2_gauge,
     multisig_0,
-    multisig_1,
 ):
     ##
     ## epoch 0: do nothing
@@ -88,16 +81,6 @@ def test_l2_gauges(
     ## epoch 2: deploy L2 gauge, add to gauge controller and distribute rewards
     ##
     fastforward_chain_weeks(num_weeks=0, delta=0, log=True)
-
-    l2_gauge = deploy_l2_gauge(
-        RootGaugeCctp,
-        DfxUpgradeableProxy,
-        DFX,
-        distributor,
-        deploy_account,
-        multisig_0,
-        multisig_1,
-    )
 
     add_to_gauge_controller(
         gauge_controller, l2_gauge, multisig_0, add_placeholder=True
@@ -133,63 +116,22 @@ def test_l2_gauges(
         print(f"{gauge.symbol()}: {DFX.balanceOf(gauge) / 1e18}")
 
 
-##
-## Utils
-##
-def deploy_l2_gauge(
-    RootGaugeCctp,
-    DfxUpgradeableProxy,
-    dfx,
-    distributor,
-    deploy_account,
-    multisig_0,
-    multisig_1,
-):
-    # deploy gauge logic
-    gauge_implementation = RootGaugeCctp.deploy(
+def test_l2_gauge_cctp(DFX, l2_gauge, deploy_account, multisig_0):
+    l2_gauge.update_distributor(
+        deploy_account, {"from": multisig_0, "gas_price": gas_strategy}
+    )
+
+    reward_amount = 1e23
+    DFX.mint(
+        deploy_account,
+        reward_amount,
         {"from": deploy_account, "gas_price": gas_strategy},
     )
-
-    # deploy gauge proxy and initialize
-    gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
-        "l2-gauge",
-        dfx,
-        distributor,
-        42161,
-        "0x0000000000000000000000000000000000000001",
-        multisig_0,
+    DFX.transfer(
+        l2_gauge, reward_amount, {"from": deploy_account, "gas_price": gas_strategy}
     )
-    proxy = DfxUpgradeableProxy.deploy(
-        gauge_implementation.address,
-        multisig_1,
-        gauge_initializer_calldata,
+    l2_gauge.notifyReward(
+        l2_gauge.address,
+        reward_amount,
         {"from": deploy_account, "gas_price": gas_strategy},
-    )
-
-    # load gauge interface on proxy for non-admin users
-    gauge_proxy = Contract.from_abi("RootGaugeCctp", proxy, RootGaugeCctp.abi)
-    return gauge_proxy
-
-
-def add_to_gauge_controller(gauge_controller, gauge, multisig_0, add_placeholder=False):
-    if add_placeholder:
-        # add placeholder gauge type `1` to keep consistent with Angle distributor contract
-        gauge_controller.add_type(
-            "DFX Perpetuals",
-            0,
-            {"from": multisig_0, "gas_price": gas_strategy},
-        )
-
-    # add new l2 gauge type to gauge controller
-    gauge_controller.add_type(
-        "L2 Liquidity Pools",
-        1e18,
-        {"from": multisig_0, "gas_price": gas_strategy},
-    )
-    # add l2 gauge to gauge controller
-    gauge_controller.add_gauge(
-        gauge,
-        2,
-        DEFAULT_GAUGE_WEIGHT,
-        {"from": multisig_0, "gas_price": gas_strategy},
     )

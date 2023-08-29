@@ -151,6 +151,11 @@ def distributor(
     yield dfx_distributor_proxy
 
 
+@pytest.fixture(scope="function")
+def ccip_router(MockCcipRouter, deploy_account):
+    yield MockCcipRouter.deploy({"from": deploy_account, "gas_price": gas_strategy})
+
+
 """
 Gauges
 """
@@ -197,3 +202,42 @@ def three_gauges(
         )
         contracts.append(gauge_proxy)
     yield contracts
+
+
+@pytest.fixture(scope="function")
+def l2_gauge(
+    DFX,
+    RootGaugeCctp,
+    DfxUpgradeableProxy,
+    distributor,
+    ccip_router,
+    deploy_account,
+    multisig_0,
+    multisig_1,
+):
+    # deploy gauge logic
+    gauge_implementation = RootGaugeCctp.deploy(
+        {"from": deploy_account, "gas_price": gas_strategy},
+    )
+
+    # deploy gauge proxy and initialize
+    gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
+        "l2-gauge",
+        DFX,
+        distributor,
+        ccip_router,  # mock ccip router address
+        123,  # mock target chain selector
+        "0x0000000000000000000000000000000000000001",  # mock destination address
+        "0x0000000000000000000000000000000000000002",  # mock fee token address
+        multisig_0,
+    )
+    proxy = DfxUpgradeableProxy.deploy(
+        gauge_implementation.address,
+        multisig_1,
+        gauge_initializer_calldata,
+        {"from": deploy_account, "gas_price": gas_strategy},
+    )
+
+    # load gauge interface on proxy for non-admin users
+    gauge_proxy = Contract.from_abi("RootGaugeCctp", proxy, RootGaugeCctp.abi)
+    return gauge_proxy
