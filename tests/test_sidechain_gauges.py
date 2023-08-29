@@ -20,7 +20,7 @@ from .helpers_sidechain_gauges import add_to_gauge_controller
 def setup(
     DFX,
     gauge_controller,
-    three_gauges,
+    three_gauges_L1,
     distributor,
     deploy_account,
     multisig_0,
@@ -28,7 +28,7 @@ def setup(
     fund_multisigs(deploy_account, [multisig_0])
 
     # setup gauges and distributor
-    setup_gauge_controller(gauge_controller, three_gauges, multisig_0)
+    setup_gauge_controller(gauge_controller, three_gauges_L1, multisig_0)
 
     # Params:
     # - reward token
@@ -56,8 +56,8 @@ def test_l2_gauge_timetravel(
     DFX,
     gauge_controller,
     distributor,
-    three_gauges,
-    l2_gauge,
+    three_gauges_L1,
+    root_gauge_L1,
     multisig_0,
 ):
     ##
@@ -70,11 +70,11 @@ def test_l2_gauge_timetravel(
     ##
     fastforward_chain_weeks(num_weeks=0, delta=0, log=True)
     distributor.distributeRewardToMultipleGauges(
-        three_gauges,
+        three_gauges_L1,
         {"from": multisig_0, "gas_price": gas_strategy},
     )
     print(f"Epoch {distributor.miningEpoch()}: {DFX.balanceOf(distributor) / 1e18} DFX")
-    for gauge in three_gauges:
+    for gauge in three_gauges_L1:
         print(f"{gauge.symbol()}: {DFX.balanceOf(gauge) / 1e18}")
 
     ##
@@ -83,24 +83,24 @@ def test_l2_gauge_timetravel(
     fastforward_chain_weeks(num_weeks=0, delta=0, log=True)
 
     add_to_gauge_controller(
-        gauge_controller, l2_gauge, multisig_0, add_placeholder=True
+        gauge_controller, root_gauge_L1, multisig_0, add_placeholder=True
     )
 
     # set l2 gauge as a delegate for automating distribution
     distributor.setDelegateGauge(
-        l2_gauge,
-        l2_gauge,
+        root_gauge_L1,
+        root_gauge_L1,
         True,
         {"from": multisig_0, "gas_price": gas_strategy},
     )
-    print(f"Rewards delegate is set: {distributor.isInterfaceKnown(l2_gauge)}")
+    print(f"Rewards delegate is set: {distributor.isInterfaceKnown(root_gauge_L1)}")
 
     distributor.distributeRewardToMultipleGauges(
-        [*three_gauges, l2_gauge],
+        [*three_gauges_L1, root_gauge_L1],
         {"from": multisig_0, "gas_price": gas_strategy},
     )
     print(f"Epoch {distributor.miningEpoch()}: {DFX.balanceOf(distributor) / 1e18} DFX")
-    for gauge in [*three_gauges, l2_gauge]:
+    for gauge in [*three_gauges_L1, root_gauge_L1]:
         print(f"{gauge.symbol()}: {DFX.balanceOf(gauge) / 1e18}")
 
     ##
@@ -108,16 +108,16 @@ def test_l2_gauge_timetravel(
     ##
     fastforward_chain_weeks(num_weeks=0, delta=0, log=True)
     distributor.distributeRewardToMultipleGauges(
-        [*three_gauges, l2_gauge],
+        [*three_gauges_L1, root_gauge_L1],
         {"from": multisig_0, "gas_price": gas_strategy},
     )
     print(f"Epoch {distributor.miningEpoch()}: {DFX.balanceOf(distributor) / 1e18} DFX")
-    for gauge in [*three_gauges, l2_gauge]:
+    for gauge in [*three_gauges_L1, root_gauge_L1]:
         print(f"{gauge.symbol()}: {DFX.balanceOf(gauge) / 1e18}")
 
 
-def test_l2_gauge_cctp(DFX, l2_gauge, deploy_account, multisig_0):
-    l2_gauge.update_distributor(
+def test_cctp_root_gauge_send(DFX, root_gauge_L1, deploy_account, multisig_0):
+    root_gauge_L1.update_distributor(
         deploy_account, {"from": multisig_0, "gas_price": gas_strategy}
     )
 
@@ -128,10 +128,12 @@ def test_l2_gauge_cctp(DFX, l2_gauge, deploy_account, multisig_0):
         {"from": deploy_account, "gas_price": gas_strategy},
     )
     DFX.transfer(
-        l2_gauge, reward_amount, {"from": deploy_account, "gas_price": gas_strategy}
+        root_gauge_L1,
+        reward_amount,
+        {"from": deploy_account, "gas_price": gas_strategy},
     )
-    l2_gauge.notifyReward(
-        l2_gauge.address,
+    root_gauge_L1.notifyReward(
+        root_gauge_L1.address,
         reward_amount,
         {"from": deploy_account, "gas_price": gas_strategy},
     )

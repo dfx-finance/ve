@@ -72,14 +72,28 @@ claim_data: HashMap[address, HashMap[address, uint256]]
 admin: public(address)
 future_admin: public(address)  # Can and will be a smart contract
 
+initialized: public(bool)
+
 
 @external
-def __init__( _admin: address, _lp_token: address):
+def __init__():
     """
     @notice Contract constructor
+    @dev The contract has an initializer to prevent the take over of the implementation
+    """
+    assert self.initialized == False #dev: contract is already initialized
+    self.initialized = True
+
+
+@external
+def initialize(_admin: address, _lp_token: address):
+    """
+    @notice Contract initializer
     @param _admin Admin who can kill the gauge
     @param _lp_token Liquidity Pool contract address
     """
+    assert self.initialized == False #dev: contract is already initialized
+    self.initialized = True    
 
     symbol: String[26] = ERC20Extended(_lp_token).symbol()
     self.name = concat("Curve.fi ", symbol, " RewardGauge Deposit")
@@ -87,7 +101,7 @@ def __init__( _admin: address, _lp_token: address):
 
     self.lp_token = _lp_token
     self.admin = _admin
-
+    self.initialized = True
 
 @view
 @external

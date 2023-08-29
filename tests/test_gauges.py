@@ -22,7 +22,7 @@ from .constants import EMISSION_RATE, TOTAL_DFX_REWARDS
 def setup(
     DFX,
     gauge_controller,
-    three_gauges,
+    three_gauges_L1,
     distributor,
     deploy_account,
     multisig_0,
@@ -30,7 +30,7 @@ def setup(
     fund_multisigs(deploy_account, [multisig_0])
 
     # setup gauges and distributor
-    setup_gauge_controller(gauge_controller, three_gauges, multisig_0)
+    setup_gauge_controller(gauge_controller, three_gauges_L1, multisig_0)
 
     # Params:
     # - reward token
@@ -62,13 +62,13 @@ def test_single_user_unboosted(
     gauge_controller,
     distributor,
     three_lpts,
-    three_gauges,
+    three_gauges_L1,
     deploy_account,
     multisig_0,
 ):
     fastforward_chain_weeks(num_weeks=0, delta=10)
 
-    lpt, gauge = three_lpts[1], three_gauges[1]
+    lpt, gauge = three_lpts[1], three_gauges_L1[1]
 
     # deposit tokens to gauge
     deposit_lp_tokens(lpt, gauge, deploy_account)
@@ -88,7 +88,7 @@ def test_single_user_unboosted(
     for i in range(5):
         fastforward_chain_weeks(num_weeks=0, delta=10)
         distributor.distributeRewardToMultipleGauges(
-            three_gauges,
+            three_gauges_L1,
             {"from": multisig_0, "gas_price": gas_strategy},
         )
 
@@ -104,7 +104,7 @@ def test_single_user_claim(
     gauge_controller,
     distributor,
     three_lpts,
-    three_gauges,
+    three_gauges_L1,
     deploy_account,
     multisig_0,
 ):
@@ -113,12 +113,12 @@ def test_single_user_claim(
         gauge_controller,
         distributor,
         three_lpts,
-        three_gauges,
+        three_gauges_L1,
         deploy_account,
         multisig_0,
     )
 
-    gauge = three_gauges[1]
+    gauge = three_gauges_L1[1]
     starting_dfx_balance = DFX.balanceOf(deploy_account)
 
     # claim staking reward
@@ -140,13 +140,13 @@ def test_multi_user_boosted(
     gauge_controller,
     distributor,
     three_lpts,
-    three_gauges,
+    three_gauges_L1,
     deploy_account,
     multisig_0,
     user_0,
     user_1,
 ):
-    lpt, gauge = three_lpts[1], three_gauges[1]
+    lpt, gauge = three_lpts[1], three_gauges_L1[1]
 
     # Mint 10,000 of LP tokens are minted
     mint_lp_tokens(lpt, [user_0, user_1], deploy_account)
@@ -161,7 +161,7 @@ def test_multi_user_boosted(
     # distribute available reward to gauges
     fastforward_chain_weeks(num_weeks=1, delta=-10)
     distributor.distributeRewardToMultipleGauges(
-        three_gauges, {"from": multisig_0, "gas_price": gas_strategy}
+        three_gauges_L1, {"from": multisig_0, "gas_price": gas_strategy}
     )
     assert distributor.miningEpoch() == 1
 
@@ -176,7 +176,7 @@ def test_multi_user_boosted(
     deposit_to_ve(DFX, veDFX, [user_0], [1e21], [100], lock_timestamp)
 
     # place votes in bps (10000 = 100.00%) for gauge 1
-    submit_ve_vote(gauge_controller, three_gauges, [0, 10000, 0], user_0)
+    submit_ve_vote(gauge_controller, three_gauges_L1, [0, 10000, 0], user_0)
 
     # all voting power is registered on controller
     assert gauge_controller.vote_user_power(user_0) == 10000
@@ -209,7 +209,7 @@ def test_multi_user_boosted(
         epoch, user0_rewards, user1_rewards = expected[i]
 
         distributor.distributeRewardToMultipleGauges(
-            three_gauges,
+            three_gauges_L1,
             {"from": multisig_0, "gas_price": gas_strategy},
         )
         assert distributor.miningEpoch() == epoch

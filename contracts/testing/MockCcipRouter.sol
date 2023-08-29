@@ -38,4 +38,9 @@ contract MockCcipRouter {
             token.transferFrom(msg.sender, address(this), message.tokenAmounts[i].amount);
         }
     }
+
+    // Helper to send tokens held by this contract to another address
+    function transfer(address token, address to, uint256 value) public returns (bool) {
+        return IERC20(token).transfer(to, value);
+    }
 }

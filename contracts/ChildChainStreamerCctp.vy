@@ -37,8 +37,6 @@ IERC165_INTERFACE_ID: constant(bytes4) = 0x01ffc9a7
 
 i_router: immutable(address)
 
-
-
 reward_receiver: public(address)
 reward_tokens: public(address[8])
 reward_count: public(uint256)
@@ -51,13 +49,13 @@ future_owner: public(address)
 
 @external
 def __init__(_owner: address, _receiver: address, _reward: address, _router: address):
-    assert _router == ZERO_ADDRESS, "Invalid router"
+    assert _router != ZERO_ADDRESS, "Invalid router"
     i_router = _router
 
     self.owner = _owner
     self.reward_receiver = _receiver
 
-    # self.reward_tokens[0] = _reward
+    self.reward_tokens[0] = _reward
     self.reward_count = 1
     self.reward_data[_reward].distributor = _owner
     self.reward_data[_reward].duration = 86400 * 7

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.8.0;
 
+import "../../testing/IERC165.sol";
 import "./IAny2EVMMessageReceiver.sol";
-import "./IERC165.sol";
 
 contract InterfaceIds {
     constructor() {}
