@@ -4,8 +4,14 @@ from datetime import datetime
 import math
 import pytest
 
+from utils.constants import MAX_UINT256
 from utils.helper import fund_multisigs
-from .helpers_childchainstreamer import advance_epoch, set_gauge_reward
+from .helpers_childchainstreamer import (
+    advance_epoch,
+    log_ve_gauge,
+    log_ve_user,
+    set_gauge_reward,
+)
 
 
 # handle setup logic required for each unit test
@@ -48,10 +54,7 @@ def test_stream_to_gauge(
     mock_ccip_router,
     deploy_account,
     multisig_0,
-    multisig_1,
 ):
-    print(f"--- Start time: {datetime.fromtimestamp(chain.time())}")
-
     set_gauge_reward(
         DFX_OFT,
         child_chain_streamer,
@@ -69,11 +72,8 @@ def test_stream_to_gauge(
     )
     child_chain_streamer.notify_reward_amount(DFX_OFT, {"from": mock_ccip_router})
 
-    # print(mock_ccip_router, child_chain_streamer.reward_data(DFX_OFT))
-
     # deposit lpt to l2 gauge
-    max_uint256 = 2**256 - 1
-    lpt_L2.approve(child_gauge_L2, max_uint256, {"from": deploy_account})
+    lpt_L2.approve(child_gauge_L2, MAX_UINT256, {"from": deploy_account})
     child_gauge_L2.deposit(1e18, {"from": deploy_account})
 
     print(f"User gauge balance: {child_gauge_L2.balanceOf(deploy_account)/1e18} LPT")
@@ -85,9 +85,63 @@ def test_stream_to_gauge(
         advance_epoch(
             DFX_OFT,
             child_chain_streamer,
-            child_gauge_L2,
             mock_ccip_router,
-            deploy_account,
             multisig_0,
-            multisig_1,
         )
+        now = datetime.fromtimestamp(chain.time())
+        print(f"-- {now}")
+        log_ve_gauge(DFX_OFT, child_chain_streamer, child_gauge_L2)
+        log_ve_user(DFX_OFT, child_gauge_L2, deploy_account, claim=True)
+
+
+def test_two_stakers(
+    DFX_OFT,
+    lpt_L2,
+    child_chain_streamer,
+    child_gauge_L2,
+    mock_ccip_router,
+    multisig_0,
+    deploy_account,
+    user_0,
+    user_1,
+):
+    set_gauge_reward(
+        DFX_OFT,
+        child_chain_streamer,
+        child_gauge_L2,
+        mock_ccip_router,
+        multisig_0,
+    )
+
+    # give distributor rewards
+    mock_ccip_router.transferToken(
+        DFX_OFT,
+        child_chain_streamer,
+        1e23,
+        {"from": multisig_0},
+    )
+    child_chain_streamer.notify_reward_amount(DFX_OFT, {"from": mock_ccip_router})
+
+    # deposit lpt to l2 gauge for user 0
+    lpt_L2.transfer(user_0, 1e20, {"from": deploy_account})
+    lpt_L2.approve(child_gauge_L2, MAX_UINT256, {"from": user_0})
+    child_gauge_L2.deposit(1e20, {"from": user_0})
+
+    # deposit lpt to l2 gauge for user 1
+    lpt_L2.transfer(user_1, 3e20, {"from": deploy_account})
+    lpt_L2.approve(child_gauge_L2, MAX_UINT256, {"from": user_1})
+    child_gauge_L2.deposit(3e20, {"from": user_1})
+
+    for _ in range(3):
+        advance_epoch(
+            DFX_OFT,
+            child_chain_streamer,
+            mock_ccip_router,
+            multisig_0,
+        )
+
+        now = datetime.fromtimestamp(chain.time())
+        print(f"-- {now}")
+        log_ve_gauge(DFX_OFT, child_chain_streamer, child_gauge_L2)
+        log_ve_user(DFX_OFT, child_gauge_L2, user_0, label=1, claim=True)
+        log_ve_user(DFX_OFT, child_gauge_L2, user_1, label=2, claim=True)

@@ -35,26 +35,28 @@ def set_gauge_reward(DFX_OFT, streamer, gauge, router, multisig_0):
     )
 
 
-def advance_epoch(
-    DFX_OFT, streamer, gauge, router, deploy_account, multisig_0, multisig_1
-):
+def advance_epoch(DFX_OFT, streamer, router, multisig_0):
     fastforward_chain_weeks(num_weeks=1, delta=10)
     router.transferToken(DFX_OFT, streamer, 1e23, {"from": multisig_0})
     streamer.notify_reward_amount(DFX_OFT, {"from": multisig_0})
 
+
+def log_ve_gauge(DFX_OFT, streamer, gauge):
+    print(f"Streamer balance: {DFX_OFT.balanceOf(streamer)/1e18}")
+    print(f"Gauge balance: {DFX_OFT.balanceOf(gauge)/1e18}")
+
+
+def log_ve_user(DFX_OFT, gauge, user_account, label=None, claim=False):
     # tx = gauge.claimable_reward_write(deploy_account, DFX_OFT, {"from": deploy_account})
     # print(tx.value)
     # available_rewards = 0
+    available_rewards = gauge.claimable_reward(user_account, DFX_OFT)
+    if claim:
+        gauge.claim_rewards({"from": user_account})
+    claimed_rewards = gauge.claimed_reward(user_account, DFX_OFT)
 
-    available_rewards = gauge.claimable_reward(deploy_account, DFX_OFT)
-    gauge.claim_rewards({"from": deploy_account})
-    claimed_rewards = gauge.claimed_reward(deploy_account, DFX_OFT)
-
-    now = datetime.fromtimestamp(chain.time())
-    print(f"-- {now}")
-    print(f"Streamer balance: {DFX_OFT.balanceOf(streamer)/1e18}")
-    print(f"Gauge balance: {DFX_OFT.balanceOf(gauge)/1e18}")
-    print(f"User staked LPT: {gauge.balanceOf(deploy_account)/1e18}")
-    print(f"User available rewards: {available_rewards/1e18}")
-    print(f"User claimed rewards: {claimed_rewards/1e18}")
-    print(f"User balance: {DFX_OFT.balanceOf(deploy_account)/1e18}")
+    user_label = f"User {label}" if label else "User"
+    print(f"{user_label} staked LPT: {gauge.balanceOf(user_account)/1e18}")
+    print(f"{user_label} available rewards: {available_rewards/1e18}")
+    print(f"{user_label} claimed rewards: {claimed_rewards/1e18}")
+    print(f"{user_label} DFX balance: {DFX_OFT.balanceOf(user_account)/1e18}")
