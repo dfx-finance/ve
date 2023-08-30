@@ -8,16 +8,13 @@ from utils.chain import (
     # fastforward_chain_anvil as fastforward_chain,
     # fastforward_chain_weeks_anvil as fastforward_chain_weeks,
 )
-from utils.gas import gas_strategy
 
 
-def add_gauge_reward(DFX_OFT, streamer, gauge, mock_ccip_router, multisig_0):
+def set_gauge_reward(DFX_OFT, streamer, gauge, router, multisig_0):
     # update authorized user for childchainstreamer rewards
     # DEV: This will be the address of the CCTP contract which is calling "notify_reward_amount"
     # on ChildChainStreamer
-    streamer.set_reward_distributor(
-        DFX_OFT, mock_ccip_router, {"from": multisig_0, "gas_price": gas_strategy}
-    )
+    streamer.set_reward_distributor(DFX_OFT, router, {"from": multisig_0})
 
     # set rewards contract on gauge
     # DEV: cannot be set while gauge has 0 deposits?
@@ -34,26 +31,23 @@ def add_gauge_reward(DFX_OFT, streamer, gauge, mock_ccip_router, multisig_0):
             ZERO_ADDRESS,
             ZERO_ADDRESS,
         ],
-        {"from": multisig_0, "gas_price": gas_strategy},
+        {"from": multisig_0},
     )
 
 
-def advance_epoch(DFX_OFT, streamer, gauge, router, deploy_account, multisig_0):
+def advance_epoch(
+    DFX_OFT, streamer, gauge, router, deploy_account, multisig_0, multisig_1
+):
     fastforward_chain_weeks(num_weeks=1, delta=10)
-    router.transfer(
-        DFX_OFT, streamer, 1e23, {"from": multisig_0, "gas_price": gas_strategy}
-    )
-    streamer.notify_reward_amount(
-        DFX_OFT, {"from": multisig_0, "gas_price": gas_strategy}
-    )
+    router.transferToken(DFX_OFT, streamer, 1e23, {"from": multisig_0})
+    streamer.notify_reward_amount(DFX_OFT, {"from": multisig_0})
 
-    tx = gauge.claimable_reward_write(
-        deploy_account, DFX_OFT, {"from": deploy_account, "gas_price": gas_strategy}
-    )
-    available_rewards = tx.return_value
+    # tx = gauge.claimable_reward_write(deploy_account, DFX_OFT, {"from": deploy_account})
+    # print(tx.value)
+    # available_rewards = 0
 
-    gauge.claim_rewards({"from": deploy_account, "gas_price": gas_strategy})
-    # rewards = gauge.claimable_reward(deploy_account, DFX_OFT)
+    available_rewards = gauge.claimable_reward(deploy_account, DFX_OFT)
+    gauge.claim_rewards({"from": deploy_account})
     claimed_rewards = gauge.claimed_reward(deploy_account, DFX_OFT)
 
     now = datetime.fromtimestamp(chain.time())
@@ -61,7 +55,6 @@ def advance_epoch(DFX_OFT, streamer, gauge, router, deploy_account, multisig_0):
     print(f"Streamer balance: {DFX_OFT.balanceOf(streamer)/1e18}")
     print(f"Gauge balance: {DFX_OFT.balanceOf(gauge)/1e18}")
     print(f"User staked LPT: {gauge.balanceOf(deploy_account)/1e18}")
-    # print(available_rewards)
-    # print(f"User available rewards: {available_rewards/1e18}")
-    # print(f"User claimed rewards: {claimed_rewards/1e18}")
-    # print(f"User balance: {DFX_OFT.balanceOf(deploy_account)/1e18}")
+    print(f"User available rewards: {available_rewards/1e18}")
+    print(f"User claimed rewards: {claimed_rewards/1e18}")
+    print(f"User balance: {DFX_OFT.balanceOf(deploy_account)/1e18}")
