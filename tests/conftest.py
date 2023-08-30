@@ -2,7 +2,6 @@
 import pytest
 from brownie import ZERO_ADDRESS, Contract
 
-from utils.gas import gas_strategy
 from utils.chain import (
     fastforward_chain_weeks,
     # fastforward_chain_weeks_anvil as fastforward_chain_weeks,
@@ -58,21 +57,19 @@ Contracts
 # Native test token
 @pytest.fixture(scope="function")
 def DFX(DFX_, deploy_account):
-    yield DFX_.deploy(1e30, {"from": deploy_account, "gas_price": gas_strategy})
+    yield DFX_.deploy(1e30, {"from": deploy_account})
 
 
 # Vote-escrow version of test token
 @pytest.fixture(scope="function")
 def veDFX(VeDFX, DFX, deploy_account):
-    yield VeDFX.deploy(
-        DFX, "veDFX", "veDFX", 1, {"from": deploy_account, "gas_price": gas_strategy}
-    )
+    yield VeDFX.deploy(DFX, "veDFX", "veDFX", 1, {"from": deploy_account})
 
 
 # Cross-chain version of test token
 @pytest.fixture(scope="function")
 def DFX_OFT(DFX_, deploy_account):
-    yield DFX_.deploy(1e30, {"from": deploy_account, "gas_price": gas_strategy})
+    yield DFX_.deploy(1e30, {"from": deploy_account})
 
 
 # Vote-escrow controller which tracks the various gauges and their current votes
@@ -82,7 +79,7 @@ def gauge_controller(GaugeController, DFX, veDFX, deploy_account, multisig_0):
         DFX,
         veDFX,
         multisig_0,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
 
@@ -93,7 +90,7 @@ def veboost_proxy(VeBoostProxy, veDFX, deploy_account, multisig_0):
         veDFX,
         ZERO_ADDRESS,
         multisig_0,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
 
@@ -113,9 +110,7 @@ def distributor(
     fastforward_chain_weeks(num_weeks=0, delta=0)
 
     # Deploy DfxDistributor logic
-    dfx_distributor = DfxDistributor.deploy(
-        {"from": deploy_account, "gas_price": gas_strategy}
-    )
+    dfx_distributor = DfxDistributor.deploy({"from": deploy_account})
 
     # Deploy DfxDistributor proxy
     distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
@@ -132,7 +127,7 @@ def distributor(
         dfx_distributor.address,
         multisig_1,
         distributor_initializer_calldata,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
     # Load Distributor ABI on proxy address
@@ -160,19 +155,19 @@ def child_chain_streamer(
         child_gauge_L2,
         DFX_OFT,
         mock_ccip_router,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
 
 # Test-only contract which mocks the Chainlink CCIP router
 @pytest.fixture(scope="function")
 def mock_ccip_router(DFX_OFT, MockCcipRouter, deploy_account):
-    router = MockCcipRouter.deploy({"from": deploy_account, "gas_price": gas_strategy})
+    router = MockCcipRouter.deploy({"from": deploy_account})
     # give router some rewards to distribute to L2 ChildChainStreamer
     DFX_OFT.transfer(
         router,
         1e25,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
     yield router
 
@@ -183,9 +178,7 @@ Gauges
 
 
 def _deploy_lpt(ERC20LP, name, symbol, deploy_account, decimals=18, amount=1e9):
-    return ERC20LP.deploy(
-        name, symbol, 18, 1e9, {"from": deploy_account, "gas_price": gas_strategy}
-    )
+    return ERC20LP.deploy(name, symbol, 18, 1e9, {"from": deploy_account})
 
 
 def _deploy_gauge_L1(
@@ -201,7 +194,7 @@ def _deploy_gauge_L1(
     multisig_1,
 ):
     # deploy gauge logic
-    gauge = LiquidityGaugeV4.deploy({"from": deploy_account, "gas_price": gas_strategy})
+    gauge = LiquidityGaugeV4.deploy({"from": deploy_account})
 
     # deploy gauge behind proxy
     gauge_initializer_calldata = gauge.initialize.encode_input(
@@ -216,7 +209,7 @@ def _deploy_gauge_L1(
         gauge.address,
         multisig_1,
         gauge_initializer_calldata,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
     gauge_proxy = Contract.from_abi(
@@ -273,7 +266,7 @@ def _deploy_root_gauge_L1(
 ):
     # deploy gauge logic
     gauge_implementation = RootGaugeCctp.deploy(
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
     # deploy gauge proxy and initialize
@@ -291,7 +284,7 @@ def _deploy_root_gauge_L1(
         gauge_implementation.address,
         multisig_1,
         gauge_initializer_calldata,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
     # load gauge interface on proxy for non-admin users
@@ -309,7 +302,7 @@ def _deploy_child_gauge_L2(
 ):
     # deploy gauge logic
     gauge_implementation = RewardsOnlyGauge.deploy(
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
     # deploy gauge proxy and initialize
@@ -320,7 +313,7 @@ def _deploy_child_gauge_L2(
         gauge_implementation.address,
         multisig_1,
         gauge_initializer_calldata,
-        {"from": deploy_account, "gas_price": gas_strategy},
+        {"from": deploy_account},
     )
 
     # load gauge interface on proxy for non-admin users

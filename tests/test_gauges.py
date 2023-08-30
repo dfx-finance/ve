@@ -11,7 +11,6 @@ from utils.chain import (
     # fastforward_chain_weeks_anvil as fastforward_chain_weeks,
 )
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
-from utils.gas import gas_strategy
 from utils.helper import fund_multisigs, mint_dfx
 from utils.ve import deposit_to_ve, submit_ve_vote
 from .constants import EMISSION_RATE, TOTAL_DFX_REWARDS
@@ -74,9 +73,7 @@ def test_single_user_unboosted(
     deposit_lp_tokens(lpt, gauge, deploy_account)
 
     # artificially set gauge weight for our gauge
-    gauge_controller.change_gauge_weight(
-        gauge, 1 * 1e18, {"from": multisig_0, "gas_price": gas_strategy}
-    )
+    gauge_controller.change_gauge_weight(gauge, 1 * 1e18, {"from": multisig_0})
 
     expected_rewards = [
         0,
@@ -89,7 +86,7 @@ def test_single_user_unboosted(
         fastforward_chain_weeks(num_weeks=0, delta=10)
         distributor.distributeRewardToMultipleGauges(
             three_gauges_L1,
-            {"from": multisig_0, "gas_price": gas_strategy},
+            {"from": multisig_0},
         )
 
         assert math.isclose(
@@ -123,9 +120,7 @@ def test_single_user_claim(
 
     # claim staking reward
     reward_amount = gauge.claimable_reward(deploy_account, DFX)
-    gauge.claim_rewards(
-        deploy_account, {"from": deploy_account, "gas_price": gas_strategy}
-    )
+    gauge.claim_rewards(deploy_account, {"from": deploy_account})
     # Test estimated and claimed rewards are similar to 0.1 DFX from raw 1e18 amount
     assert math.isclose(
         DFX.balanceOf(deploy_account) - starting_dfx_balance,
@@ -160,9 +155,7 @@ def test_multi_user_boosted(
     # (epoch 1) set chain to 10s before the week change and
     # distribute available reward to gauges
     fastforward_chain_weeks(num_weeks=1, delta=-10)
-    distributor.distributeRewardToMultipleGauges(
-        three_gauges_L1, {"from": multisig_0, "gas_price": gas_strategy}
-    )
+    distributor.distributeRewardToMultipleGauges(three_gauges_L1, {"from": multisig_0})
     assert distributor.miningEpoch() == 1
 
     # (epoch 1) advance chain to 5h10s before next epoch change
@@ -180,13 +173,13 @@ def test_multi_user_boosted(
 
     # all voting power is registered on controller
     assert gauge_controller.vote_user_power(user_0) == 10000
-    gauge.user_checkpoint(user_0, {"from": user_0, "gas_price": gas_strategy})
+    gauge.user_checkpoint(user_0, {"from": user_0})
 
     # (epoch 1)
     fastforward_chain(int(chain.time()) + 4 * 60 * 60)
 
     # checkpoint necessary for calculating boost
-    gauge.user_checkpoint(user_0, {"from": user_0, "gas_price": gas_strategy})
+    gauge.user_checkpoint(user_0, {"from": user_0})
     assert int(gauge.claimable_reward(user_0, DFX) // 1e18) == 680
     assert distributor.miningEpoch() == 1
 
@@ -210,13 +203,13 @@ def test_multi_user_boosted(
 
         distributor.distributeRewardToMultipleGauges(
             three_gauges_L1,
-            {"from": multisig_0, "gas_price": gas_strategy},
+            {"from": multisig_0},
         )
         assert distributor.miningEpoch() == epoch
 
         # checkpoint for calculating boost
-        gauge.user_checkpoint(user_0, {"from": user_0, "gas_price": gas_strategy})
-        gauge.user_checkpoint(user_1, {"from": user_1, "gas_price": gas_strategy})
+        gauge.user_checkpoint(user_0, {"from": user_0})
+        gauge.user_checkpoint(user_1, {"from": user_1})
 
         assert int(gauge.claimable_reward(user_0, DFX) // 1e18) == user0_rewards
         assert int(gauge.claimable_reward(user_1, DFX) // 1e18) == user1_rewards

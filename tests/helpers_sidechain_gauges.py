@@ -4,7 +4,6 @@ from utils.constants import (
     # DEFAULT_GAUGE_TYPE,
     DEFAULT_GAUGE_WEIGHT,
 )
-from utils.gas import gas_strategy
 
 
 def add_to_gauge_controller(gauge_controller, gauge, multisig_0, add_placeholder=False):
@@ -13,19 +12,19 @@ def add_to_gauge_controller(gauge_controller, gauge, multisig_0, add_placeholder
         gauge_controller.add_type(
             "DFX Perpetuals",
             0,
-            {"from": multisig_0, "gas_price": gas_strategy},
+            {"from": multisig_0},
         )
 
     # add new l2 gauge type to gauge controller
     gauge_controller.add_type(
         "L2 Liquidity Pools",
         1e18,
-        {"from": multisig_0, "gas_price": gas_strategy},
+        {"from": multisig_0},
     )
     # add l2 gauge to gauge controller
     gauge_controller.add_gauge(
         gauge,
         2,
         DEFAULT_GAUGE_WEIGHT,
-        {"from": multisig_0, "gas_price": gas_strategy},
+        {"from": multisig_0},
     )

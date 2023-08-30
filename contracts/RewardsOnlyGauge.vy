@@ -1,7 +1,7 @@
 # @version 0.3.3
 """
 @title Rewards-Only Gauge
-@author Curve Finance
+@author Curve Finance, DFX
 @license MIT
 @notice Distribution of third-party rewards without CRV
 """
@@ -96,7 +96,7 @@ def initialize(_admin: address, _lp_token: address):
     self.initialized = True    
 
     symbol: String[26] = ERC20Extended(_lp_token).symbol()
-    self.name = concat("Curve.fi ", symbol, " RewardGauge Deposit")
+    self.name = concat("DFX ", symbol, " RewardGauge Deposit")
     self.symbol = concat(symbol, "-gauge")
 
     self.lp_token = _lp_token

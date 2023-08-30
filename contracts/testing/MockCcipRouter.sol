@@ -40,7 +40,7 @@ contract MockCcipRouter {
     }
 
     // Helper to send tokens held by this contract to another address
-    function transfer(address token, address to, uint256 value) public returns (bool) {
+    function transferToken(address token, address to, uint256 value) public returns (bool) {
         return IERC20(token).transfer(to, value);
     }
 }
