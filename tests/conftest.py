@@ -275,9 +275,9 @@ def _deploy_root_gauge_L1(
         DFX,
         distributor,
         ccip_router,  # mock ccip router address
-        123,  # mock target chain selector
-        "0x0000000000000000000000000000000000000001",  # mock destination address
-        "0x0000000000000000000000000000000000000002",  # mock fee token address
+        14767482510784806043,  # mock target chain selector
+        "0x33Af579F8faFADa29d98922A825CFC0228D7ce39",  # mock destination address
+        "0x0000000000000000000000000000000000000000",  # mock fee token address
         multisig_0,
     )
     proxy = DfxUpgradeableProxy.deploy(
