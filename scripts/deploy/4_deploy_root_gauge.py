@@ -3,7 +3,7 @@ import json
 import time
 
 from brownie import DfxUpgradeableProxy, RootGaugeCctp
-from brownie import accounts, config
+from brownie import accounts
 
 from utils.gas import verify_gas_strategy
 from utils.network import get_network_addresses, network_info
@@ -39,7 +39,9 @@ def main():
     # deploy gauge behind proxy
     print(f"--- Deploying  Root Gauge CCTP proxy contract to {connected_network} ---")
 
-    gauge_implementation = RootGaugeCctp.deploy({"from": DEPLOY_ACCT})
+    gauge_implementation = RootGaugeCctp.deploy(
+        {"from": DEPLOY_ACCT}, publish_source=True
+    )
 
     # deploy gauge proxy and initialize
     gauge_initializer_calldata = gauge_implementation.initialize.encode_input(

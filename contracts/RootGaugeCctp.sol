@@ -15,49 +15,68 @@ import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/
 
 contract RootGaugeCctp is AccessControlUpgradeable {
     // Custom errors to provide more descriptive revert messages.
-    error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees); // Used to make sure contract has enough balance.
+    error DestinationChainNotWhitelisted(uint64 destinationChainSelector); // Used when the destination chain has not been whitelisted by the contract owner.
+    error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees); // Used to make sure contract has enough balance to cover the fees.
 
     // Event emitted when a message is sent to another chain.
+    // The unique ID of the CCIP message.
     // The chain selector of the destination chain.
     // The address of the receiver on the destination chain.
     // The text being sent.
+    // The token address that was transferred.
+    // The token amount that was transferred.
     // the token address used to pay CCIP fees.
     // The fees paid for sending the CCIP message.
-    event MessageSent( // The unique ID of the CCIP message.
+    event MessageSent(
         bytes32 indexed messageId,
         uint64 indexed destinationChainSelector,
         address receiver,
         string text,
+        address token,
+        uint256 tokenAmount,
         address feeToken,
         uint256 fees
     );
 
-    IRouterClient router;
-    LinkTokenInterface linkToken;
-
     string public name;
     string public symbol;
-
-    address public DFX;
-    address public controller;
-    address public distributor;
-
     uint256 public period;
     uint256 public startEpochTime;
+    uint256 constant WEEK = 604800;
+
+    IRouterClient router;
+    address public controller;
+    address public distributor;
+    uint64 public destinationChain;
+    address public destination;
+    address public DFX;
+    address public feeToken;
+
+    // Mapping to keep track of whitelisted destination chains.
+    mapping(uint64 => bool) public whitelistedDestinationChains;
 
     address public admin;
 
-    // address public router;
-    uint256 public destinationChain;
-    address public destination;
-    address public feeToken;
-
-    uint256 constant WEEK = 604800;
-
     constructor() initializer {}
 
+    /// @dev Modifier that checks whether the msg.sender is admin
     modifier onlyAdmin() {
         require(msg.sender == admin, "Not admin");
+        _;
+    }
+
+    /// @dev Modifier that checks whether the msg.sender is the distributor contract address
+    modifier onlyDistributor() {
+        require(msg.sender == distributor, "Not distributor");
+        _;
+    }
+
+    /// @dev Modifier that checks if the chain with the given destinationChainSelector is whitelisted.
+    /// @param _destinationChainSelector The selector of the destination chain.
+    modifier onlyWhitelistedDestinationChain(uint64 _destinationChainSelector) {
+        if (!whitelistedDestinationChains[_destinationChainSelector]) {
+            revert DestinationChainNotWhitelisted(_destinationChainSelector);
+        }
         _;
     }
 
@@ -74,7 +93,7 @@ contract RootGaugeCctp is AccessControlUpgradeable {
         address _DFX,
         address _distributor,
         address _router,
-        uint256 _destinationChain,
+        uint64 _destinationChain,
         address _destination,
         address _feeToken,
         address _admin
@@ -95,6 +114,7 @@ contract RootGaugeCctp is AccessControlUpgradeable {
         period = block.timestamp / WEEK - 1;
     }
 
+    /* Parameters */
     function updateDestination(address _newDestination) external onlyAdmin {
         destination = _newDestination;
     }
@@ -103,27 +123,66 @@ contract RootGaugeCctp is AccessControlUpgradeable {
         distributor = _newDistributor;
     }
 
-    function testFee(uint256 amount) external view returns (Client.EVM2AnyMessage memory) {
-        // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
-        Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
-            receiver: abi.encode(destination), // ABI-encoded receiver address
-            data: "", // ABI-encoded string
-            tokenAmounts: new Client.EVMTokenAmount[](0), // Empty array indicating no tokens are being sent
-            extraArgs: Client._argsToBytes(
-                // Additional arguments, setting gas limit and non-strict sequencing mode
-                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
-                ),
-            // Set the feeToken  address, indicating LINK will be used for fees
-            feeToken: feeToken
-        });
-
-        // uint256 fees = router.getFee(self.destination_chain, message);
-
-        // Emit an event with message details
-        emit MessageSent(messageId, destinationChainSelector, receiver, text, feeToken, fees);
-        return message;
+    /* Gauge actions */
+    function testFee(uint256 _amount) external view returns (uint256) {
+        Client.EVM2AnyMessage memory message = _buildCcipMessage(destination, DFX, _amount, feeToken);
+        return router.getFee(destinationChain, message);
     }
 
+    function _notifyReward(uint256 _amount) internal returns (bytes32) {
+        startEpochTime = block.timestamp;
+
+        // Max approve spending of rewards tokens by router
+        if (IERC20(DFX).allowance(address(this), address(router)) < _amount) {
+            IERC20(DFX).approve(address(router), type(uint256).max);
+        }
+
+        Client.EVM2AnyMessage memory message = _buildCcipMessage(destination, DFX, _amount, feeToken);
+        uint256 fees = router.getFee(destinationChain, message);
+
+        if (fees > address(this).balance) {
+            revert NotEnoughBalance(address(this).balance, fees);
+        }
+
+        // When fee token is set, send messages across CCIP using token. Otherwise,
+        // use the native gas token
+        bytes32 messageId;
+        if (feeToken != address(0)) {
+            // Max approve spending of gas tokens by router
+            if (IERC20(feeToken).allowance(address(this), address(router)) < fees) {
+                IERC20(feeToken).approve(address(router), type(uint256).max);
+            }
+            messageId = router.ccipSend(destinationChain, message);
+        } else {
+            messageId = router.ccipSend{value: fees}(destinationChain, message);
+        }
+
+        // Emit an event with message details
+        emit MessageSent(messageId, destinationChain, destination, "", DFX, _amount, feeToken, fees);
+        return messageId;
+    }
+
+    function notifyReward(uint256 _amount)
+        external
+        onlyDistributor
+        onlyWhitelistedDestinationChain(destinationChain)
+        returns (bytes32)
+    {
+        bytes32 messageId = _notifyReward(_amount);
+        return messageId;
+    }
+
+    function notifyReward(address, uint256 _amount)
+        external
+        onlyDistributor
+        onlyWhitelistedDestinationChain(destinationChain)
+        returns (bytes32)
+    {
+        bytes32 messageId = _notifyReward(_amount);
+        return messageId;
+    }
+
+    /* CCIP */
     /// @notice Construct a CCIP message.
     /// @dev This function will create an EVM2AnyMessage struct with all the necessary information for tokens transfer.
     /// @param _receiver The address of the receiver.
@@ -131,7 +190,7 @@ contract RootGaugeCctp is AccessControlUpgradeable {
     /// @param _amount The amount of the token to be transferred.
     /// @param _feeTokenAddress The address of the token used for fees. Set address(0) for native gas.
     /// @return Client.EVM2AnyMessage Returns an EVM2AnyMessage struct which contains information for sending a CCIP message.
-    function _buildCCIPMessage(address _receiver, address _token, uint256 _amount, address _feeTokenAddress)
+    function _buildCcipMessage(address _receiver, address _token, uint256 _amount, address _feeTokenAddress)
         internal
         pure
         returns (Client.EVM2AnyMessage memory)
@@ -155,11 +214,26 @@ contract RootGaugeCctp is AccessControlUpgradeable {
         return evm2AnyMessage;
     }
 
+    /// @dev Whitelists a chain for transactions.
+    /// @notice This function can only be called by the owner.
+    /// @param _destinationChainSelector The selector of the destination chain to be whitelisted.
+    function whitelistDestinationChain(uint64 _destinationChainSelector) external onlyAdmin {
+        whitelistedDestinationChains[_destinationChainSelector] = true;
+    }
+
+    /// @dev Denylists a chain for transactions.
+    /// @notice This function can only be called by the owner.
+    /// @param _destinationChainSelector The selector of the destination chain to be denylisted.
+    function denylistDestinationChain(uint64 _destinationChainSelector) external onlyAdmin {
+        whitelistedDestinationChains[_destinationChainSelector] = false;
+    }
+
     /// @notice Fallback function to allow the contract to receive Ether.
     /// @dev This function has no function body, making it a default function for receiving Ether.
     /// It is automatically called when Ether is transferred to the contract without any data.
     receive() external payable {}
 
+    /* Admin */
     /// @notice Emergency withdraw
     /// @param _token Address of token to withdraw
     function emergencyWithdraw(address _beneficiary, address _token, uint256 _amount) external onlyAdmin {
