@@ -5,7 +5,7 @@ from brownie.network.gas.strategies import LinearScalingStrategy
 
 # Setting gas price is always necessary for deploy
 # https://stackoverflow.com/questions/71341281/awaiting-transaction-in-the-mempool
-gas_strategy = LinearScalingStrategy("60 gwei", "65 gwei", 1.3)
+gas_strategy = LinearScalingStrategy("10 gwei", "15 gwei", 1.5)
 
 
 def verify_gas_strategy():
