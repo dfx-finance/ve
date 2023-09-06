@@ -2,7 +2,7 @@
 import json
 import time
 
-from brownie import DfxUpgradeableProxy, RootGaugeCctp
+from brownie import RootGaugeCctpBasic
 from brownie import accounts
 
 from utils.network import get_network_addresses, network_info
@@ -32,16 +32,7 @@ def main():
     )
 
     print(f"--- Deploying Root Gauge CCTP contract to {connected_network} ---")
-
-    # deploy gauge behind proxy
-    print(f"--- Deploying  Root Gauge CCTP proxy contract to {connected_network} ---")
-
-    gauge_implementation = RootGaugeCctp.deploy(
-        {"from": DEPLOY_ACCT}, publish_source=True
-    )
-
-    # deploy gauge proxy and initialize
-    gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
+    gauge_implementation = RootGaugeCctpBasic.deploy(
         "L1 ETH/BTC Root Gauge",
         addresses.DFX_CCIP,
         DEPLOY_ACCT,
@@ -50,19 +41,12 @@ def main():
         "0x33Af579F8faFADa29d98922A825CFC0228D7ce39",  # mock destination address
         "0x0000000000000000000000000000000000000000",  # mock fee token address
         DEPLOY_ACCT,
-    )
-    proxy = DfxUpgradeableProxy.deploy(
-        gauge_implementation.address,
-        PROXY_ADMIN_ACCT,
-        gauge_initializer_calldata,
         {"from": DEPLOY_ACCT},
         publish_source=True,
     )
 
     output_data["gauges"]["rootGaugeTest"] = {
         "logic": gauge_implementation.address,
-        "calldata": gauge_initializer_calldata,
-        "proxy": proxy.address,
     }
 
     with open(
