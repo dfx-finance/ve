@@ -98,6 +98,10 @@ contract RootGaugeCctpBasic is AccessControl {
     }
 
     /* Parameters */
+    function updateAdmin(address _newAdmin) external onlyAdmin {
+        admin = _newAdmin;
+    }
+
     function updateDestination(address _newDestination) external onlyAdmin {
         destination = _newDestination;
     }
