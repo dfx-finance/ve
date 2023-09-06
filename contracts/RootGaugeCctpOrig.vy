@@ -16,7 +16,7 @@ struct EVMTokenAmount:
 struct EVM2AnyMessage:
     receiver: Bytes[32] # abi.encode(receiver address) for dest EVM chains
     data: Bytes[32] # Data payload
-    tokenAmounts: DynArray[EVMTokenAmount, 2] # Token transfers
+    tokenAmounts: EVMTokenAmount[1] # Token transfers
     feeToken: address # Address of feeToken. address(0) means you will send msg.value.
     extraArgs: Bytes[32] # Populate this with _argsToBytes(EVMExtraArgsV1)
 
@@ -105,8 +105,8 @@ def update_distributor(_new_distributor: address):
 
     self.distributor = _new_distributor
 
-@external
-def notifyReward(gauge: address, amount: uint256):
+@internal
+def _notify_reward(amount: uint256):
     assert msg.sender == self.distributor
 
     self.start_epoch_time = block.timestamp
@@ -122,10 +122,12 @@ def notifyReward(gauge: address, amount: uint256):
     message: EVM2AnyMessage = EVM2AnyMessage({
         receiver: _abi_encode(self.destination),
         data: empty(Bytes[32]),  # no data
-        tokenAmounts: [EVMTokenAmount({
-            token: self.DFX,
-            amount: amount,
-        })],
+        tokenAmounts: [
+            EVMTokenAmount({
+                token: self.DFX,
+                amount: amount,
+            })            
+        ],
         feeToken: self.fee_token,
         extraArgs: empty(Bytes[32])
     })
@@ -143,7 +145,34 @@ def notifyReward(gauge: address, amount: uint256):
 
         router.ccipSend(self.destination_chain, message)
     else:
-        router.ccipSend(self.destination_chain, message, value=fees)
+        router.ccipSend(self.destination_chain, message, value=fees)    
+
+@external
+def notify_reward(amount: uint256):
+    self._notify_reward(amount)
+
+@external
+def notifyReward(gauge: address, amount: uint256):
+    # gaugeAddr parameter for compatibility, but unused
+    self._notify_reward(amount)
+
+@view
+@external
+def test_fee(amount: uint256) -> EVM2AnyMessage:
+    router: CctpRouter = CctpRouter(self.router)
+
+    message: EVM2AnyMessage = EVM2AnyMessage({
+        receiver: _abi_encode(self.destination),
+        data: empty(Bytes[32]),  # no data
+        tokenAmounts: [EVMTokenAmount({
+            token: self.DFX,
+            amount: amount,
+        })],
+        feeToken: self.fee_token,
+        extraArgs: empty(Bytes[32])
+    })
+    # fees: uint256 = router.getFee(self.destination_chain, message)
+    return message
 
 
 @external
