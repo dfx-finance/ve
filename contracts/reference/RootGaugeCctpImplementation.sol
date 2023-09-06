@@ -8,12 +8,12 @@ pragma solidity ^0.8.10;
  * @notice Receives total allocated weekly DFX emission mints and sends to L2 gauge
  */
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelinUpgradeable/contracts/access/AccessControlUpgradeable.sol";
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 
-contract RootGaugeCctpBasic is AccessControl {
+contract RootGaugeCctp is AccessControlUpgradeable {
     // Custom errors to provide more descriptive revert messages.
     error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees); // Used to make sure contract has enough balance to cover the fees.
 
@@ -51,6 +51,8 @@ contract RootGaugeCctpBasic is AccessControl {
 
     address public admin;
 
+    constructor() initializer {}
+
     /// @dev Modifier that checks whether the msg.sender is admin
     modifier onlyAdmin() {
         require(msg.sender == admin, "Not admin");
@@ -63,7 +65,7 @@ contract RootGaugeCctpBasic is AccessControl {
         _;
     }
 
-    /// @notice Contract constructor
+    /// @notice Contract initializer
     /// @param _symbol Gauge base symbol
     /// @param _DFX Address of the DFX token
     /// @param _distributor Address of the mainnet rewards distributor
@@ -71,7 +73,7 @@ contract RootGaugeCctpBasic is AccessControl {
     /// @param _destinationChain Chain ID of the chain with the destination gauge. CCIP uses its own set of chain selectors to identify blockchains
     /// @param _destination Address of the destination gauge on the sidechain
     /// @param _admin Admin who can kill the gauge
-    constructor(
+    function initialize(
         string memory _symbol,
         address _DFX,
         address _distributor,
@@ -80,7 +82,7 @@ contract RootGaugeCctpBasic is AccessControl {
         address _destination,
         address _feeToken,
         address _admin
-    ) {
+    ) external initializer {
         require(_DFX != address(0), "Token cannot be zero address");
 
         name = string(abi.encodePacked("DFX ", _symbol, " Gauge"));
@@ -98,10 +100,6 @@ contract RootGaugeCctpBasic is AccessControl {
     }
 
     /* Parameters */
-    function updateAdmin(address _newAdmin) external onlyAdmin {
-        admin = _newAdmin;
-    }
-
     function updateDestination(address _newDestination) external onlyAdmin {
         destination = _newDestination;
     }
@@ -200,7 +198,9 @@ contract RootGaugeCctpBasic is AccessControl {
 
     /* Admin */
     /// @notice Emergency withdraw
+    /// @param _beneficiary Receiver of emergeny withdraw
     /// @param _token Address of token to withdraw
+    /// @param _amount Amount to withdraw
     function emergencyWithdraw(address _beneficiary, address _token, uint256 _amount) external onlyAdmin {
         IERC20(_token).transfer(_beneficiary, _amount);
     }
