@@ -13,6 +13,7 @@ implements: ERC20
 
 interface ERC20Extended:
     def symbol() -> String[26]: view
+    def name() -> String[26]: view
 
 
 event Deposit:
@@ -95,8 +96,9 @@ def initialize(_admin: address, _lp_token: address):
     assert self.initialized == False #dev: contract is already initialized
     self.initialized = True    
 
+    name: String[26] = ERC20Extended(_lp_token).name()
     symbol: String[26] = ERC20Extended(_lp_token).symbol()
-    self.name = concat("DFX ", symbol, " RewardGauge Deposit")
+    self.name = concat("DFX ", name, " RewardGauge")
     self.symbol = concat(symbol, "-gauge")
 
     self.lp_token = _lp_token
