@@ -156,7 +156,7 @@ contract RootGaugeCctp is AccessControl {
         return messageId;
     }
 
-    function notifyReward(address, uint256 _amount) external onlyDistributor returns (bytes32) {
+    function notifyReward(address, uint256 _amount) external returns (bytes32) {
         bytes32 messageId = _notifyReward(_amount);
         return messageId;
     }

@@ -120,7 +120,6 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
     constructor() initializer {}
 
     // ======================== Internal Functions =================================
-
     /// @notice Internal function to distribute rewards to a gauge
     /// @param gaugeAddr Address of the gauge to distribute rewards to
     /// @return weeksElapsed Weeks elapsed since the last call

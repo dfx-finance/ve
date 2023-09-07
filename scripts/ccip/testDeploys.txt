@@ -1,4 +1,4 @@
-RootGaugeCctp deployed at: 
+RootGaugeCctp deployed at: 0xccaF842839d0A879C3F17781d79be03CEe986395
 
 ERC20LP deployed at: 0xF15BBC3b5D2DF49b88967d2b574eF3d289a0138f
 RewardsOnlyGauge deployed at: 0x5562BA2254987700bD301503C34c7E026871f0d5

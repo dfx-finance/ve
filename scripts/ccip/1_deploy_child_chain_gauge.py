@@ -48,36 +48,40 @@ def deploy():
     lpt = ERC20LP.at("0xF15BBC3b5D2DF49b88967d2b574eF3d289a0138f")
     output_data["l2Gauge"]["lpt"] = lpt.address
 
-    # deploy l2 rewards-only gauge
-    print(f"--- Deploying L2 gauge implementation contract to {connected_network} ---")
-    gauge_implementation = RewardsOnlyGauge.deploy(
-        {"from": DEPLOY_ACCT},
-    )
-    output_data["l2Gauge"]["gaugeImplementation"] = gauge_implementation.address
+    # # deploy l2 rewards-only gauge
+    # print(f"--- Deploying L2 gauge implementation contract to {connected_network} ---")
+    # gauge_implementation = RewardsOnlyGauge.deploy(
+    #     {"from": DEPLOY_ACCT},
+    # )
+    # output_data["l2Gauge"]["gaugeImplementation"] = gauge_implementation.address
 
-    # deploy gauge proxy and initialize
-    print(f"--- Deploying L2 gauge proxy contract to {connected_network} ---")
-    gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
-        DEPLOY_ACCT, lpt.address
-    )
-    proxy = DfxUpgradeableProxy.deploy(
-        gauge_implementation.address,
-        PROXY_ADMIN_ACCT,
-        gauge_initializer_calldata,
-        {"from": DEPLOY_ACCT},
-        publish_source=True,
-    )
+    # # deploy gauge proxy and initialize
+    # print(f"--- Deploying L2 gauge proxy contract to {connected_network} ---")
+    # gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
+    #     DEPLOY_ACCT, lpt.address
+    # )
+    # proxy = DfxUpgradeableProxy.deploy(
+    #     gauge_implementation.address,
+    #     PROXY_ADMIN_ACCT,
+    #     gauge_initializer_calldata,
+    #     {"from": DEPLOY_ACCT},
+    #     publish_source=True,
+    # )
+    # gauge_proxy = Contract.from_abi("RewardsOnlyGauge", proxy, RewardsOnlyGauge.abi)
+    # output_data["l2Gauge"]["gaugeProxy"] = gauge_proxy.address
+
+    # # deploy childchainstreamer
+    # streamer = ChildChainStreamer.deploy(
+    #     DEPLOY_ACCT,
+    #     gauge_proxy.address,
+    #     DFX_OFT,
+    #     {"from": DEPLOY_ACCT},
+    # )
+    # output_data["l2Gauge"]["streamer"] = streamer.address
+
+    proxy = DfxUpgradeableProxy.at("0x8A8fe189B4722aE0c252565a6F72C7f3D7F7f903")
     gauge_proxy = Contract.from_abi("RewardsOnlyGauge", proxy, RewardsOnlyGauge.abi)
-    output_data["l2Gauge"]["gaugeProxy"] = gauge_proxy.address
-
-    # deploy childchainstreamer
-    streamer = ChildChainStreamer.deploy(
-        DEPLOY_ACCT,
-        gauge_proxy.address,
-        DFX_OFT,
-        {"from": DEPLOY_ACCT},
-    )
-    output_data["l2Gauge"]["streamer"] = streamer.address
+    streamer = ChildChainStreamer.at("0x8Fac0dE6e6F6E7714074f515E6dDb263B0fE12E0")
 
     # deploy childchainreceiver
     receiver = ChildChainReceiver.deploy(
@@ -140,9 +144,9 @@ def main():
         )
     )
 
-    # lpt, gauge_proxy, streamer, receiver = deploy()
-    # configure(receiver, streamer, gauge_proxy)
+    lpt, gauge_proxy, streamer, receiver = deploy()
+    configure(receiver, streamer, gauge_proxy)
 
-    lpt, gauge_proxy, streamer, receiver = load()
-    receiver.whitelistSourceChain(SEPOLIA_CHAIN_SELECTOR, {"from": DEPLOY_ACCT})
-    receiver.whitelistSender(CCIP_ROUTER, {"from": DEPLOY_ACCT})
+    # lpt, gauge_proxy, streamer, receiver = load()
+    # receiver.whitelistSourceChain(SEPOLIA_CHAIN_SELECTOR, {"from": DEPLOY_ACCT})
+    # receiver.whitelistSender(CCIP_ROUTER, {"from": DEPLOY_ACCT})

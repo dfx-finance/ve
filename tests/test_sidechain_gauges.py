@@ -59,6 +59,9 @@ def test_l2_gauge_timetravel(
     root_gauge_L1,
     multisig_0,
 ):
+    # provide root gauge with gas money
+    multisig_0.transfer(root_gauge_L1.address, 5e17)
+
     ##
     ## epoch 0: do nothing
     ##
@@ -85,7 +88,7 @@ def test_l2_gauge_timetravel(
         gauge_controller, root_gauge_L1, multisig_0, add_placeholder=True
     )
 
-    # set l2 gauge as a delegate for automating distribution
+    # set l2 gauge as a delegate for automating distribution by calling RootGauge notifyReward function
     distributor.setDelegateGauge(
         root_gauge_L1,
         root_gauge_L1,
@@ -98,6 +101,7 @@ def test_l2_gauge_timetravel(
         [*three_gauges_L1, root_gauge_L1],
         {"from": multisig_0},
     )
+
     print(f"Epoch {distributor.miningEpoch()}: {DFX.balanceOf(distributor) / 1e18} DFX")
     for gauge in [*three_gauges_L1, root_gauge_L1]:
         print(f"{gauge.symbol()}: {DFX.balanceOf(gauge) / 1e18}")
@@ -116,7 +120,10 @@ def test_l2_gauge_timetravel(
 
 
 def test_cctp_root_gauge_send(DFX, root_gauge_L1, deploy_account, multisig_0):
-    root_gauge_L1.update_distributor(deploy_account, {"from": multisig_0})
+    root_gauge_L1.updateDistributor(deploy_account, {"from": multisig_0})
+
+    # provide gauge with gas money
+    multisig_0.transfer(root_gauge_L1.address, 5e17)
 
     reward_amount = 1e23
     DFX.mint(

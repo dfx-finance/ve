@@ -256,7 +256,7 @@ def gauge_L1(
 
 def _deploy_root_gauge_L1(
     DFX,
-    RootGaugeCctp,
+    RootGaugeCctpImplementation,
     DfxUpgradeableProxy,
     distributor,
     ccip_router,
@@ -265,7 +265,7 @@ def _deploy_root_gauge_L1(
     multisig_1,
 ):
     # deploy gauge logic
-    gauge_implementation = RootGaugeCctp.deploy(
+    gauge_implementation = RootGaugeCctpImplementation.deploy(
         {"from": deploy_account},
     )
 
@@ -288,7 +288,9 @@ def _deploy_root_gauge_L1(
     )
 
     # load gauge interface on proxy for non-admin users
-    gauge_proxy = Contract.from_abi("RootGaugeCctp", proxy, RootGaugeCctp.abi)
+    gauge_proxy = Contract.from_abi(
+        "RootGaugeCctpImplementation", proxy, RootGaugeCctpImplementation.abi
+    )
     return gauge_proxy
 
 
@@ -321,11 +323,11 @@ def _deploy_child_gauge_L2(
     return gauge_proxy
 
 
-# Deploys a RootGaugeCctp on Layer 1, sends to a L2 RewardsOnlyGauge via ChildChainStreamer
+# Deploys a RootGaugeCctpImplementation on Layer 1, sends to a L2 RewardsOnlyGauge via ChildChainStreamer
 @pytest.fixture(scope="function")
 def root_gauge_L1(
     DFX,
-    RootGaugeCctp,
+    RootGaugeCctpImplementation,
     DfxUpgradeableProxy,
     distributor,
     mock_ccip_router,
@@ -335,7 +337,7 @@ def root_gauge_L1(
 ):
     root_gauge = _deploy_root_gauge_L1(
         DFX,
-        RootGaugeCctp,
+        RootGaugeCctpImplementation,
         DfxUpgradeableProxy,
         distributor,
         mock_ccip_router,
@@ -352,7 +354,7 @@ def lpt_L2(ERC20LP, deploy_account):
     return _deploy_lpt(ERC20LP, "L2 BTC/ETH LPT", "l2-cadc-usdc-lpt", deploy_account)
 
 
-# Deploys a RewardsOnlyGauge contract on Layer 2, receives from a L1 RootGaugeCctp via ChildChainStreamer
+# Deploys a RewardsOnlyGauge contract on Layer 2, receives from a L1 RootGaugeCctpImplementation via ChildChainStreamer
 @pytest.fixture(scope="function")
 def child_gauge_L2(
     RewardsOnlyGauge,

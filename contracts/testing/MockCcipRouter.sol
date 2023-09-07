@@ -20,14 +20,14 @@ struct EVM2AnyMessage {
 contract MockCcipRouter {
     constructor() {}
 
-    function getFee(uint256 chainSelector, EVM2AnyMessage calldata message) public pure returns (uint256) {
-        chainSelector;
+    function getFee(uint64 destinationChainSelector, EVM2AnyMessage memory message) public pure returns (uint256 fee) {
+        destinationChainSelector;
         message;
-        return 1e18;
+        return 1e16;
     }
 
-    function ccipSend(uint256 chainSelector, EVM2AnyMessage calldata message) public payable {
-        if (message.feeToken == address(0)) {
+    function ccipSend(uint64 chainSelector, EVM2AnyMessage memory message) public payable returns (bytes32) {
+        if (message.feeToken != address(0)) {
             uint256 feeAmount = getFee(chainSelector, message);
             IERC20(message.feeToken).transferFrom(msg.sender, address(this), feeAmount);
         }
@@ -37,6 +37,7 @@ contract MockCcipRouter {
             IERC20 token = IERC20(message.tokenAmounts[i].token);
             token.transferFrom(msg.sender, address(this), message.tokenAmounts[i].amount);
         }
+        return "";
     }
 
     // Helper to send tokens held by this contract to another address

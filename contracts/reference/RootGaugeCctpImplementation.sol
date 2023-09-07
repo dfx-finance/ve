@@ -136,7 +136,7 @@ contract RootGaugeCctpImplementation is AccessControlUpgradeable {
             if (IERC20(feeToken).allowance(address(this), address(router)) < fees) {
                 IERC20(feeToken).approve(address(router), type(uint256).max);
             }
-            messageId = router.ccipSend(destinationChain, message);
+            //     messageId = router.ccipSend(destinationChain, message);
         } else {
             if (fees > address(this).balance) {
                 revert NotEnoughBalance(address(this).balance, fees);
@@ -149,12 +149,12 @@ contract RootGaugeCctpImplementation is AccessControlUpgradeable {
         return messageId;
     }
 
-    function notifyReward(uint256 _amount) external onlyDistributor returns (bytes32) {
-        bytes32 messageId = _notifyReward(_amount);
-        return messageId;
-    }
+    // function notifyReward(uint256 _amount) external returns (bytes32) {
+    //     bytes32 messageId = _notifyReward(_amount);
+    //     return messageId;
+    // }
 
-    function notifyReward(address, uint256 _amount) external onlyDistributor returns (bytes32) {
+    function notifyReward(address, uint256 _amount) external returns (bytes32) {
         bytes32 messageId = _notifyReward(_amount);
         return messageId;
     }
