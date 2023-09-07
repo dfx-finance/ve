@@ -42,7 +42,6 @@ contract RootGaugeCctp is AccessControl {
     uint256 constant WEEK = 604800;
 
     IRouterClient router;
-    address public controller;
     address public distributor;
     uint64 public destinationChain;
     address public destination;

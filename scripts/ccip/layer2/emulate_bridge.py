@@ -16,17 +16,18 @@ SEPOLIA_CHAIN_SELECTOR = 16015286601757825753
 
 
 def main():
-    # interface.IERC20(DFX_OFT).transfer(
-    #     CHILD_CHAIN_RECEIVER,
-    #     5e16,
-    #     {"from": DEPLOY_ACCT},
-    # )
-    # DEPLOY_ACCT.transfer(CHILD_CHAIN_RECEIVER, 1e17)
+    reward_amount = 5e16
+    interface.IERC20(DFX_OFT).transfer(
+        CHILD_CHAIN_RECEIVER,
+        reward_amount,
+        {"from": DEPLOY_ACCT},
+    )
+    DEPLOY_ACCT.transfer(CHILD_CHAIN_RECEIVER, 1e17)
 
     receiver = ChildChainReceiver.at(CHILD_CHAIN_RECEIVER)
-    msg = receiver.testBuildCcipMessage(receiver, DFX_OFT, 5e16, ZERO_ADDRESS)
-    print(msg)
+    # msg = receiver.testBuildCcipMessage(receiver, DFX_OFT, 5e16, ZERO_ADDRESS)
+    # print(msg)
     # print(receiver.streamer())
     # receiver.testCcipReceive(msg, {"from": DEPLOY_ACCT})
 
-    # receiver.testNotify(DFX_OFT, 1e17, {"from": DEPLOY_ACCT})
+    receiver.testNotify(DFX_OFT, reward_amount, {"from": DEPLOY_ACCT})

@@ -6,7 +6,7 @@ from brownie import RootGaugeCctp
 
 from utils.constants_addresses import Mumbai
 from utils.network import get_network_addresses, network_info
-from .utils_ccip import DEPLOY_ACCT, MUMBAI_CHAIN_SELECTOR
+from ..utils_ccip import DEPLOY_ACCT, MUMBAI_CHAIN_SELECTOR
 
 addresses = get_network_addresses()
 connected_network, is_local_network = network_info()

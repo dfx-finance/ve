@@ -2,7 +2,7 @@
 from brownie import RootGaugeCctp, Contract, interface, web3
 
 from utils.network import get_network_addresses
-from .utils_ccip import DEPLOY_ACCT
+from ..utils_ccip import DEPLOY_ACCT
 
 addresses = get_network_addresses()
 

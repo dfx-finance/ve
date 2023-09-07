@@ -10,7 +10,7 @@ from brownie import (
 )
 
 from utils.network import get_network_addresses, network_info
-from .utils_ccip import DEPLOY_ACCT, SEPOLIA_CHAIN_SELECTOR
+from ..utils_ccip import DEPLOY_ACCT, SEPOLIA_CHAIN_SELECTOR
 
 addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
@@ -49,7 +49,7 @@ def load():
 
 
 def check_setup(lpt, gauge_proxy, streamer, receiver):
-    assert_eq(lpt.address, addresses.DFX_ETH_BTC_LP, "LPT address not match")
+    assert_eq(lpt.address, addresses.DFX_ETH_BTC_LP, "LPT does not match")
     assert_eq(
         gauge_proxy.lp_token(),
         addresses.DFX_ETH_BTC_LP,
