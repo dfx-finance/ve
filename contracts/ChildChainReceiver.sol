@@ -3,7 +3,7 @@ pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
-import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
+import {CCIPReceiver} from "./CCIPReceiver.sol";
 
 import {IChildChainStreamer} from "../interfaces/IChildChainStreamer.sol";
 
@@ -34,7 +34,7 @@ contract ChildChainReceiver is CCIPReceiver {
     address private lastReceivedTokenAddress; // Store the last received token address.
     uint256 private lastReceivedTokenAmount; // Store the last received amount.
 
-    address public admin;
+    address public owner;
 
     // Mapping to keep track of whitelisted source chains.
     mapping(uint64 => bool) public whitelistedSourceChains;
@@ -42,9 +42,9 @@ contract ChildChainReceiver is CCIPReceiver {
     // Mapping to keep track of whitelisted senders.
     mapping(address => bool) public whitelistedSenders;
 
-    /// @dev Modifier that checks whether the msg.sender is admin
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "Not admin");
+    /// @dev Modifier that checks whether the msg.sender is owner
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
         _;
     }
 
@@ -67,15 +67,15 @@ contract ChildChainReceiver is CCIPReceiver {
     /// @notice Constructor initializes the contract with the router address.
     /// @param _router The address of the router contract.
     /// @param _streamer The address of associated ChildChainStreamer contract.
-    /// @param _admin The address of the contract admin.
-    constructor(address _router, address _streamer, address _admin) CCIPReceiver(_router) {
+    /// @param _owner The address of the contract owner.
+    constructor(address _router, address _streamer, address _owner) CCIPReceiver(_router) {
         streamer = _streamer;
-        admin = _admin;
+        owner = _owner;
     }
 
     /* Parameters */
-    function updateAdmin(address _newAdmin) external onlyAdmin {
-        admin = _newAdmin;
+    function updateOwner(address _newOwner) external onlyOwner {
+        owner = _newOwner;
     }
 
     /**
@@ -121,16 +121,44 @@ contract ChildChainReceiver is CCIPReceiver {
     }
 
     /* Admin */
+    /// @dev Whitelists a chain for transactions.
+    /// @notice This function can only be called by the owner.
+    /// @param _sourceChainSelector The selector of the source chain to be whitelisted.
+    function whitelistSourceChain(uint64 _sourceChainSelector) external onlyOwner {
+        whitelistedSourceChains[_sourceChainSelector] = true;
+    }
+
+    /// @dev Denylists a chain for transactions.
+    /// @notice This function can only be called by the owner.
+    /// @param _sourceChainSelector The selector of the source chain to be denylisted.
+    function denylistSourceChain(uint64 _sourceChainSelector) external onlyOwner {
+        whitelistedSourceChains[_sourceChainSelector] = false;
+    }
+
+    /// @dev Whitelists a sender.
+    /// @notice This function can only be called by the owner.
+    /// @param _sender The address of the sender.
+    function whitelistSender(address _sender) external onlyOwner {
+        whitelistedSenders[_sender] = true;
+    }
+
+    /// @dev Denylists a sender.
+    /// @notice This function can only be called by the owner.
+    /// @param _sender The address of the sender.
+    function denySender(address _sender) external onlyOwner {
+        whitelistedSenders[_sender] = false;
+    }
+
     /// @notice Emergency withdraw
     /// @param _token Address of token to withdraw
-    function emergencyWithdraw(address _beneficiary, address _token, uint256 _amount) external onlyAdmin {
+    function emergencyWithdraw(address _beneficiary, address _token, uint256 _amount) external onlyOwner {
         IERC20(_token).transfer(_beneficiary, _amount);
     }
 
     /// @notice Emergency withdraw native token
     /// @param _beneficiary Receiver of emergeny withdraw
     /// @param _amount Amount to withdraw
-    function emergencyWithdrawNative(address _beneficiary, uint256 _amount) external onlyAdmin {
+    function emergencyWithdrawNative(address _beneficiary, uint256 _amount) external onlyOwner {
         (bool sent,) = _beneficiary.call{value: _amount}("");
         require(sent, "Failed to send Ether");
     }

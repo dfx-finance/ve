@@ -1,10 +1,17 @@
 #!/usr/bin/env python
-from brownie import DfxUpgradeableProxy, RootGaugeCctp
+from brownie import (
+    ChildChainReceiver,
+    DfxUpgradeableProxy,
+    RootGaugeCctp,
+)
 
 
 def main():
-    # proxy = DfxUpgradeableProxy.at("0x599A1c5C41b0133fc97EC4911FcC17667128311B")
-    # DfxUpgradeableProxy.publish_source(proxy)
+    # receiver = ChildChainReceiver.at("0x2ac83d175bb12A11714319d6827b7C6D597e6504")
+    # ChildChainReceiver.publish_source(receiver)
 
-    gauge = RootGaugeCctp.at("0x5e0b8BC60CE0b6Cf5FdCD4bED7854B584B81651d")
-    RootGaugeCctp.publish_source(gauge)
+    # ChildChainStreamer: Vyper
+
+    # proxy = DfxUpgradeableProxy.at("0xB69f0Ae30b33e536EC435810241fd56FB49cEB8f")
+    # DfxUpgradeableProxy.publish_source(proxy)
+    pass
