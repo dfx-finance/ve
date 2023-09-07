@@ -25,8 +25,8 @@ def main():
 
     receiver = ChildChainReceiver.at(CHILD_CHAIN_RECEIVER)
     msg = receiver.testBuildCcipMessage(receiver, DFX_OFT, 5e16, ZERO_ADDRESS)
-    receiver.testCcipReceive(msg, {"from": DEPLOY_ACCT})
-    # print(msg)
+    print(msg)
     # print(receiver.streamer())
+    # receiver.testCcipReceive(msg, {"from": DEPLOY_ACCT})
 
     # receiver.testNotify(DFX_OFT, 1e17, {"from": DEPLOY_ACCT})

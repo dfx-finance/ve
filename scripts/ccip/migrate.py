@@ -7,7 +7,7 @@ from .utils_ccip import DEPLOY_ACCT
 addresses = get_network_addresses()
 
 PREV_GAUGE = ""
-NEW_GAUGE = addresses.MUMBAI_ETH_BTC_ROOT_GAUGE
+NEW_GAUGE = addresses.DFX_ETH_BTC_GAUGE
 
 
 # Send ccDFX and contract-owned ETH to new address

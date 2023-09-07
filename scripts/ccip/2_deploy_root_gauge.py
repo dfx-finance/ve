@@ -4,6 +4,7 @@ import time
 
 from brownie import RootGaugeCctp
 
+from utils.constants_addresses import Mumbai
 from utils.network import get_network_addresses, network_info
 from .utils_ccip import DEPLOY_ACCT, MUMBAI_CHAIN_SELECTOR
 
@@ -36,7 +37,7 @@ def deploy():
         DEPLOY_ACCT,  # distributor address
         addresses.CCIP_ROUTER,  # ccip router address
         MUMBAI_CHAIN_SELECTOR,  # target chain selector
-        addresses.MUMBAI_ETH_BTC_CHILD_CHAIN_RECEIVER,  # child chain receiver address (l2 address)
+        Mumbai.CCIP_RECEIVER,  # child chain receiver address (l2 address)
         "0x0000000000000000000000000000000000000000",  # fee token address
         DEPLOY_ACCT,
         {"from": DEPLOY_ACCT},

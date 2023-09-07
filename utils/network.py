@@ -17,10 +17,10 @@ def get_network_addresses():
 
     if connected_network in ["ethereum", "mainnet"]:
         return Ethereum
-    if connected_network in ["sepolia", "sepolia-dev"]:
-        return Sepolia
     if connected_network in ["polygon-main"]:
         return Polygon
+    if connected_network in ["sepolia", "sepolia-dev"]:
+        return Sepolia
     if connected_network in ["polygon-test"]:
         return Mumbai
     if connected_network in ["hardhat", "development"]:
