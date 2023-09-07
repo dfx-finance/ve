@@ -13,7 +13,7 @@ from brownie import (
 )
 
 from utils.network import get_network_addresses, network_info
-from .utils_ccip import DEPLOY_ACCT, PROXY_ADMIN_ACCT
+from .utils_ccip import DEPLOY_ACCT, PROXY_ADMIN_ACCT, SEPOLIA_CHAIN_SELECTOR
 
 addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
@@ -35,23 +35,21 @@ def deploy():
     # name = "DFX Fake LPT"
     # symbol = "dfx-l2-lpt-fake"
     # lpt = ERC20LP.deploy(name, symbol, 18, 1e9, {"from": DEPLOY_ACCT})
-    lpt = ERC20LP.at("0xF15BBC3b5D2DF49b88967d2b574eF3d289a0138f")
+    lpt = ERC20LP.at(addresses.DFX_ETH_BTC_LP)
     output_data["l2Gauge"]["lpt"] = lpt.address
 
     # deploy l2 rewards-only gauge
     print(f"--- Deploying L2 gauge implementation contract to {connected_network} ---")
-    gauge_implementation = RewardsOnlyGauge.deploy(
+    gauge = RewardsOnlyGauge.deploy(
         {"from": DEPLOY_ACCT},
     )
-    output_data["l2Gauge"]["gaugeImplementation"] = gauge_implementation.address
+    output_data["l2Gauge"]["gaugeImplementation"] = gauge.address
 
     # deploy gauge proxy and initialize
     print(f"--- Deploying L2 gauge proxy contract to {connected_network} ---")
-    gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
-        DEPLOY_ACCT, lpt.address
-    )
+    gauge_initializer_calldata = gauge.initialize.encode_input(DEPLOY_ACCT, lpt)
     proxy = DfxUpgradeableProxy.deploy(
-        gauge_implementation.address,
+        gauge.address,
         PROXY_ADMIN_ACCT,
         gauge_initializer_calldata,
         {"from": DEPLOY_ACCT},
@@ -63,15 +61,11 @@ def deploy():
     # deploy childchainstreamer
     streamer = ChildChainStreamer.deploy(
         DEPLOY_ACCT,
-        gauge_proxy.address,
+        gauge_proxy,
         addresses.CCIP_DFX,
         {"from": DEPLOY_ACCT},
     )
     output_data["l2Gauge"]["streamer"] = streamer.address
-
-    proxy = DfxUpgradeableProxy.at("0x8A8fe189B4722aE0c252565a6F72C7f3D7F7f903")
-    gauge_proxy = Contract.from_abi("RewardsOnlyGauge", proxy, RewardsOnlyGauge.abi)
-    streamer = ChildChainStreamer.at("0x8Fac0dE6e6F6E7714074f515E6dDb263B0fE12E0")
 
     # deploy childchainreceiver
     receiver = ChildChainReceiver.deploy(
@@ -98,7 +92,7 @@ def configure(receiver, streamer, gauge):
     # DEV: This will be the address of the CCTP contract which is calling "notify_reward_amount"
     # on ChildChainStreamer
     streamer.set_reward_distributor(
-        addresses.DFX_CCIP, receiver.address, {"from": DEPLOY_ACCT}
+        addresses.CCIP_RECEIVER, receiver.address, {"from": DEPLOY_ACCT}
     )
 
     # set rewards contract on gauge
@@ -107,7 +101,7 @@ def configure(receiver, streamer, gauge):
         streamer,
         streamer.signatures["get_reward"],
         [
-            addresses.DFX_CCIP,
+            addresses.CCIP_DFX,
             ZERO_ADDRESS,
             ZERO_ADDRESS,
             ZERO_ADDRESS,
@@ -119,21 +113,39 @@ def configure(receiver, streamer, gauge):
         {"from": DEPLOY_ACCT},
     )
 
-    # # whitelist source chain and address on receiver
-    # receiver.whitelistSourceChain(SEPOLIA_CHAIN_SELECTOR, {"from": DEPLOY_ACCT})
-    # receiver.whitelistSender(CCIP_ROUTER, {"from": DEPLOY_ACCT})
+    # whitelist source chain and address on receiver
+    receiver.whitelistSourceChain(SEPOLIA_CHAIN_SELECTOR, {"from": DEPLOY_ACCT})
+    receiver.whitelistSender(addresses.CCIP_ROUTER, {"from": DEPLOY_ACCT})
 
 
 ## DEBUG
 def load():
-    lpt = ERC20LP.at("0xF15BBC3b5D2DF49b88967d2b574eF3d289a0138f")
-
-    proxy = DfxUpgradeableProxy.at("0x8A8fe189B4722aE0c252565a6F72C7f3D7F7f903")
+    lpt = ERC20LP.at(addresses.DFX_ETH_BTC_LP)
+    proxy = DfxUpgradeableProxy.at(addresses.DFX_ETH_BTC_GAUGE)
     gauge_proxy = Contract.from_abi("RewardsOnlyGauge", proxy, RewardsOnlyGauge.abi)
-    streamer = ChildChainStreamer.at("0x8Fac0dE6e6F6E7714074f515E6dDb263B0fE12E0")
-    receiver = ChildChainReceiver.at("0xa47562EBba9f246039d5f032d0DE56a97aA2e428")
-
+    streamer = ChildChainStreamer.at(addresses.CCIP_STREAMER)
+    receiver = ChildChainReceiver.at(addresses.CCIP_RECEIVER)
     return lpt, gauge_proxy, streamer, receiver
+
+
+def check_setup(lpt, gauge_proxy, streamer, receiver):
+    assert lpt.address == addresses.DFX_ETH_BTC_LP
+    assert gauge_proxy.lp_token() == addresses.DFX_ETH_BTC_LP
+    assert gauge_proxy.reward_tokens(0) == addresses.CCIP_DFX
+    assert streamer.reward_count() == 1
+    assert streamer.reward_tokens(0) == addresses.CCIP_DFX
+    assert (
+        streamer.reward_data(addresses.CCIP_DFX)[0] == addresses.CCIP_RECEIVER
+    )  # reward token distributor
+    assert (
+        streamer.reward_receiver() == addresses.DFX_ETH_BTC_GAUGE
+    )  # receiver here indicates gauge which will receive from streamer
+    assert receiver.owner() == DEPLOY_ACCT
+    assert receiver.streamer() == streamer.address
+    assert receiver.owner() == DEPLOY_ACCT
+    assert receiver.whitelistedSourceChains(SEPOLIA_CHAIN_SELECTOR) == True
+    assert receiver.whitelistedSenders(addresses.CCIP_ROUTER) == True
+    print("All tests passed.")
 
 
 def main():
@@ -147,10 +159,10 @@ def main():
 
     # Deploy all contracts
     lpt, gauge_proxy, streamer, receiver = deploy()
-    # lpt, gauge_proxy, streamer, receiver = load() # debug
+    # lpt, gauge_proxy, streamer, receiver = load()  # debug
 
-    # # Configure ChildChainStreamer distributor address (router), gauge
-    # # reward token address (ccDFX on L2), and whitelisting on ChildChainReceiver
-    # configure(receiver, streamer, gauge_proxy)
+    # Configure ChildChainStreamer distributor address (router), gauge
+    # reward token address (ccDFX on L2), and whitelisting on ChildChainReceiver
+    configure(receiver, streamer, gauge_proxy)
 
-    # lpt, gauge_proxy, streamer, receiver = load()
+    check_setup(lpt, gauge_proxy, streamer, receiver)
