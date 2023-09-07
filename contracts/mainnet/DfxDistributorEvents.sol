@@ -7,10 +7,10 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelinUpgradeable/contracts/access/AccessControlUpgradeable.sol";
 import "@openzeppelinUpgradeable/contracts/security/ReentrancyGuardUpgradeable.sol";
 
-import "../interfaces/IGaugeController.sol";
-import "../interfaces/ILiquidityGauge.sol";
-import "../interfaces/IDfxMiddlemanGauge.sol";
-import "../interfaces/IStakingRewards.sol";
+import "../../interfaces/IGaugeController.sol";
+import "../../interfaces/ILiquidityGauge.sol";
+import "../../interfaces/IDfxMiddlemanGauge.sol";
+import "../../interfaces/IStakingRewards.sol";
 
 // import "../external/AccessControlUpgradeable.sol";
 

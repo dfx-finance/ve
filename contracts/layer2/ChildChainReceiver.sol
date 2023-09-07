@@ -3,9 +3,9 @@ pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
-import {CCIPReceiver} from "./CCIPReceiver.sol";
+import {CCIPReceiver} from "../vendor/chainlink/CCIPReceiver.sol";
 
-import {IChildChainStreamer} from "../interfaces/IChildChainStreamer.sol";
+import {IChildChainStreamer} from "../../interfaces/IChildChainStreamer.sol";
 
 contract ChildChainReceiver is CCIPReceiver {
     // Custom errors to provide more descriptive revert messages.
@@ -168,6 +168,11 @@ contract ChildChainReceiver is CCIPReceiver {
     }
 
     /* Admin */
+    /// @notice Fallback function to allow the contract to receive Ether.
+    /// @dev This function has no function body, making it a default function for receiving Ether.
+    /// It is automatically called when Ether is transferred to the contract without any data.
+    receive() external payable {}
+
     /// @dev Whitelists a chain for transactions.
     /// @notice This function can only be called by the owner.
     /// @param _sourceChainSelector The selector of the source chain to be whitelisted.
