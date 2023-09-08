@@ -105,20 +105,14 @@ contract ChildChainReceiver is CCIPReceiver {
         IERC20(rewardToken).transfer(streamer, rewardAmount);
         IChildChainStreamer(streamer).notify_reward_amount(rewardToken);
 
-        emit MessageReceived(
-            message.messageId,
-            message.sourceChainSelector, // fetch the source chain identifier (aka selector)
-            abi.decode(message.sender, (address)), // abi-decoding of the sender address,
-            abi.decode(message.data, (string)),
-            rewardToken,
-            rewardAmount
-        );
-    }
-
-    /* Tests */
-    function testNotify(address rewardToken, uint256 rewardAmount) public {
-        IERC20(rewardToken).transfer(streamer, rewardAmount);
-        IChildChainStreamer(streamer).notify_reward_amount(rewardToken);
+        // emit MessageReceived(
+        //     message.messageId,
+        //     message.sourceChainSelector, // fetch the source chain identifier (aka selector)
+        //     abi.decode(message.sender, (address)), // abi-decoding of the sender address,
+        //     abi.decode(message.data, (string)),
+        //     rewardToken,
+        //     rewardAmount
+        // );
     }
 
     /* Admin */

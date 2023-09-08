@@ -12,5 +12,5 @@ def main():
     gauge = Contract.from_abi(
         "RootGaugeCctp", addresses.MUMBAI_ETH_BTC_ROOT_GAUGE, RootGaugeCctp.abi
     )
-    gauge.updateDestination(Mumbai.CCIP_RECEIVER, {"from": DEPLOY_ACCT})
+    gauge.setDestination(Mumbai.CCIP_RECEIVER, {"from": DEPLOY_ACCT})
     print(f"Root gauge receiver (L2) updated: {Mumbai.CCIP_RECEIVER}")

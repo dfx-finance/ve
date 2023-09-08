@@ -52,8 +52,7 @@ def main():
     streamer = load()
     receiver = deploy(streamer)
 
-    # Configure ChildChainStreamer distributor address (router), gauge
-    # reward token address (ccDFX on L2), and whitelisting on ChildChainReceiver
+    # Configure ChildChainStreamer distributor address (router) and whitelisting on ChildChainReceiver
     configure(receiver, streamer)
 
     print(f"Streamer: {streamer.address}")
