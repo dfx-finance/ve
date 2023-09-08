@@ -47,6 +47,7 @@ contract RootGaugeCctp is AccessControl {
     address public destination;
     address public DFX;
     address public feeToken;
+    uint256 public l2Fee = 200_000;
 
     address public admin;
 
@@ -101,20 +102,19 @@ contract RootGaugeCctp is AccessControl {
         admin = _newAdmin;
     }
 
-    function updateDestination(address _newDestination) external onlyAdmin {
+    function setDestination(address _newDestination) external onlyAdmin {
         destination = _newDestination;
     }
 
-    function updateDistributor(address _newDistributor) external onlyAdmin {
+    function setDistributor(address _newDistributor) external onlyAdmin {
         distributor = _newDistributor;
     }
 
-    /* Gauge actions */
-    function testFee(uint256 _amount) external view returns (uint256) {
-        Client.EVM2AnyMessage memory message = _buildCcipMessage(destination, DFX, _amount, feeToken);
-        return router.getFee(destinationChain, message);
+    function setL2Fee(uint256 _newFee) external onlyAdmin {
+        l2Fee = _newFee;
     }
 
+    /* Gauge actions */
     function _notifyReward(uint256 _amount) internal returns (bytes32) {
         startEpochTime = block.timestamp;
 
@@ -170,7 +170,7 @@ contract RootGaugeCctp is AccessControl {
     /// @return Client.EVM2AnyMessage Returns an EVM2AnyMessage struct which contains information for sending a CCIP message.
     function _buildCcipMessage(address _receiver, address _token, uint256 _amount, address _feeTokenAddress)
         internal
-        pure
+        view
         returns (Client.EVM2AnyMessage memory)
     {
         // Set the token amounts
@@ -184,7 +184,7 @@ contract RootGaugeCctp is AccessControl {
             tokenAmounts: tokenAmounts, // The amount and type of token being transferred
             extraArgs: Client._argsToBytes(
                 // Additional arguments, setting gas limit to 0 as we are not sending any data and non-strict sequencing mode
-                Client.EVMExtraArgsV1({gasLimit: 0, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: l2Fee, strict: false})
                 ),
             // Set the feeToken to a feeTokenAddress, indicating specific asset will be used for fees
             feeToken: _feeTokenAddress

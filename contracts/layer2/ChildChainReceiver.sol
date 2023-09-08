@@ -116,52 +116,6 @@ contract ChildChainReceiver is CCIPReceiver {
     }
 
     /* Tests */
-    function testBuildCcipMessage(address _receiver, address _token, uint256 _amount, address _feeTokenAddress)
-        public
-        pure
-        returns (Client.EVM2AnyMessage memory)
-    {
-        // Set the token amounts
-        Client.EVMTokenAmount[] memory tokenAmounts = new Client.EVMTokenAmount[](1);
-        Client.EVMTokenAmount memory tokenAmount = Client.EVMTokenAmount({token: _token, amount: _amount});
-        tokenAmounts[0] = tokenAmount;
-        // Create an EVM2AnyMessage struct in memory with necessary information for sending a cross-chain message
-        Client.EVM2AnyMessage memory evm2AnyMessage = Client.EVM2AnyMessage({
-            receiver: abi.encode(_receiver), // ABI-encoded receiver address
-            data: "", // No data
-            tokenAmounts: tokenAmounts, // The amount and type of token being transferred
-            extraArgs: Client._argsToBytes(
-                // Additional arguments, setting gas limit to 0 as we are not sending any data and non-strict sequencing mode
-                Client.EVMExtraArgsV1({gasLimit: 0, strict: false})
-                ),
-            // Set the feeToken to a feeTokenAddress, indicating specific asset will be used for fees
-            feeToken: _feeTokenAddress
-        });
-        return evm2AnyMessage;
-    }
-
-    /// handle a received message
-    function testCcipReceive(Client.Any2EVMMessage memory message) public {
-        lastReceivedMessageId = message.messageId; // fetch the messageId
-        // Expect one token to be transferred at once, but you can transfer several tokens.
-        address rewardToken = message.destTokenAmounts[0].token;
-        uint256 rewardAmount = message.destTokenAmounts[0].amount;
-        lastReceivedTokenAddress = rewardToken;
-        lastReceivedTokenAmount = rewardAmount;
-
-        IERC20(rewardToken).transfer(streamer, rewardAmount);
-        IChildChainStreamer(streamer).notify_reward_amount(rewardToken);
-
-        emit MessageReceived(
-            message.messageId,
-            message.sourceChainSelector, // fetch the source chain identifier (aka selector)
-            abi.decode(message.sender, (address)), // abi-decoding of the sender address,
-            abi.decode(message.data, (string)),
-            rewardToken,
-            rewardAmount
-        );
-    }
-
     function testNotify(address rewardToken, uint256 rewardAmount) public {
         IERC20(rewardToken).transfer(streamer, rewardAmount);
         IChildChainStreamer(streamer).notify_reward_amount(rewardToken);

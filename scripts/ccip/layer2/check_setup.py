@@ -48,7 +48,7 @@ def load():
     return lpt, gauge_proxy, streamer, receiver
 
 
-def check_setup(lpt, gauge_proxy, streamer, receiver):
+def check_setup(lpt, gauge_proxy, streamer, receiver, debugging=False):
     assert_eq(lpt.address, addresses.DFX_ETH_BTC_LP, "LPT does not match")
     assert_eq(
         gauge_proxy.lp_token(),
@@ -87,11 +87,13 @@ def check_setup(lpt, gauge_proxy, streamer, receiver):
         True,
         "Sender not whitelisted",
     )
-    assert_bal(receiver, addresses.CCIP_DFX, 0)
-    assert_bal_eth(receiver, 0)
+    # DEBUG: provide reward token and gas for manually calling ccipReceive functions
+    if debugging:
+        assert_bal(receiver, addresses.CCIP_DFX, 0)
+        assert_bal_eth(receiver, 0)
     print("All tests passed.")
 
 
 def main():
     lpt, gauge_proxy, streamer, receiver = load()  # debug
-    check_setup(lpt, gauge_proxy, streamer, receiver)
+    check_setup(lpt, gauge_proxy, streamer, receiver, debugging=False)

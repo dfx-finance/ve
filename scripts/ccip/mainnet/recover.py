@@ -6,12 +6,12 @@ from ..utils_ccip import DEPLOY_ACCT
 
 addresses = get_network_addresses()
 
-PREV_GAUGE = ""
-NEW_GAUGE = addresses.DFX_ETH_BTC_GAUGE
+PREV_GAUGE = "0x6A7DfDA5ea407E31f753279FaEEd1546189F185E"
+NEW_GAUGE = addresses.MUMBAI_ETH_BTC_ROOT_GAUGE
 
 
 # Send ccDFX and contract-owned ETH to new address
-def migrate_assets():
+def recover():
     prev_gauge = Contract.from_abi("RootGaugeCctp", PREV_GAUGE, RootGaugeCctp.abi)
     # transfer ccDFX
     dfx_bal = interface.IERC20(addresses.CCIP_DFX).balanceOf(PREV_GAUGE)
@@ -24,4 +24,4 @@ def migrate_assets():
 
 
 def main():
-    migrate_assets()
+    recover()

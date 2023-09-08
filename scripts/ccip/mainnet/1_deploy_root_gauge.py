@@ -33,7 +33,7 @@ def deploy():
     print(f"--- Deploying Root Gauge CCTP contract to {connected_network} ---")
     gauge = RootGaugeCctp.deploy(
         GAUGE_NAME,
-        addresses.DFX_CCIP,
+        addresses.CCIP_DFX,
         DEPLOY_ACCT,  # distributor address
         addresses.CCIP_ROUTER,  # ccip router address
         MUMBAI_CHAIN_SELECTOR,  # target chain selector
@@ -55,4 +55,4 @@ def deploy():
 
 
 def main():
-    gauge = deploy()
+    deploy()

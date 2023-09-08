@@ -28,11 +28,11 @@ def assert_bal(addr, token, min_bal, inclusive=False):
 def assert_bal_eth(acct, min_bal, inclusive=False):
     if inclusive:
         assert (
-            acct.balance >= min_bal
+            acct.balance() >= min_bal
         ), f"Insufficient balance: {acct.balance} (must be >= {min_bal}))"
     else:
         assert (
-            acct.balance > min_bal
+            acct.balance() > min_bal
         ), f"Insufficient balance: {acct.balance} (must be > ({min_bal}))"
 
 
@@ -44,7 +44,7 @@ def load():
     return root_gauge
 
 
-def check_setup(root_gauge):
+def check_setup(root_gauge, debugging=False):
     assert_eq(
         root_gauge.address,
         addresses.MUMBAI_ETH_BTC_ROOT_GAUGE,
@@ -66,24 +66,28 @@ def check_setup(root_gauge):
         MUMBAI_CHAIN_SELECTOR,
         "Destination chain selector does not match",
     )
-    # # Deployed version
-    # assert_eq(
-    #     root_gauge.destination(),
-    #     Mumbai.CCIP_RECEIVER,
-    #     "Destination receiver does not match",
-    # )
+    # Deployed version
     assert_eq(
         root_gauge.destination(),
-        DEPLOY_ACCT,
+        Mumbai.CCIP_RECEIVER,
         "Destination receiver does not match",
-    )  # DEBUG destination set to deploy account
+    )
+    # assert_eq(
+    #     root_gauge.destination(),
+    #     DEPLOY_ACCT,
+    #     "Destination receiver does not match",
+    # )  # DEBUG destination set to deploy account
     assert_eq(root_gauge.DFX(), addresses.CCIP_DFX, "Reward token does not match")
     assert_eq(root_gauge.feeToken(), ZERO_ADDRESS, "Fee token does not match")
     assert_eq(root_gauge.admin(), DEPLOY_ACCT, "Unexpected admin address")
+
+    if debugging:
+        assert_bal(root_gauge, addresses.CCIP_DFX, 0)
+        assert_bal_eth(root_gauge, 0)
 
     print("All tests passed.")
 
 
 def main():
-    root_gauge = load()  # debug
-    check_setup(root_gauge)
+    root_gauge = load()
+    check_setup(root_gauge, debugging=False)
