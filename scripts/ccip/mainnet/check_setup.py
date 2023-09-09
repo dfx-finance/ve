@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 from brownie import (
-    RootGaugeCctp,
+    DfxUpgradeableProxy,
+    RootGaugeCcip,
     interface,
+    Contract,
     ZERO_ADDRESS,
 )
 
@@ -37,10 +39,8 @@ def assert_bal_eth(acct, min_bal, inclusive=False):
 
 
 def load():
-    # proxy = DfxUpgradeableProxy.at(addresses.MUMBAI_ETH_BTC_ROOT_GAUGE)
-    # root_gauge = Contract.from_abi("RootGaugeCctp", proxy, RootGaugeCctp.abi)
-
-    root_gauge = RootGaugeCctp.at(addresses.MUMBAI_ETH_BTC_ROOT_GAUGE)
+    proxy = DfxUpgradeableProxy.at(addresses.MUMBAI_ETH_BTC_ROOT_GAUGE)
+    root_gauge = Contract.from_abi("RootGaugeCcip", proxy, RootGaugeCcip.abi)
     return root_gauge
 
 
@@ -66,17 +66,11 @@ def check_setup(root_gauge, debugging=False):
         MUMBAI_CHAIN_SELECTOR,
         "Destination chain selector does not match",
     )
-    # Deployed version
     assert_eq(
         root_gauge.destination(),
         Mumbai.CCIP_RECEIVER,
         "Destination receiver does not match",
     )
-    # assert_eq(
-    #     root_gauge.destination(),
-    #     DEPLOY_ACCT,
-    #     "Destination receiver does not match",
-    # )  # DEBUG destination set to deploy account
     assert_eq(root_gauge.DFX(), addresses.CCIP_DFX, "Reward token does not match")
     assert_eq(root_gauge.feeToken(), ZERO_ADDRESS, "Fee token does not match")
     assert_eq(root_gauge.admin(), DEPLOY_ACCT, "Unexpected admin address")

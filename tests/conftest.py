@@ -256,7 +256,7 @@ def gauge_L1(
 
 def _deploy_root_gauge_L1(
     DFX,
-    RootGaugeCctpImplementation,
+    RootGaugeCcip,
     DfxUpgradeableProxy,
     distributor,
     ccip_router,
@@ -265,14 +265,14 @@ def _deploy_root_gauge_L1(
     multisig_1,
 ):
     # deploy gauge logic
-    gauge_implementation = RootGaugeCctpImplementation.deploy(
+    gauge_implementation = RootGaugeCcip.deploy(
+        DFX,
         {"from": deploy_account},
     )
 
     # deploy gauge proxy and initialize
     gauge_initializer_calldata = gauge_implementation.initialize.encode_input(
         "L1 ETH/BTC Root Gauge",
-        DFX,
         distributor,
         ccip_router,  # mock ccip router address
         14767482510784806043,  # mock target chain selector
@@ -288,9 +288,7 @@ def _deploy_root_gauge_L1(
     )
 
     # load gauge interface on proxy for non-admin users
-    gauge_proxy = Contract.from_abi(
-        "RootGaugeCctpImplementation", proxy, RootGaugeCctpImplementation.abi
-    )
+    gauge_proxy = Contract.from_abi("RootGaugeCcip", proxy, RootGaugeCcip.abi)
     return gauge_proxy
 
 
@@ -323,11 +321,11 @@ def _deploy_child_gauge_L2(
     return gauge_proxy
 
 
-# Deploys a RootGaugeCctpImplementation on Layer 1, sends to a L2 RewardsOnlyGauge via ChildChainStreamer
+# Deploys a RootGaugeCcip on Layer 1, sends to a L2 RewardsOnlyGauge via ChildChainStreamer
 @pytest.fixture(scope="function")
 def root_gauge_L1(
     DFX,
-    RootGaugeCctpImplementation,
+    RootGaugeCcip,
     DfxUpgradeableProxy,
     distributor,
     mock_ccip_router,
@@ -337,7 +335,7 @@ def root_gauge_L1(
 ):
     root_gauge = _deploy_root_gauge_L1(
         DFX,
-        RootGaugeCctpImplementation,
+        RootGaugeCcip,
         DfxUpgradeableProxy,
         distributor,
         mock_ccip_router,
@@ -354,7 +352,7 @@ def lpt_L2(ERC20LP, deploy_account):
     return _deploy_lpt(ERC20LP, "L2 BTC/ETH LPT", "l2-cadc-usdc-lpt", deploy_account)
 
 
-# Deploys a RewardsOnlyGauge contract on Layer 2, receives from a L1 RootGaugeCctpImplementation via ChildChainStreamer
+# Deploys a RewardsOnlyGauge contract on Layer 2, receives from a L1 RootGaugeCcip via ChildChainStreamer
 @pytest.fixture(scope="function")
 def child_gauge_L2(
     RewardsOnlyGauge,

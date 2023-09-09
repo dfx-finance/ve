@@ -1,9 +1,5 @@
 #!/usr/bin/env python
-from brownie import (
-    ChildChainReceiver,
-    DfxUpgradeableProxy,
-    RootGaugeCctp,
-)
+from brownie import ChildChainReceiver, DfxUpgradeableProxy
 
 
 def main():

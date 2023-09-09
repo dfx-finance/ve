@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import DfxUpgradeableProxy, RootGaugeCctp, accounts
+from brownie import DfxUpgradeableProxy, RootGaugeCcip, accounts
 from utils.gas import gas_strategy, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
 
@@ -18,7 +18,7 @@ def main():
     if not is_local_network:
         verify_gas_strategy()
 
-    gauge_implementation = RootGaugeCctp.deploy(
+    gauge_implementation = RootGaugeCcip.deploy(
         {"from": DEPLOY_ACCT, "gas_price": gas_strategy}, publish_source=True
     )
 

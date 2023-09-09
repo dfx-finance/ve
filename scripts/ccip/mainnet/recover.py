@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import RootGaugeCctp, Contract, interface, web3
+from brownie import RootGaugeCcip, Contract, interface, web3
 
 from utils.network import get_network_addresses
 from ..utils_ccip import DEPLOY_ACCT
@@ -12,7 +12,7 @@ NEW_GAUGE = addresses.MUMBAI_ETH_BTC_ROOT_GAUGE
 
 # Send ccDFX and contract-owned ETH to new address
 def recover():
-    prev_gauge = Contract.from_abi("RootGaugeCctp", PREV_GAUGE, RootGaugeCctp.abi)
+    prev_gauge = Contract.from_abi("RootGaugeCcip", PREV_GAUGE, RootGaugeCcip.abi)
     # transfer ccDFX
     dfx_bal = interface.IERC20(addresses.CCIP_DFX).balanceOf(PREV_GAUGE)
     prev_gauge.emergencyWithdraw(
