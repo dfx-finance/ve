@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from brownie import ChildChainStreamer, ChildChainReceiver
 
+from utils.constants_addresses import Sepolia
 from utils.network import get_network_addresses, network_info
 from ..utils_ccip import DEPLOY_ACCT, SEPOLIA_CHAIN_SELECTOR
 
@@ -31,7 +32,7 @@ def configure(receiver, streamer):
 
     # whitelist source chain and address on receiver
     receiver.whitelistSourceChain(SEPOLIA_CHAIN_SELECTOR, {"from": DEPLOY_ACCT})
-    receiver.whitelistSender(addresses.CCIP_ROUTER, {"from": DEPLOY_ACCT})
+    receiver.whitelistSender(Sepolia.MUMBAI_ETH_BTC_ROOT_GAUGE, {"from": DEPLOY_ACCT})
 
 
 def load():

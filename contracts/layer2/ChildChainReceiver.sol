@@ -19,11 +19,10 @@ contract ChildChainReceiver is CCIPReceiver {
     // The text that was received.
     // The token address that was transferred.
     // The token amount that was transferred.
-    event MessageReceived(
+    event GaugeRewardReceived(
         bytes32 indexed messageId,
         uint64 indexed sourceChainSelector,
         address sender,
-        string text,
         address token,
         uint256 tokenAmount
     );
@@ -94,7 +93,12 @@ contract ChildChainReceiver is CCIPReceiver {
     }
 
     /// handle a received message
-    function _ccipReceive(Client.Any2EVMMessage memory message) internal override {
+    function _ccipReceive(Client.Any2EVMMessage memory message)
+        internal
+        override
+        onlyWhitelistedSourceChain(message.sourceChainSelector)
+        onlyWhitelistedSenders(abi.decode(message.sender, (address)))
+    {
         lastReceivedMessageId = message.messageId; // fetch the messageId
         // Expect one token to be transferred at once, but you can transfer several tokens.
         address rewardToken = message.destTokenAmounts[0].token;
@@ -105,14 +109,13 @@ contract ChildChainReceiver is CCIPReceiver {
         IERC20(rewardToken).transfer(streamer, rewardAmount);
         IChildChainStreamer(streamer).notify_reward_amount(rewardToken);
 
-        // emit MessageReceived(
-        //     message.messageId,
-        //     message.sourceChainSelector, // fetch the source chain identifier (aka selector)
-        //     abi.decode(message.sender, (address)), // abi-decoding of the sender address,
-        //     abi.decode(message.data, (string)),
-        //     rewardToken,
-        //     rewardAmount
-        // );
+        emit GaugeRewardReceived(
+            message.messageId,
+            message.sourceChainSelector, // fetch the source chain identifier (aka selector)
+            abi.decode(message.sender, (address)), // abi-decoding of the sender address,
+            rewardToken,
+            rewardAmount
+        );
     }
 
     /* Admin */
