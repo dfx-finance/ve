@@ -9,6 +9,7 @@ from brownie import (
     interface,
 )
 
+from utils.constants_addresses import Sepolia
 from utils.network import get_network_addresses, network_info
 from ..utils_ccip import DEPLOY_ACCT, SEPOLIA_CHAIN_SELECTOR
 
@@ -74,7 +75,7 @@ def check_setup(lpt, gauge_proxy, streamer, receiver, debugging=False):
         addresses.DFX_ETH_BTC_GAUGE,
         "Streamer receiver gauge does not match",
     )
-    assert_eq(receiver.owner(), DEPLOY_ACCT, "Unexpected owner")
+    assert_eq(streamer.owner(), DEPLOY_ACCT, "Unexpected owner")
     assert_eq(receiver.streamer(), streamer.address, "Streamer does not match")
     assert_eq(receiver.owner(), DEPLOY_ACCT, "Unexpected owner")
     assert_eq(
@@ -83,7 +84,7 @@ def check_setup(lpt, gauge_proxy, streamer, receiver, debugging=False):
         "Chain not whitelisted",
     )
     assert_eq(
-        receiver.whitelistedSenders(addresses.CCIP_ROUTER),
+        receiver.whitelistedSenders(Sepolia.MUMBAI_ETH_BTC_ROOT_GAUGE),
         True,
         "Sender not whitelisted",
     )
