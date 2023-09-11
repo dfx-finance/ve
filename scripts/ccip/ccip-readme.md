@@ -29,3 +29,9 @@ Brownie's `networks-config.yml` should contain an entry for `sepolia` and `polyg
 3. Deploy L1 contracts: `brownie run scripts/ccip/mainnet/1_deploy_root_gauge.py --network sepolia`
    - To check config: `brownie run scripts/ccip/mainnet/check_setup.py --network polygon-test`
 4. Update L2 ChildChainReceiver with L1 RootGaugeCcip address
+
+### Running
+
+1. Fund the RootGaugeCcip with ETH for gas when calling `ccipSend()`.
+2. To emulate the DfxDistributor, provide the RootGaugeCcip contract with rewards.
+3. Then, call `notifyReward(_amount)` on RootGaugeCcip with the amount of rewards funded in step 2.
