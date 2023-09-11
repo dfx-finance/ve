@@ -49,7 +49,7 @@ def main():
         )
     )
 
-    # Deploy all contracts
+    # Load and deploy contracts
     streamer = load()
     receiver = deploy(streamer)
 

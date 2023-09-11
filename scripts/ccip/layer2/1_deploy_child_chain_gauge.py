@@ -12,6 +12,7 @@ from brownie import (
     ZERO_ADDRESS,
 )
 
+from utils.constants_addresses import Sepolia
 from utils.network import get_network_addresses, network_info
 from ..utils_ccip import DEPLOY_ACCT, PROXY_ADMIN_ACCT, SEPOLIA_CHAIN_SELECTOR
 
@@ -112,10 +113,6 @@ def configure(receiver, streamer, gauge):
         ],
         {"from": DEPLOY_ACCT},
     )
-
-    # whitelist source chain and address on receiver
-    receiver.whitelistSourceChain(SEPOLIA_CHAIN_SELECTOR, {"from": DEPLOY_ACCT})
-    receiver.whitelistSender(addresses.CCIP_ROUTER, {"from": DEPLOY_ACCT})
 
 
 def main():
