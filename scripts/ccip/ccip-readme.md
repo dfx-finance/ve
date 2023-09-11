@@ -25,10 +25,12 @@ Brownie's `networks-config.yml` should contain an entry for `sepolia` and `polyg
 
 1. Deploy L2 contracts: `brownie run scripts/ccip/layer2/1_deploy_child_chain_gauge.py --network polygon-test`
    - To check config: `brownie run scripts/ccip/layer2/check_setup.py --network polygon-test`
+   - NOTE: Update `./utils/contstants_addresses.py` with newly deployed receiver, streamer and gauge (proxy) address
 2. Configure L1 deploy script (`./scripts/ccip/2_deploy_child_chain_gauge.py`) with L2 addresses
 3. Deploy L1 contracts: `brownie run scripts/ccip/mainnet/1_deploy_root_gauge.py --network sepolia`
    - To check config: `brownie run scripts/ccip/mainnet/check_setup.py --network sepolia`
-4. Update L2 ChildChainReceiver with L1 RootGaugeCcip address
+   - NOTE: Update `./utils/contstants_addresses.py` with newly deployed root gauge address
+4. Update L2 ChildChainReceiver with L1 RootGaugeCcip address: `brownie run scripts/ccip/layer2/2_set_sender.py --network polygon-test`
 
 ### Running
 
