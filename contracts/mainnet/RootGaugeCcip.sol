@@ -8,11 +8,11 @@ pragma solidity ^0.8.10;
  * @notice Receives total allocated weekly DFX emission mints and sends to L2 gauge
  */
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelinUpgradeable/contracts/access/AccessControlUpgradeable.sol";
+import "@openzeppelinUpgradeable/contracts/proxy/utils/Initializable.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 
-contract RootGaugeCcip is AccessControlUpgradeable {
+contract RootGaugeCcip is Initializable {
     // Custom errors to provide more descriptive revert messages.
     error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees); // Used to make sure contract has enough balance to cover the fees.
 
@@ -231,10 +231,10 @@ contract RootGaugeCcip is AccessControlUpgradeable {
         return evm2AnyMessage;
     }
 
-    // /// @notice Fallback function to allow the contract to receive Ether.
-    // /// @dev This function has no function body, making it a default function for receiving Ether.
-    // /// It is automatically called when Ether is transferred to the contract without any data.
-    // receive() external payable {}
+    /// @notice Fallback function to allow the contract to receive Ether.
+    /// @dev This function has no function body, making it a default function for receiving Ether.
+    /// It is automatically called when Ether is transferred to the contract without any data.
+    receive() external payable {}
 
     /* Admin */
     /// @notice Withdraw ERC20 tokens accidentally sent to the contract.
