@@ -11,3 +11,5 @@ TOKENLESS_PRODUCTION = 40  # %, as hardcoded in contract
 DEFAULT_GAUGE_TYPE = 0  # Ethereum stableswap pools
 DEFAULT_TYPE_WEIGHT = 1e18
 DEFAULT_GAUGE_WEIGHT = 1e18
+
+MAX_UINT256 = 2**256 - 1

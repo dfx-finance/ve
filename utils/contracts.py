@@ -8,18 +8,20 @@ from .network import get_network_addresses
 def voting_escrow(address):
     return brownie.interface.IVotingEscrow(address)
 
-
 def veboost_proxy(address):
     return brownie.interface.IVeBoostProxy(address)
 
+def rewards_onl(address):
+    return brownie.interface.IGaugeController(address)
 
 def gauge_controller(address):
     return brownie.interface.IGaugeController(address)
 
-
 def dfx_distributor(address):
     return brownie.interface.IDfxDistributor(address)
 
+def root_gauge_cctp(address):
+    return brownie.interface.IDfxDistributor(address)
 
 def gauge(address):
     return brownie.interface.ILiquidityGauge(address)
