@@ -1,5 +1,14 @@
 # CCIP L2 Gauges
 
+## Overview
+
+The L2 gauges flow comprises:
+
+- `RootGaugeCcip.sol` (L1) - Placeholder gauge contract on L1 that receives rewards from mainnet distributor based on their voted weight. This contract then relays the rewards to a gauge on L2 using CCIP.
+- `ChildChainReceiver.sol` (L2) - Receives messages and tokens from CCIP and forwards tokens to the ChildChainStreamer. This contract is responsible for calling the `notify_reward_amount()` function.
+- `ChildChainStramer.vy` (L2) - Acts as a distributor for an RewardsOnlyGauge. This contract receives weekly rewards and linearly allocates rewards to gauges over a week.
+- `RewardsOnlyGauge.vy` (L2) - Allows users to stake LPTs on L2 and receive rewards. Rewards are distributed without boost and functions similar to a standard StakingRewards contract.
+
 ## Deployment scripts
 
 1. Deploy L2 contracts: `brownie run scripts/ccip/1_deploy_child_chain_gauge.py --network polygon-test`
