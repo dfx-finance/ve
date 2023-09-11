@@ -31,3 +31,4 @@ Calculations on VE emissions: https://docs.google.com/spreadsheets/d/1k1yAvAW_a6
 1. [Testing of VE Contracts](./docs/testing.md)
 2. [Deploy VE Contracts](./docs/deploy.md)
 3. [Operation Guide](./docs/operation.md)
+4. [L2 Gauges](./scripts/ccip/ccip-readme.md)
