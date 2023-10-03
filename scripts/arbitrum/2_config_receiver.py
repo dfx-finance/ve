@@ -3,7 +3,17 @@ from brownie import ChildChainReceiver
 
 from fork.utils.account import DEPLOY_ACCT
 from utils.ccip import ETHEREUM_CHAIN_SELECTOR
-from utils.constants_addresses import Arbitrum, Ethereum
+from utils.constants_addresses import (
+    Arbitrum,
+    Ethereum,
+    ArbitrumLocalhost,
+    EthereumLocalhost,
+)
+from utils.network import network_info
+
+connected = network_info()
+Ethereum = EthereumLocalhost if connected.is_local else Ethereum
+Arbitrum = ArbitrumLocalhost if connected.is_local else Arbitrum
 
 
 # whitelist source chain and address on receiver

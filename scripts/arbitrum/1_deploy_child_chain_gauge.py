@@ -60,7 +60,7 @@ def deploy_gauge(
     gauge = Contract.from_abi("RewardsOnlyGauge", proxy, RewardsOnlyGauge.abi)
     output_data["gauges"].setdefault(label, output_data_gauge)
     output_data["gauges"][label]["gaugeProxy"] = gauge.address
-    write_contract(f"arbitrum{label.capitalize()}Gauge", gauge.address)
+    write_contract(f"arbitrum{label[0].upper() + label[1:]}Gauge", gauge.address)
     return gauge
 
 
@@ -74,7 +74,7 @@ def deploy_streamer(gauge: RewardsOnlyGauge, label: str) -> ChildChainStreamer:
         {"from": DEPLOY_ACCT},
     )
     output_data["gauges"][label]["streamer"] = streamer.address
-    write_contract(f"arbitrum{label.capitalize()}Streamer", streamer.address)
+    write_contract(f"arbitrum{label[0].upper() + label[1:]}Streamer", streamer.address)
     return streamer
 
 
@@ -91,7 +91,7 @@ def deploy_receiver(
         publish_source=verify_contracts,
     )
     output_data["gauges"][label]["receiver"] = receiver.address
-    write_contract(f"arbitrum{label.capitalize()}Receiver", receiver.address)
+    write_contract(f"arbitrum{label[0].upper() + label[1:]}Receiver", receiver.address)
     return receiver
 
 
