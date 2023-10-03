@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 from fork.utils.account import DEPLOY_ACCT, impersonate
 from utils import contracts
-from utils.gauges import active_gauges
 from utils.helper import fund_multisigs
 from utils.network import get_network_addresses
-from utils.gas import gas_strategy
+from utils.gas_strategy import gas_strategy
 
 
 addresses = get_network_addresses()

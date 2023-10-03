@@ -6,8 +6,8 @@ from brownie import DfxUpgradeableProxy, LiquidityGaugeV4
 
 from fork.utils.account import DEPLOY_ACCT, impersonate
 from utils import contracts
-from utils.gas import gas_strategy, verify_gas_strategy
-from utils.helper import fund_multisigs
+from utils.gas import gas_strategy
+from utils.helper import fund_multisigs, verify_gas_strategy
 from utils.network import get_network_addresses, network_info
 
 addresses = get_network_addresses()

@@ -4,18 +4,25 @@ import time
 
 from brownie import DfxUpgradeableProxy, RootGaugeCcip
 
-from utils.constants_addresses import Mumbai
+from utils.constants_addresses import Arbitrum, Polygon
 from utils.network import get_network_addresses, network_info
-from ..utils_ccip import DEPLOY_ACCT, PROXY_ADMIN_ACCT, MUMBAI_CHAIN_SELECTOR
+from ..utils_ccip import (
+    DEPLOY_ACCT,
+    PROXY_ADMIN_ACCT,
+    ARBITRUM_CHAIN_SELECTOR,
+    POLYGON_CHAIN_SELECTOR,
+    MUMBAI_CHAIN_SELECTOR,
+)
+
 
 addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
 
-GAUGE_NAME = "Polygon ETH/BTC Root Gauge"
+GAUGE_NAME = "Polygon XSGD/USDC Root Gauge"
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
-DESTINATION_CHAIN_SELECTOR = MUMBAI_CHAIN_SELECTOR
-DESTINATION_ADDRESS = Mumbai.CCIP_RECEIVER
+DESTINATION_CHAIN_SELECTOR = POLYGON_CHAIN_SELECTOR
+DESTINATION_ADDRESS = Polygon.CCIP_XSGD_USDC_RECEIVER
 
 
 output_data = {"gauges": {"rootGauge": {}}}
@@ -35,7 +42,7 @@ def deploy():
         GAUGE_NAME,
         DEPLOY_ACCT,  # source chain distributor address
         addresses.CCIP_ROUTER,  # source chain ccip router address
-        MUMBAI_CHAIN_SELECTOR,  # target chain selector
+        DESTINATION_CHAIN_SELECTOR,  # target chain selector
         DESTINATION_ADDRESS,  # child chain receiver address (l2 address)
         "0x0000000000000000000000000000000000000000",  # fee token address (zero address for native)
         DEPLOY_ACCT,

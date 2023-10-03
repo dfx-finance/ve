@@ -6,7 +6,8 @@ from brownie import DfxUpgradeableProxy
 
 from fork.utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT
 from utils import contracts
-from utils.gas import verify_gas_strategy, gas_strategy
+from utils.gas import gas_strategy
+from utils.helper import verify_gas_strategy
 from utils.log import write_json_log
 from utils.network import get_network_addresses, network_info
 
