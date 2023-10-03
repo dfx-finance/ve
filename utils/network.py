@@ -3,13 +3,16 @@ from brownie.network import show_active, gas_price
 from .constants_addresses import (
     Arbitrum,
     Ethereum,
-    Localhost,
+    EthereumLocalhost,
     Mumbai,
     Polygon,
     Sepolia,
-    NetworkAddresses,
 )
 from .gas import gas_strategy
+
+
+class NetworkAddresses:
+    pass
 
 
 class ConnectedNetwork:
@@ -35,7 +38,7 @@ def get_network_addresses(connected_network):
     if connected_network in ["polygon-test"]:
         return Mumbai
     if connected_network in ["hardhat", "development"]:
-        return Localhost
+        return EthereumLocalhost
 
 
 def network_info() -> ConnectedNetwork:

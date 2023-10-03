@@ -6,12 +6,14 @@ from brownie import Contract, DfxUpgradeableProxy, LiquidityGaugeV4
 
 from fork.utils.account import DEPLOY_ACCT, impersonate
 from utils import contracts
-from utils.constants_addresses import Ethereum
+from utils.constants_addresses import Ethereum, EthereumLocalhost
 from utils.helper import verify_deploy_address, verify_deploy_network
 from utils.log import write_contract
 from utils.network import network_info
 
 connected = network_info()
+# override addresses when running on local fork
+Ethereum = EthereumLocalhost if connected.is_local else Ethereum
 
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
@@ -32,7 +34,7 @@ def deploy_implementation(verify_contracts=False):
 def deploy_gauge(
     gauge_logic: LiquidityGaugeV4, lpt: str, label: str, verify_contracts=False
 ) -> LiquidityGaugeV4:
-    veboost_proxy = contracts.veboost_proxy(Ethereum.VE_BOOST_PROXY)
+    veboost_proxy = contracts.veboost_proxy(Ethereum.VEBOOST_PROXY)
     dfx_distributor = contracts.dfx_distributor(Ethereum.DFX_DISTRIBUTOR)
 
     # deploy gauge behind proxy
@@ -95,10 +97,12 @@ def main():
         time.sleep(3)
 
     deploy_gauge(gauge_logic, Ethereum.DFX_CADC_USDC_LP, "cadcUsdc", verify_contracts)
-    deploy_gauge(gauge_logic, Ethereum.DFX_GYEN_USDC_LP, "eurcUsdc", verify_contracts)
-    deploy_gauge(gauge_logic, Ethereum.DFX_NZDS_USDC_LP, "gyenUsdc", verify_contracts)
-    deploy_gauge(gauge_logic, Ethereum.DFX_TRYB_USDC_LP, "nzdsUsdc", verify_contracts)
-    deploy_gauge(gauge_logic, Ethereum.DFX_XIDR_USDC_LP, "trybUsdc", verify_contracts)
+    deploy_gauge(gauge_logic, Ethereum.DFX_EURC_USDC_LP, "eurcUsdc", verify_contracts)
+    deploy_gauge(gauge_logic, Ethereum.DFX_GBPT_USDC_LP, "gbptUsdc", verify_contracts)
+    deploy_gauge(gauge_logic, Ethereum.DFX_GYEN_USDC_LP, "gyenUsdc", verify_contracts)
+    deploy_gauge(gauge_logic, Ethereum.DFX_NZDS_USDC_LP, "nzdsUsdc", verify_contracts)
+    deploy_gauge(gauge_logic, Ethereum.DFX_TRYB_USDC_LP, "trybUsdc", verify_contracts)
+    deploy_gauge(gauge_logic, Ethereum.DFX_XIDR_USDC_LP, "xidrUsdc", verify_contracts)
     deploy_gauge(gauge_logic, Ethereum.DFX_XSGD_USDC_LP, "xsgdUsdc", verify_contracts)
 
     if not connected.is_local:

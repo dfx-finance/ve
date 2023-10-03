@@ -5,7 +5,7 @@ import json
 import time
 
 from fork.utils.account import DEPLOY_ACCT
-from utils.constants_addresses import Ethereum
+from utils.constants_addresses import Ethereum, EthereumLocalhost
 from utils.helper import (
     verify_deploy_address,
     verify_deploy_network,
@@ -17,6 +17,8 @@ DEFAULT_GAUGE_TYPE_NAME = "DFX LP Ethereum Gauge"
 DEFAULT_TYPE_WEIGHT = 1e18
 
 connected = network_info()
+# override addresses when running on local fork
+Ethereum = EthereumLocalhost if connected.is_local else Ethereum
 
 output_data = {
     "veBoostProxy": None,
@@ -30,11 +32,11 @@ def deploy():
     # 1. Deploy veBoostProxy
     print(f"--- Deploying VeBoostProxy contract to {connected.name} ---")
     # (votingEscrow address, delegation address, admin address)
-    ve_boost_proxy_params = eth_abi.encode_abi(
+    VEBOOST_PROXY_params = eth_abi.encode_abi(
         ["address", "address", "address"],
         (Ethereum.VEDFX, ZERO_ADDRESS, DEPLOY_ACCT.address),
     ).hex()
-    ve_boost_proxy = VeBoostProxy.deploy(
+    VEBOOST_PROXY = VeBoostProxy.deploy(
         Ethereum.VEDFX,
         ZERO_ADDRESS,
         DEPLOY_ACCT,
@@ -42,9 +44,9 @@ def deploy():
     )
     if not connected.is_local:
         time.sleep(3)
-    output_data["veBoostProxy"] = ve_boost_proxy.address
-    output_data["veBoostProxyParams"] = ve_boost_proxy_params
-    write_contract("veBoostProxy", ve_boost_proxy.address)
+    output_data["veBoostProxy"] = VEBOOST_PROXY.address
+    output_data["veBoostProxyParams"] = VEBOOST_PROXY_params
+    write_contract("veBoostProxy", VEBOOST_PROXY.address)
 
     # 2. Deploy Gauge Controller
     print(f"--- Deploying Gauge Controller contract to {connected.name} ---")
@@ -62,7 +64,7 @@ def deploy():
         time.sleep(3)
     output_data["gaugeController"] = gauge_controller.address
     output_data["gaugeControllerParams"] = gauge_controller_params
-    write_contract("gaugeController", ve_boost_proxy.address)
+    write_contract("gaugeController", gauge_controller.address)
 
     # Output results
     print(

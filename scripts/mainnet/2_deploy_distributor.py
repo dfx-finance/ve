@@ -6,7 +6,7 @@ from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
 from fork.utils.account import DEPLOY_ACCT
 from utils import contracts
-from utils.constants_addresses import Ethereum
+from utils.constants_addresses import Ethereum, EthereumLocalhost
 from utils.helper import verify_deploy_address, verify_deploy_network
 from utils.log import write_contract
 from utils.network import network_info
@@ -15,6 +15,8 @@ REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
 connected = network_info()
+# override addresses when running on local fork
+Ethereum = EthereumLocalhost if connected.is_local else Ethereum
 
 output_data = {"distributor": {"logic": None, "proxy": None}}
 

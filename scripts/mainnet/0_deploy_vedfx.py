@@ -5,7 +5,7 @@ import json
 import time
 
 from fork.utils.account import DEPLOY_ACCT
-from utils.constants_addresses import Ethereum
+from utils.constants_addresses import Ethereum, EthereumLocalhost
 from utils.helper import (
     verify_deploy_address,
     verify_deploy_network,
@@ -14,6 +14,9 @@ from utils.log import write_contract
 from utils.network import network_info
 
 connected = network_info()
+
+# override addresses when running on local fork
+Ethereum = EthereumLocalhost if connected.is_local else Ethereum
 
 
 def deploy():
