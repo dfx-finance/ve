@@ -14,7 +14,7 @@ from brownie import (
 
 from utils.constants_addresses import Sepolia
 from utils.network import get_network_addresses, network_info
-from ..utils_ccip import DEPLOY_ACCT, PROXY_ADMIN_ACCT, SEPOLIA_CHAIN_SELECTOR
+from ..utils_ccip import DEPLOY_ACCT, PROXY_ADMIN_ACCT
 
 addresses = get_network_addresses()
 connected_network, is_local_network = network_info()
