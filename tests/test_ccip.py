@@ -10,7 +10,6 @@ from utils.chain import (
     # fastforward_chain_anvil as fastforward_chain,
     # fastforward_chain_weeks_anvil as fastforward_chain_weeks,
 )
-from utils.gas import gas_strategy
 from utils.gauges import deposit_lp_tokens, setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs, mint_dfx
@@ -27,12 +26,10 @@ def setup(
     deploy_account,
     multisig_0,
 ):
-
     fund_multisigs(deploy_account, [multisig_0])
 
-
     # setup gauges and distributor
-    #setup_gauge_controller(gauge_controller, three_gauges, multisig_0)
+    # setup_gauge_controller(gauge_controller, three_gauges, multisig_0)
 
     # Params:
     # - reward token
@@ -47,7 +44,6 @@ def setup(
         multisig_0,
         EMISSION_RATE,
         TOTAL_DFX_REWARDS,
-        
     )
 
 
@@ -61,29 +57,22 @@ def teardown():
 ## Tests
 ##
 
-def test_RootGauge(
-    root_gauge_L1,
-    distributor,
-    mock_ccip_router,
-    deploy_account,
-    multisig_0
-):
 
-    print("Msg Sent",root_gauge_L1, distributor )
+def test_RootGauge(
+    root_gauge_L1, distributor, mock_ccip_router, deploy_account, multisig_0
+):
+    print("Msg Sent", root_gauge_L1, distributor)
 
     root_gauge_L1.update_distributor(
         deploy_account, {"from": multisig_0, "gas_price": gas_strategy}
     )
 
-    print("Msg Sent",root_gauge_L1 )
+    print("Msg Sent", root_gauge_L1)
 
-
-    tx = root_gauge_L1.notifyRewardTest(mock_ccip_router, 1 ,  {"from": deploy_account, 'gas_price': gas_strategy})
+    tx = root_gauge_L1.notifyRewardTest(
+        mock_ccip_router, 1, {"from": deploy_account, "gas_price": gas_strategy}
+    )
 
     print(tx.info())
     print(tx)
     print(tx.return_value)
-
-
-
-

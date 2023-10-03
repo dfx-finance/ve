@@ -1,22 +1,33 @@
 from brownie.network import show_active, gas_price
 
-from .constants_addresses import Localhost, Polygon, Ethereum, Sepolia, Mumbai
+from .constants_addresses import (
+    Arbitrum,
+    Ethereum,
+    Localhost,
+    Mumbai,
+    Polygon,
+    Sepolia,
+    NetworkAddresses,
+)
 from .gas import gas_strategy
 
 
-def network_info():
-    connected_network = show_active()
-    is_local_network = connected_network in ["ganache-cli", "hardhat", "development"]
-    if is_local_network:
-        gas_price(gas_strategy)
-    return connected_network, is_local_network
+class ConnectedNetwork:
+    name: str
+    addresses: NetworkAddresses
+    is_local: bool
+
+    def __init__(self, name: str, addresses: NetworkAddresses, is_local: bool):
+        self.name = name
+        self.addresses = addresses
+        self.is_local = is_local
 
 
-def get_network_addresses():
-    connected_network, _ = network_info()
-
+def get_network_addresses(connected_network):
     if connected_network in ["ethereum", "mainnet"]:
         return Ethereum
+    if connected_network in ["arbitrum"]:
+        return Arbitrum
     if connected_network in ["polygon-main"]:
         return Polygon
     if connected_network in ["sepolia", "sepolia-dev"]:
@@ -25,3 +36,12 @@ def get_network_addresses():
         return Mumbai
     if connected_network in ["hardhat", "development"]:
         return Localhost
+
+
+def network_info() -> ConnectedNetwork:
+    name = show_active()
+    addresses = get_network_addresses(name)
+    is_local_network = name in ["ganache-cli", "hardhat", "development"]
+    if is_local_network:
+        gas_price(gas_strategy)
+    return ConnectedNetwork(name, addresses, is_local_network)

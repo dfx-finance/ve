@@ -6,16 +6,56 @@ from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
 from fork.utils.account import DEPLOY_ACCT
 from utils import contracts
-from utils.gas import gas_strategy, verify_gas_strategy
-from utils.network import get_network_addresses, network_info
+from utils.constants_addresses import Ethereum
+from utils.helper import verify_deploy_address, verify_deploy_network
+from utils.log import write_contract
+from utils.network import network_info
 
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
 
-addresses = get_network_addresses()
-connected_network, is_local_network = network_info()
+connected = network_info()
 
 output_data = {"distributor": {"logic": None, "proxy": None}}
+
+
+def deploy(verify_contracts=False):
+    gauge_controller = contracts.gauge_controller(Ethereum.GAUGE_CONTROLLER)
+
+    print(f"--- Deploying Distributor contract to {connected.name} ---")
+    dfx_distributor = DfxDistributor.deploy(
+        {"from": DEPLOY_ACCT},
+        publish_source=verify_contracts,
+    )
+    output_data["distributor"]["logic"] = dfx_distributor.address
+
+    print(f"--- Deploying Distributor proxy contract to {connected.name} ---")
+    distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
+        Ethereum.DFX,
+        gauge_controller.address,
+        REWARDS_RATE,
+        PREV_DISTRIBUTED_REWARDS,
+        # needs another multisig to deal with access control behind proxy (ideally 2)
+        Ethereum.DFX_MULTISIG_0,  # governor
+        Ethereum.DFX_MULTISIG_0,  # guardian
+        ZERO_ADDRESS,  # delegate gauge for pulling type 2 gauge rewards
+    )
+    dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
+        dfx_distributor.address,
+        Ethereum.DFX_MULTISIG_1,
+        distributor_initializer_calldata,
+        {"from": DEPLOY_ACCT},
+        publish_source=verify_contracts,
+    )
+    output_data["distributor"]["proxy"] = dfx_upgradable_proxy.address
+
+    write_contract("dfxDistributor", dfx_upgradable_proxy.address)
+    if not connected.is_local:
+        # Write output to file
+        with open(
+            f"./scripts/deployed_distributor_{int(time.time())}.json", "w"
+        ) as output_f:
+            json.dump(output_data, output_f, indent=4)
 
 
 def main():
@@ -29,42 +69,9 @@ def main():
             "\t4. Governor and Guardian addresses"
         )
     )
-    if not is_local_network:
-        verify_gas_strategy()
-    should_verify = not is_local_network
-    # should_verify = False
 
-    gauge_controller = contracts.gauge_controller(addresses.GAUGE_CONTROLLER)
+    verify_deploy_network(connected.name)
+    verify_deploy_address(DEPLOY_ACCT)
 
-    print(f"--- Deploying Distributor contract to {connected_network} ---")
-    dfx_distributor = DfxDistributor.deploy(
-        {"from": DEPLOY_ACCT, "gas_price": gas_strategy}, publish_source=should_verify
-    )
-    output_data["distributor"]["logic"] = dfx_distributor.address
-
-    print(f"--- Deploying Distributor proxy contract to {connected_network} ---")
-    distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
-        addresses.DFX,
-        gauge_controller.address,
-        REWARDS_RATE,
-        PREV_DISTRIBUTED_REWARDS,
-        # needs another multisig to deal with access control behind proxy (ideally 2)
-        addresses.DFX_MULTISIG_0,  # governor
-        addresses.DFX_MULTISIG_0,  # guardian
-        ZERO_ADDRESS,  # delegate gauge for pulling type 2 gauge rewards
-    )
-    dfx_upgradable_proxy = DfxUpgradeableProxy.deploy(
-        dfx_distributor.address,
-        addresses.DFX_MULTISIG_1,
-        distributor_initializer_calldata,
-        {"from": DEPLOY_ACCT, "gas_price": gas_strategy},
-        publish_source=should_verify,
-    )
-    output_data["distributor"]["proxy"] = dfx_upgradable_proxy.address
-
-    if not is_local_network:
-        # Write output to file
-        with open(
-            f"./scripts/deployed_distributor_{int(time.time())}.json", "w"
-        ) as output_f:
-            json.dump(output_data, output_f, indent=4)
+    verify_contracts = False if connected.is_local else True
+    deploy(verify_contracts)

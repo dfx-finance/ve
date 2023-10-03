@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from datetime import datetime
 import json
+import os
 import time
 
 from brownie import chain, web3
@@ -16,6 +17,20 @@ def write_json_log(base_fn: str, output_data: dict) -> str:
     with open(fp, "w") as output_f:
         json.dump(output_data, output_f, indent=4)
     return fp
+
+
+# Writes contract name and address to a "latest" master list file or overwrites
+def write_contract(label: str, address: str):
+    fp = f"./scripts/ve-addresses-latest.json"
+    data = {}
+    if os.path.exists(fp):
+        try:
+            data = json.load(open(fp))
+        except json.JSONDecodeError:
+            pass
+    data[label] = address
+    with open(fp, "w") as json_f:
+        json.dump(data, json_f, indent=4)
 
 
 ### Console

@@ -4,18 +4,19 @@ from brownie import accounts, config, network
 from fork.constants import LOCAL_BLOCKCHAIN_ENVIRONMENTS
 from utils.network import network_info
 
-connected_network, is_local_network = network_info()
+connected = network_info()
 
 # Constants
 DEPLOY_ACCT = None
 DEPLOY_PROXY_ACCT = None
-if is_local_network:
+if connected.is_local:
     DEPLOY_ACCT = accounts[0]
     DEPLOY_PROXY_ACCT = accounts[1]
 else:
     print("Loading live wallets [deployve, deployve-proxyadmin]...")
-    DEPLOY_ACCT = accounts.load("deployve")
-    DEPLOY_PROXY_ACCT = accounts.load("deployve-proxyadmin")
+    # DEPLOY_ACCT = accounts.load("deployve")
+    # DEPLOY_PROXY_ACCT = accounts.load("deployve-proxyadmin")
+    DEPLOY_ACCT = accounts.load("cldfx")
 
 
 def get_account(number=None):
