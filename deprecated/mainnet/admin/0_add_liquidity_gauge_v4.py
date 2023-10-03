@@ -29,7 +29,7 @@ def main():
 
     should_verify = False if is_local_network else True
 
-    veboost_proxy = contracts.veboost_proxy(addresses.VE_BOOST_PROXY)
+    veboost_proxy = contracts.veboost_proxy(addresses.VEBOOST_PROXY)
     dfx_distributor = contracts.dfx_distributor(addresses.DFX_DISTRIBUTOR)
 
     label = "GBPT_USDC"

@@ -37,11 +37,11 @@ def main():
     # 1. Deploy veBoostProxy
     print(f"--- Deploying VeBoostProxy contract to {connected_network} ---")
     # (votingEscrow address, delegation address, admin address)
-    ve_boost_proxy_params = eth_abi.encode_abi(
+    VEBOOST_PROXY_params = eth_abi.encode_abi(
         ["address", "address", "address"],
         (addresses.VEDFX, ZERO_ADDRESS, DEPLOY_ACCT.address),
     ).hex()
-    ve_boost_proxy = VeBoostProxy.deploy(
+    VEBOOST_PROXY = VeBoostProxy.deploy(
         addresses.VEDFX,
         ZERO_ADDRESS,
         DEPLOY_ACCT,
@@ -49,8 +49,8 @@ def main():
     )
     if not is_local_network:
         time.sleep(3)
-    output_data["veBoostProxy"] = ve_boost_proxy.address
-    output_data["veBoostProxyParams"] = ve_boost_proxy_params
+    output_data["veBoostProxy"] = VEBOOST_PROXY.address
+    output_data["veBoostProxyParams"] = VEBOOST_PROXY_params
 
     # 2. Deploy Gauge Controller
     print(f"--- Deploying Gauge Controller contract to {connected_network} ---")

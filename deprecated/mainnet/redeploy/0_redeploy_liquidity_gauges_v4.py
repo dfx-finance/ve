@@ -42,7 +42,7 @@ def deploy_proxied_gauges(lp_addresses):
             DEPLOY_ACCT,
             addresses.DFX,
             addresses.VEDFX,
-            addresses.VE_BOOST_PROXY,
+            addresses.VEBOOST_PROXY,
             addresses.DFX_DISTRIBUTOR,
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
