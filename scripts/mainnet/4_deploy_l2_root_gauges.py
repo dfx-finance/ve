@@ -7,6 +7,7 @@ from brownie import DfxUpgradeableProxy, RootGaugeCcip
 from fork.utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT
 from utils.constants_addresses import Ethereum, Arbitrum, Polygon
 from utils.helper import verify_deploy_address, verify_deploy_network
+from utils.log import write_contract
 from utils.network import network_info
 from utils.ccip import ARBITRUM_CHAIN_SELECTOR, POLYGON_CHAIN_SELECTOR
 
@@ -58,6 +59,7 @@ def deploy_gauge(
         publish_source=verify_contracts,
     )
 
+    write_contract(label, proxy.address)
     output_data["gauges"]["rootGauge"][label] = {
         "calldata": gauge_initializer_calldata,
         "proxy": proxy.address,
@@ -91,7 +93,7 @@ def main():
         "Arbitrum CADC/USDC Root Gauge",
         ARBITRUM_CHAIN_SELECTOR,
         Arbitrum.CCIP_CADC_USDC_RECEIVER,
-        "cadcUsdcArbitrumRootGauge",
+        "arbitrumCadcUsdcRootGauge",
         verify_contracts,
     )
     deploy_gauge(
@@ -99,7 +101,7 @@ def main():
         "Arbitrum GYEN/USDC Root Gauge",
         ARBITRUM_CHAIN_SELECTOR,
         Arbitrum.CCIP_GYEN_USDC_RECEIVER,
-        "gyenUsdcArbitrumRootGauge",
+        "arbitrumGyenUsdcRootGauge",
         verify_contracts,
     )
 
@@ -109,7 +111,7 @@ def main():
         "Polygon CADC/USDC Root Gauge",
         POLYGON_CHAIN_SELECTOR,
         Polygon.CCIP_CADC_USDC_RECEIVER,
-        "cadcUsdcPolygonRootGauge",
+        "polygonCadcUsdcRootGauge",
         verify_contracts,
     )
     deploy_gauge(
@@ -117,7 +119,7 @@ def main():
         "Polygon NGNC/USDC Root Gauge",
         POLYGON_CHAIN_SELECTOR,
         Polygon.CCIP_NGNC_USDC_RECEIVER,
-        "ngncUsdcPolygonRootGauge",
+        "polygonNgncUsdcRootGauge",
         verify_contracts,
     )
     deploy_gauge(
@@ -125,7 +127,7 @@ def main():
         "Polygon TRYB/USDC Root Gauge",
         POLYGON_CHAIN_SELECTOR,
         Polygon.CCIP_TRYB_USDC_RECEIVER,
-        "trybUsdcPolygonRootGauge",
+        "polygonTrybUsdcRootGauge",
         verify_contracts,
     )
     deploy_gauge(
@@ -133,12 +135,13 @@ def main():
         "Polygon XSGD/USDC Root Gauge",
         POLYGON_CHAIN_SELECTOR,
         Polygon.CCIP_XSGD_USDC_RECEIVER,
-        "xsgdUsdcPolygonRootGauge",
+        "polygonXsgdUsdcRootGauge",
         verify_contracts,
     )
 
     # output log
-    with open(
-        f"./scripts/deployed_root_gauges_ccip_{int(time.time())}.json", "w"
-    ) as output_f:
-        json.dump(output_data, output_f, indent=4)
+    if not connected.is_local:
+        with open(
+            f"./scripts/deployed_root_gauges_ccip_{int(time.time())}.json", "w"
+        ) as output_f:
+            json.dump(output_data, output_f, indent=4)

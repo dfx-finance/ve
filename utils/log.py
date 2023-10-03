@@ -21,7 +21,7 @@ def write_json_log(base_fn: str, output_data: dict) -> str:
 
 # Writes contract name and address to a "latest" master list file or overwrites
 def write_contract(label: str, address: str):
-    fp = f"./scripts/ve-addresses-latest.json"
+    fp = "./scripts/ve-addresses-latest.json"
     data = {}
     if os.path.exists(fp):
         try:
