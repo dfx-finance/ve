@@ -16,8 +16,8 @@ from utils.constants_addresses import (
 from utils.network import network_info
 
 connected = network_info()
-Arbitrum = ArbitrumLocalhost if connected.is_local else Arbitrum
-Polygon = PolygonLocalhost if connected.is_local else Polygon
+Arbitrum = ArbitrumLocalhost if network.is_local else Arbitrum
+Polygon = PolygonLocalhost if network.is_local else Polygon
 
 
 def assert_latest(key, value):

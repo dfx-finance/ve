@@ -13,7 +13,7 @@ from utils.network import network_info
 
 connected = network_info()
 # override addresses when running on local fork
-Ethereum = EthereumLocalhost if connected.is_local else Ethereum
+Ethereum = EthereumLocalhost if network.is_local else Ethereum
 
 DEFAULT_GAUGE_TYPE = 0
 DEFAULT_GAUGE_WEIGHT = 1e18
@@ -23,7 +23,7 @@ output_data = {"gauges": {"amm": {}}}
 
 # deploy gauge logic
 def deploy_implementation(verify_contracts=False):
-    print(f"--- Deploying Liquidity Gauges (v4) contract to {connected.name} ---")
+    print(f"--- Deploying Liquidity Gauges (v4) contract to {network.name} ---")
     gauge_logic = LiquidityGaugeV4.deploy(
         {"from": DEPLOY_ACCT}, publish_source=verify_contracts
     )
@@ -38,7 +38,7 @@ def deploy_gauge(
     dfx_distributor = contracts.dfx_distributor(Ethereum.DFX_DISTRIBUTOR)
 
     # deploy gauge behind proxy
-    print(f"--- Deploying LiquidityGaugeV4 proxy contract to {connected.name} ---")
+    print(f"--- Deploying LiquidityGaugeV4 proxy contract to {network.name} ---")
     gauge_initializer_calldata = gauge_logic.initialize.encode_input(
         lpt,
         DEPLOY_ACCT,
@@ -67,7 +67,7 @@ def add_to_gauge_controller(gauge: LiquidityGaugeV4):
     gauge_controller = contracts.gauge_controller(Ethereum.GAUGE_CONTROLLER)
 
     print("--- Add gauge to GaugeController ---")
-    admin = impersonate(Ethereum.DFX_MULTISIG_0) if connected.is_local else DEPLOY_ACCT
+    admin = impersonate(Ethereum.DFX_MULTISIG_0) if network.is_local else DEPLOY_ACCT
     gauge_controller.add_gauge(
         gauge.address,
         DEFAULT_GAUGE_TYPE,
@@ -87,12 +87,12 @@ def main():
         )
     )
 
-    verify_deploy_network(connected.name)
+    verify_deploy_network(network.name)
     verify_deploy_address(DEPLOY_ACCT)
 
-    verify_contracts = False if connected.is_local else True
+    verify_contracts = False if network.is_local else True
     gauge_logic = deploy_implementation(verify_contracts)
-    if not connected.is_local:
+    if not network.is_local:
         print("Sleeping after deploy....")
         time.sleep(3)
 
@@ -105,7 +105,7 @@ def main():
     deploy_gauge(gauge_logic, Ethereum.DFX_XIDR_USDC_LP, "xidrUsdc", verify_contracts)
     deploy_gauge(gauge_logic, Ethereum.DFX_XSGD_USDC_LP, "xsgdUsdc", verify_contracts)
 
-    if not connected.is_local:
+    if not network.is_local:
         with open(
             f"./scripts/deployed_liquidity_gauges_v4_{int(time.time())}.json", "w"
         ) as output_f:

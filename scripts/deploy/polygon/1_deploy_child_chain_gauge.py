@@ -33,12 +33,19 @@ output_data_gauge = {
 
 
 # deploy l2 rewards-only gauge
-def deploy_gauge_implementation() -> RewardsOnlyGauge:
+def deploy_gauge_implementation(verify_contracts=False) -> RewardsOnlyGauge:
     print(f"--- Deploying L2 gauge implementation contract to {connected.name} ---")
     gauge_logic = RewardsOnlyGauge.deploy(
         {"from": DEPLOY_ACCT},
+        publish_source=verify_contracts,
     )
     output_data["gaugeImplementation"] = gauge_logic.address
+    return gauge_logic
+
+
+def load_gauge_implementation() -> RewardsOnlyGauge:
+    print(f"--- Loading Rewards Gauge CCIP contract on {connected.name} ---")
+    gauge_logic = RewardsOnlyGauge.at(Polygon.GAUGE_IMPLEMENTATION)
     return gauge_logic
 
 
@@ -108,6 +115,13 @@ def deploy_contract_set(
     return receiver, streamer, gauge
 
 
+def load_contract_set(receiver_addr: str, streamer_addr: str, gauge_addr: str):
+    receiver = ChildChainReceiver.at(receiver_addr)
+    streamer = ChildChainStreamer.at(streamer_addr)
+    gauge = Contract.from_abi("RewardsOnlyGauge", gauge_addr, RewardsOnlyGauge.abi)
+    return receiver, streamer, gauge
+
+
 def configure(receiver, streamer, gauge):
     print(
         f"--- Configuring ChildChainStreamer contract with ChildChainReceiver as reward distributor ---"
@@ -151,22 +165,46 @@ def main():
     verify_deploy_network(connected.name)
     verify_deploy_address(DEPLOY_ACCT)
 
-    gauge_logic = deploy_gauge_implementation()
-
     # Deploy all contracts
+    # gauge_logic = deploy_gauge_implementation()
+    # if connected.is_local:
+    #     time.sleep(3)
+    gauge_logic = load_gauge_implementation()
+
     verify_contracts = False if connected.is_local else True
     cadc_usdc_receiver, cadc_usdc_streamer, cadc_usdc_gauge = deploy_contract_set(
-        gauge_logic, Polygon.DFX_CADC_USDC_LP, "cadcUsdc", verify_contracts
+        gauge_logic, Polygon.CADC_USDC_LP, "cadcUsdc", verify_contracts
     )
     ngnc_usdc_receiver, ngnc_usdc_streamer, ngnc_usdc_gauge = deploy_contract_set(
-        gauge_logic, Polygon.DFX_NGNC_USDC_LP, "ngncUsdc", verify_contracts
+        gauge_logic, Polygon.NGNC_USDC_LP, "ngncUsdc", verify_contracts
     )
     tryb_usdc_receiver, tryb_usdc_streamer, tryb_usdc_gauge = deploy_contract_set(
-        gauge_logic, Polygon.DFX_TRYB_USDC_LP, "trybUsdc", verify_contracts
+        gauge_logic, Polygon.TRYB_USDC_LP, "trybUsdc", verify_contracts
     )
     xsgd_usdc_receiver, xsgd_usdc_streamer, xsgd_usdc_gauge = deploy_contract_set(
-        gauge_logic, Polygon.DFX_XSGD_USDC_LP, "xsgdUsdc", verify_contracts
+        gauge_logic, Polygon.XSGD_USDC_LP, "xsgdUsdc", verify_contracts
     )
+
+    # cadc_usdc_receiver, cadc_usdc_streamer, cadc_usdc_gauge = load_contract_set(
+    #     Polygon.CADC_USDC_RECEIVER,
+    #     Polygon.CADC_USDC_STREAMER,
+    #     Polygon.CADC_USDC_GAUGE,
+    # )
+    # ngnc_usdc_receiver, ngnc_usdc_streamer, ngnc_usdc_gauge = load_contract_set(
+    #     Polygon.NGNC_USDC_RECEIVER,
+    #     Polygon.NGNC_USDC_STREAMER,
+    #     Polygon.NGNC_USDC_GAUGE,
+    # )
+    # tryb_usdc_receiver, tryb_usdc_streamer, tryb_usdc_gauge = load_contract_set(
+    #     Polygon.TRYB_USDC_RECEIVER,
+    #     Polygon.TRYB_USDC_STREAMER,
+    #     Polygon.TRYB_USDC_GAUGE,
+    # )
+    # xsgd_usdc_receiver, xsgd_usdc_streamer, xsgd_usdc_gauge = load_contract_set(
+    #     Polygon.XSGD_USDC_RECEIVER,
+    #     Polygon.XSGD_USDC_STREAMER,
+    #     Polygon.XSGD_USDC_GAUGE,
+    # )
 
     # Configure ChildChainStreamer distributor address (router), gauge
     # reward token address (ccDFX on L2), and whitelisting on ChildChainReceiver

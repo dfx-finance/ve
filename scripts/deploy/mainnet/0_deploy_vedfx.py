@@ -16,11 +16,11 @@ from utils.network import network_info
 connected = network_info()
 
 # override addresses when running on local fork
-Ethereum = EthereumLocalhost if connected.is_local else Ethereum
+Ethereum = EthereumLocalhost if network.is_local else Ethereum
 
 
 def deploy():
-    print(f"--- Deploying veDFX contract to {connected.name} ---")
+    print(f"--- Deploying veDFX contract to {network.name} ---")
     output_data = {"veDFX": None}
 
     vedfx_params = eth_abi.encode_abi(
@@ -38,12 +38,12 @@ def deploy():
     output_data["veDFXParams"] = vedfx_params
 
     write_contract("veDFX", vedfx.address)
-    if not connected.is_local:
+    if not network.is_local:
         with open(f"./scripts/deployed_vedfx_{int(time.time())}.json", "w") as output_f:
             json.dump(output_data, output_f, indent=4)
 
 
 def main():
-    verify_deploy_network(connected.name)
+    verify_deploy_network(network.name)
     verify_deploy_address(DEPLOY_ACCT)
     deploy()

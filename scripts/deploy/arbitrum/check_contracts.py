@@ -10,8 +10,8 @@ from utils.constants_addresses import (
 from utils.network import network_info
 
 connected = network_info()
-Ethereum = EthereumLocalhost if connected.is_local else Ethereum
-Arbitrum = ArbitrumLocalhost if connected.is_local else Arbitrum
+Ethereum = EthereumLocalhost if network.is_local else Ethereum
+Arbitrum = ArbitrumLocalhost if network.is_local else Arbitrum
 
 GAUGE_SETS = [
     (

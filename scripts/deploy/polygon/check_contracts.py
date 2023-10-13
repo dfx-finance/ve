@@ -10,8 +10,8 @@ from utils.constants_addresses import (
 from utils.network import network_info
 
 connected = network_info()
-Ethereum = EthereumLocalhost if connected.is_local else Ethereum
-Polygon = PolygonLocalhost if connected.is_local else Polygon
+Ethereum = EthereumLocalhost if network.is_local else Ethereum
+Polygon = PolygonLocalhost if network.is_local else Polygon
 
 GAUGE_SETS = [
     (

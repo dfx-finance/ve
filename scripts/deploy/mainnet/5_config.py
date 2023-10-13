@@ -14,7 +14,7 @@ from utils.helper import fund_multisigs
 from utils.network import network_info
 
 connected = network_info()
-Ethereum = EthereumLocalhost if connected.is_local else Ethereum
+Ethereum = EthereumLocalhost if network.is_local else Ethereum
 
 ETH_GAUGES = [
     Ethereum.DFX_CADC_USDC_GAUGE,
@@ -123,7 +123,7 @@ def set_l2_root_gauge_distributor(gauge_addr: str):
 
 
 def main():
-    # if connected.is_local:
+    # if network.is_local:
     #     fund_multisigs(DEPLOY_ACCT, [Ethereum.DFX_MULTISIG_0])
 
     # set_veDFX_admin()

@@ -4,16 +4,16 @@ from brownie import ChildChainReceiver
 from fork.utils.account import DEPLOY_ACCT
 from utils.ccip import ETHEREUM_CHAIN_SELECTOR
 from utils.constants_addresses import (
-    Arbitrum,
     Ethereum,
-    ArbitrumLocalhost,
+    Polygon,
     EthereumLocalhost,
+    PolygonLocalhost,
 )
 from utils.network import network_info
 
 connected = network_info()
 Ethereum = EthereumLocalhost if connected.is_local else Ethereum
-Arbitrum = ArbitrumLocalhost if connected.is_local else Arbitrum
+Polygon = PolygonLocalhost if connected.is_local else Polygon
 
 
 # whitelist source chain and address on receiver
@@ -25,13 +25,14 @@ def whitelist_sender(receiver_addr: str, root_gauge_addr: str):
 
 
 def main():
-    # Arbitrum CADC/USDC Receiver
+    # Polygon CADC/USDC Receiver
     whitelist_sender(
-        Arbitrum.CCIP_CADC_USDC_RECEIVER,
-        Ethereum.ARBITRUM_CADC_USDC_ROOT_GAUGE,
+        Polygon.CADC_USDC_RECEIVER,
+        Ethereum.POLYGON_CADC_USDC_ROOT_GAUGE,
     )
-    # Arbitrum GYEN/USDC Receiver
-    whitelist_sender(
-        Arbitrum.CCIP_GYEN_USDC_RECEIVER,
-        Ethereum.ARBITRUM_GYEN_USDC_ROOT_GAUGE,
-    )
+    # Polygon NGNC/USDC Receiver
+    whitelist_sender(Polygon.NGNC_USDC_RECEIVER, Ethereum.POLYGON_NGNC_USDC_ROOT_GAUGE)
+    # Polygon TRYB/USDC Receiver
+    whitelist_sender(Polygon.TRYB_USDC_RECEIVER, Ethereum.POLYGON_TRYB_USDC_ROOT_GAUGE)
+    # Polygon XSGD/USDC Receiver
+    whitelist_sender(Polygon.XSGD_USDC_RECEIVER, Ethereum.POLYGON_XSGD_USDC_ROOT_GAUGE)

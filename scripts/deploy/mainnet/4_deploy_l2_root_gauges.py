@@ -43,6 +43,12 @@ def deploy_implementation(verify_contracts=False) -> RootGaugeCcip:
     return gauge_logic
 
 
+def load_implementation() -> RootGaugeCcip:
+    print(f"--- Loading Root Gauge CCIP contract on {connected.name} ---")
+    gauge_logic = RootGaugeCcip.at("0x5CFD640a991253bdB7ed181B0b48ae0a1c10753F")
+    return gauge_logic
+
+
 def deploy_gauge(
     gauge_logic: RootGaugeCcip,
     gauge_name: str,
@@ -62,6 +68,20 @@ def deploy_gauge(
         "0x0000000000000000000000000000000000000000",  # fee token address (zero address for native)
         DEPLOY_ACCT,
     )
+    print(
+        [
+            gauge_logic.address,
+            gauge_name,
+            DEPLOY_ACCT,  # source chain distributor address
+            DEPLOY_PROXY_ACCT,
+            Ethereum.CCIP_ROUTER,  # source chain ccip router address
+            destinationChainId,  # target chain selector
+            destinationAddr,  # child chain receiver address (l2 address)
+            "0x0000000000000000000000000000000000000000",  # fee token address (zero address for native)
+            DEPLOY_ACCT,
+        ]
+    )
+    return
     proxy = DfxUpgradeableProxy.deploy(
         gauge_logic.address,
         DEPLOY_PROXY_ACCT,
@@ -93,38 +113,39 @@ def main():
     verify_deploy_address(DEPLOY_ACCT)
 
     verify_contracts = False if connected.is_local else True
-    gauge_logic = deploy_implementation(verify_contracts)
+    # gauge_logic = deploy_implementation(verify_contracts)
+    gauge_logic = load_implementation()
     if not connected.is_local:
         print("Sleeping after deploy....")
         time.sleep(3)
 
-    # deploy arbitrum root gauges
-    deploy_gauge(
-        gauge_logic,
-        "Arbitrum CADC/USDC Root Gauge",
-        ARBITRUM_CHAIN_SELECTOR,
-        Arbitrum.CCIP_CADC_USDC_RECEIVER,
-        "arbitrumCadcUsdcRootGauge",
-        verify_contracts,
-    )
-    deploy_gauge(
-        gauge_logic,
-        "Arbitrum GYEN/USDC Root Gauge",
-        ARBITRUM_CHAIN_SELECTOR,
-        Arbitrum.CCIP_GYEN_USDC_RECEIVER,
-        "arbitrumGyenUsdcRootGauge",
-        verify_contracts,
-    )
+    # # deploy arbitrum root gauges
+    # deploy_gauge(
+    #     gauge_logic,
+    #     "Arbitrum CADC/USDC Root Gauge",
+    #     ARBITRUM_CHAIN_SELECTOR,
+    #     Arbitrum.CCIP_CADC_USDC_RECEIVER,
+    #     "arbitrumCadcUsdcRootGauge",
+    #     verify_contracts,
+    # )
+    # deploy_gauge(
+    #     gauge_logic,
+    #     "Arbitrum GYEN/USDC Root Gauge",
+    #     ARBITRUM_CHAIN_SELECTOR,
+    #     Arbitrum.CCIP_GYEN_USDC_RECEIVER,
+    #     "arbitrumGyenUsdcRootGauge",
+    #     verify_contracts,
+    # )
 
-    # deploy polygon root gauges
-    deploy_gauge(
-        gauge_logic,
-        "Polygon CADC/USDC Root Gauge",
-        POLYGON_CHAIN_SELECTOR,
-        Polygon.CCIP_CADC_USDC_RECEIVER,
-        "polygonCadcUsdcRootGauge",
-        verify_contracts,
-    )
+    # # deploy polygon root gauges
+    # deploy_gauge(
+    #     gauge_logic,
+    #     "Polygon CADC/USDC Root Gauge",
+    #     POLYGON_CHAIN_SELECTOR,
+    #     Polygon.CCIP_CADC_USDC_RECEIVER,
+    #     "polygonCadcUsdcRootGauge",
+    #     verify_contracts,
+    # )
     deploy_gauge(
         gauge_logic,
         "Polygon NGNC/USDC Root Gauge",

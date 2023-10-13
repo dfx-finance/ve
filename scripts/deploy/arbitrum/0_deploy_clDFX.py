@@ -1,38 +1,48 @@
 #!/usr/bin/env python
-from brownie import clDFX, ERC20LP, ZERO_ADDRESS
+from brownie import Contract, clDFX, ERC20LP, DfxUpgradeableProxy, ZERO_ADDRESS
 
-import eth_abi
 import json
 import time
 
-from fork.utils.account import DEPLOY_ACCT
+from fork.utils.account import DEPLOY_ACCT, DEPLOY_PROXY_ACCT
 from utils.helper import verify_deploy_address, verify_deploy_network
 from utils.log import write_contract
 from utils.network import network_info
 
 connected = network_info()
 
-output_data = {"clDFX": None}
+output_data = {"clDFX": {}}
+
+NAME = "DFX Token (L2)"
+SYMBOL = "DFX"
 
 
 def deploy(verify_contracts=False):
     print(f"--- Deploying clDFX contract to {connected.name} ---")
-
-    cldfx_params = eth_abi.encode_abi(
-        ["string", "string", "address", "string"],
-        ("DFX", "clDFX", ZERO_ADDRESS, "1.0.0"),
-    ).hex()
-    cldfx = clDFX.deploy(
-        "DFX",
-        "clDFX",
-        ZERO_ADDRESS,
-        "1.0.0",
+    clDfx = clDFX.deploy(
         {"from": DEPLOY_ACCT},
         publish_source=verify_contracts,
     )
-    output_data["clDFX"] = cldfx.address
-    output_data["clDFXParams"] = cldfx_params
-    write_contract("arbitrumClDfx", cldfx.address)
+    output_data["clDFX"]["logic"] = clDfx.address
+
+    print(f"--- Deploying clDFX proxy contract to {connected.name} ---")
+    clDfx_initializer_calldata = clDfx.initialize.encode_input(
+        NAME,  # token name
+        SYMBOL,  # token symbol
+        ZERO_ADDRESS,  # minter
+        "0.0.0",  # version
+    )
+    proxy = DfxUpgradeableProxy.deploy(
+        clDfx.address,
+        DEPLOY_PROXY_ACCT,
+        clDfx_initializer_calldata,
+        {"from": DEPLOY_ACCT},
+        publish_source=verify_contracts,
+    )
+    proxy = Contract.from_abi("clDFX", proxy, clDFX.abi)
+    output_data["clDFX"]["proxy"] = proxy.address
+    output_data["clDFX"]["clDFXParams"] = clDfx_initializer_calldata
+    write_contract("arbitrumClDfx", proxy.address)
 
 
 # Creates fake LPT tokens for creating gauges without existing pools on local testnet forks
@@ -49,9 +59,6 @@ def main():
 
     verify_contracts = False if connected.is_local else True
     deploy(verify_contracts)
-
-    deploy_fake_lpt("DFX Fake CADC/USDC LPT", "fake-cadc-usdc")
-    deploy_fake_lpt("DFX Fake GYEN/USDC LPT", "fake-gyen-usdc", i=1)
 
     if not connected.is_local:
         with open(f"./scripts/arbitrum_cldfx_{int(time.time())}.json", "w") as output_f:
