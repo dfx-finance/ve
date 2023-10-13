@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 import pytest
 from brownie import ZERO_ADDRESS, Contract
+from brownie.network import gas_price
+from utils.gas import gas_strategy
 
 from utils.chain import (
     fastforward_chain_weeks,
     # fastforward_chain_weeks_anvil as fastforward_chain_weeks,
 )
+
+
+@pytest.fixture(scope="function", autouse=True)
+def setup_gas():
+    gas_price(gas_strategy)
 
 
 """

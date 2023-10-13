@@ -62,5 +62,5 @@ compiler:
     remappings:
       - "@openzeppelin=OpenZeppelin/openzeppelin-contracts@4.5.0"
       - "@openzeppelinUpgradeable=OpenZeppelin/openzeppelin-contracts-upgradeable@4.5.0"
-      - "@chainlink/contracts=/Users/kyle/Code/ve/node_modules/@chainlink/contracts"
-      - "@chainlink/contracts-ccip=/Users/kyle/Code/ve/node_modules/@chainlink/contracts-ccip"
+      - "@chainlink/contracts=/Users/kyle/Code/dfx/ve/node_modules/@chainlink/contracts"
+      - "@chainlink/contracts-ccip=/Users/kyle/Code/dfx/ve/node_modules/@chainlink/contracts-ccip"
