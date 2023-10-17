@@ -13,10 +13,10 @@ if connected.is_local:
     DEPLOY_ACCT = accounts[0]
     DEPLOY_PROXY_ACCT = accounts[1]
 else:
-    print("Loading live wallets [cldfx,deployve-proxyadmin]...")
+    print("Loading live wallets [v3-deploy,deployve-proxyadmin]...")
     # DEPLOY_ACCT = accounts.load("deployve")
     # DEPLOY_PROXY_ACCT = accounts.load("deployve-proxyadmin")
-    DEPLOY_ACCT = accounts.load("cldfx")
+    DEPLOY_ACCT = accounts.load("v3-deploy")
     DEPLOY_PROXY_ACCT = accounts.load("deployve-proxyadmin")
 
 

@@ -14,17 +14,17 @@ from utils.helper import fund_multisigs
 from utils.network import network_info
 
 connected = network_info()
-Ethereum = EthereumLocalhost if network.is_local else Ethereum
+Ethereum = EthereumLocalhost if connected.is_local else Ethereum
 
 ETH_GAUGES = [
-    Ethereum.DFX_CADC_USDC_GAUGE,
-    Ethereum.DFX_EURC_USDC_GAUGE,
-    Ethereum.DFX_GBPT_USDC_GAUGE,
-    Ethereum.DFX_GYEN_USDC_GAUGE,
-    Ethereum.DFX_NZDS_USDC_GAUGE,
-    Ethereum.DFX_TRYB_USDC_GAUGE,
-    Ethereum.DFX_XIDR_USDC_GAUGE,
-    Ethereum.DFX_XSGD_USDC_GAUGE,
+    Ethereum.CADC_USDC_GAUGE,
+    Ethereum.EURC_USDC_GAUGE,
+    Ethereum.GBPT_USDC_GAUGE,
+    Ethereum.GYEN_USDC_GAUGE,
+    # Ethereum.NZDS_USDC_GAUGE,
+    Ethereum.TRYB_USDC_GAUGE,
+    Ethereum.XIDR_USDC_GAUGE,
+    Ethereum.XSGD_USDC_GAUGE,
 ]
 ARBITRUM_GAUGES = [
     Ethereum.ARBITRUM_CADC_USDC_ROOT_GAUGE,

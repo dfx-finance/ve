@@ -85,7 +85,7 @@ def deploy():
 def main():
     print(
         (
-            "Script 1 of 3:\n\n"
+            "Script 1 of 4:\n\n"
             "NOTE: This script expects configuration for:\n"
             "\t1. VotingEscrow (VeDFX) contract address"
         )

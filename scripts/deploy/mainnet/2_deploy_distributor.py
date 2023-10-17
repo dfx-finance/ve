@@ -63,7 +63,7 @@ def deploy(verify_contracts=False):
 def main():
     print(
         (
-            "Script 2 of 3:\n\n"
+            "Script 2 of 4:\n\n"
             "NOTE: This script expects configuration for:\n"
             "\t1. GaugeController address\n"
             "\t2. DFX token rewards per second\n"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import Contract, clDFX, ERC20LP, DfxUpgradeableProxy, ZERO_ADDRESS
+from brownie import Contract, clDFX, DfxUpgradeableProxy, ZERO_ADDRESS
 
 import json
 import time

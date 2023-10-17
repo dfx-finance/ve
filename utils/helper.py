@@ -12,6 +12,10 @@ def fund_multisigs(funder, multisig_accounts):
         funder.transfer(multisig_account, "10 ether", gas_price=gas_strategy)
 
 
+def fund_router(funder, router):
+    funder.transfer(router, "10 ether", gas_price=gas_strategy)
+
+
 def mint_dfx(dfx, amount, account, master_account):
     dfx.mint(account, amount, {"from": master_account, "gas_price": gas_strategy})
 
