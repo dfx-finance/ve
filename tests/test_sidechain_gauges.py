@@ -120,7 +120,7 @@ def test_l2_gauge_timetravel(
 
 
 def test_cctp_root_gauge_send(DFX, root_gauge_L1, deploy_account, multisig_0):
-    root_gauge_L1.updateDistributor(deploy_account, {"from": multisig_0})
+    root_gauge_L1.setDistributor(deploy_account, {"from": multisig_0})
 
     # provide gauge with gas money
     multisig_0.transfer(root_gauge_L1.address, 5e17)

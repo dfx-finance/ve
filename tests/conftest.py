@@ -145,23 +145,34 @@ def distributor(
     yield dfx_distributor_proxy
 
 
-# Layer 2 distributor which receives rewards through CCIP router and distributes
-# rewards linearly to a RewardsOnlyGauge. For each RewardsOnlyGauge, there is an
-# associated ChildChainStreamer.
+# Layer 2 distributor which receives rewards through CCIP router and passes all rewards to streamer.
+# For each RewardsOnlyGauge, there is an associated ChildChainReceiver and ChildChainStreamer.
+@pytest.fixture(scope="function")
+def child_chain_receiver(
+    ChildChainReceiver,
+    mock_ccip_router,
+    child_chain_streamer,
+    multisig_0,
+    deploy_account,
+):
+    yield ChildChainReceiver.deploy(
+        mock_ccip_router, child_chain_streamer, multisig_0, {"from": deploy_account}
+    )
+
+
+# Streamer get rewards from receiver and distributes rewards linearly to a RewardsOnlyGauge.
 @pytest.fixture(scope="function")
 def child_chain_streamer(
     DFX_OFT,
-    ChildChainStreamerCctp,
-    mock_ccip_router,
+    ChildChainStreamer,
     child_gauge_L2,
     deploy_account,
     multisig_0,
 ):
-    yield ChildChainStreamerCctp.deploy(
+    yield ChildChainStreamer.deploy(
         multisig_0,
         child_gauge_L2,
         DFX_OFT,
-        mock_ccip_router,
         {"from": deploy_account},
     )
 

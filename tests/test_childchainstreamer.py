@@ -5,7 +5,7 @@ import math
 import pytest
 
 from utils.constants import MAX_UINT256
-from utils.helper import fund_multisigs
+from utils.helper import fund_multisigs, fund_router
 from .helpers_childchainstreamer import (
     advance_epoch,
     log_ve_gauge,
@@ -16,18 +16,23 @@ from .helpers_childchainstreamer import (
 
 # handle setup logic required for each unit test
 @pytest.fixture(scope="function", autouse=True)
-def setup(deploy_account, multisig_0):
+def setup(deploy_account, multisig_0, mock_ccip_router):
     fund_multisigs(deploy_account, [multisig_0])
+    fund_router(deploy_account, mock_ccip_router)
 
 
 def test_receive_rewards_ccip(
-    DFX_OFT, child_chain_streamer, mock_ccip_router, deploy_account, multisig_0
+    DFX_OFT,
+    child_chain_streamer,
+    child_chain_receiver,
+    deploy_account,
+    multisig_0,
 ):
     # update authorized user for childchainstreamer rewards
     # DEV: This will be the address of the CCTP contract which is calling "notify_reward_amount"
     # on ChildChainStreamer
     child_chain_streamer.set_reward_distributor(
-        DFX_OFT, mock_ccip_router, {"from": multisig_0}
+        deploy_account, child_chain_receiver, {"from": multisig_0}
     )
 
     DFX_OFT.transfer(
@@ -36,9 +41,7 @@ def test_receive_rewards_ccip(
         {"from": deploy_account},
     )
 
-    # message id, source chain selector, sender, data, destTokenAmounts
-    msg = [0, 0, 0, 0, [[DFX_OFT, 1e23]]]
-    child_chain_streamer.ccipReceive(msg, {"from": mock_ccip_router})
+    child_chain_streamer.notify_reward_amount(DFX_OFT, {"from": deploy_account})
 
     # check that token distribution/second will equal the total rewards
     # provided for the epoch

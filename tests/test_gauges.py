@@ -173,6 +173,8 @@ def test_multi_user_boosted(
 
     # all voting power is registered on controller
     assert gauge_controller.vote_user_power(user_0) == 10000
+    print(gauge.DFX(), DFX)
+    print(gauge.reward_data(DFX)[4] - min(chain.time(), gauge.reward_data(DFX)[2]))
     gauge.user_checkpoint(user_0, {"from": user_0})
 
     # (epoch 1)

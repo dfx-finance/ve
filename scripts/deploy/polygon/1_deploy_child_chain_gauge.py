@@ -166,10 +166,10 @@ def main():
     verify_deploy_address(DEPLOY_ACCT)
 
     # Deploy all contracts
-    # gauge_logic = deploy_gauge_implementation()
-    # if connected.is_local:
-    #     time.sleep(3)
-    gauge_logic = load_gauge_implementation()
+    gauge_logic = deploy_gauge_implementation()
+    if connected.is_local:
+        time.sleep(10)
+    # gauge_logic = load_gauge_implementation()
 
     verify_contracts = False if connected.is_local else True
     cadc_usdc_receiver, cadc_usdc_streamer, cadc_usdc_gauge = deploy_contract_set(
