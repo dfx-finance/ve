@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import Contract, chain, ZERO_ADDRESS
+from brownie import Contract, chain, reverts, ZERO_ADDRESS
 from brownie import DfxDistributor, DfxUpgradeableProxy
 from datetime import datetime
 import pytest
@@ -8,12 +8,21 @@ from utils.chain import fastforward_chain, fastforward_chain_weeks
 from utils.gauges import deposit_lp_tokens, setup_distributor
 from utils.helper import fund_multisigs
 from utils.gauges import setup_distributor, setup_gauge_controller
-from .constants import EMISSION_RATE, TOTAL_DFX_REWARDS
+from .constants import EMISSION_RATE, WEEK
+
+
+def set_chain_time():
+    # Set chain time to a Tuesday
+    t0 = int(datetime(2025, 4, 15, 12, 0, 0).timestamp())
+    fastforward_chain(t0)
+    return t0
 
 
 # Deploy distributor without affecting chain time
 @pytest.fixture(scope="function")
 def _distributor(DFX, gauge_controller, deploy_account, multisig_0, multisig_1):
+    set_chain_time()
+
     # Deploy DfxDistributor logic
     dfx_distributor = DfxDistributor.deploy({"from": deploy_account})
 
@@ -39,6 +48,7 @@ def _distributor(DFX, gauge_controller, deploy_account, multisig_0, multisig_1):
     dfx_distributor_proxy = Contract.from_abi(
         "DfxDistributor", proxy.address, DfxDistributor.abi
     )
+
     return dfx_distributor_proxy
 
 
@@ -50,7 +60,7 @@ def _gauge(
     LiquidityGaugeV4,
     DfxUpgradeableProxy,
     veboost_proxy,
-    distributor,
+    _distributor,
     lpt_L1,
     deploy_account,
     multisig_0,
@@ -66,7 +76,7 @@ def _gauge(
         DFX,
         veDFX,
         veboost_proxy,
-        distributor,
+        _distributor,
     )
     dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
         gauge.address,
@@ -102,33 +112,92 @@ def setup(
     )
 
 
-# ## Helpers
-# def chain_time(out=False):
-#     now = int(chain.time())
-#     if out:
-#         print("Chain time:", datetime.fromtimestamp(now))
-#     return now
+## Helpers
+def chain_time(out=False):
+    now = int(chain.time())
+    if out:
+        print("Chain time:", datetime.fromtimestamp(now))
+    return now
 
 
-# ## Tests
-# # Set deploy time to: Oct 17, 2023 12:00:00 UTC
-# # Deploy contract, epoch start is: Oct 12, 2023 00:00:00 UTC
-# def test_epoch_start(_distributor):
-#     # Set chain time to a Tuesday
-#     t0 = int(datetime(2023, 10, 17, 12, 0, 0).timestamp())
-#     fastforward_chain(t0)
-#     assert chain_time() == t0, "Chain time not Oct 17, 2023 at 12:00:00"
+## Tests
+# Set deploy time to: Apr 15, 2025 12:00:00 UTC
+# Deploy contract, epoch start is: Apr 10, 2025 00:00:00 UTC
+def test_epoch_start(_distributor):
+    # Set chain time to a Tuesday
+    t0 = set_chain_time()
+    fastforward_chain(t0)
 
-#     start_epoch = _distributor.startEpochTime()
-#     assert start_epoch == 1697068800, "Epoch start not Oct 12, 2023, at 00:00:00"
+    assert t0 - 5 <= chain_time() <= t0 + 5, "Chain time not Apr 15, 2025 at 12:00:00"
 
-
-# def test_early_distribution(_distributor, _gauge, lpt_L1, deploy_account):
-#     # check that we have been pre-minted LP tokens
-#     assert (
-#         lpt_L1.balanceOf(deploy_account) == 1_000_000_000 * 1e18
-#     ), "Insufficient LPT balance"
+    start_epoch = _distributor.startEpochTime()
+    assert (
+        1744243195 <= start_epoch <= 1744243205
+    ), "Epoch start not Apr 10, 2023 at 00:00:00"
 
 
-def test_start_distribution():
-    pass
+def test_early_distribution(
+    DFX, _distributor, _gauge, lpt_L1, deploy_account, multisig_0
+):
+    assert _distributor.miningEpoch() == 0, "Unexpected epoch"
+
+    # check that we have been pre-minted LP tokens
+    assert (
+        lpt_L1.balanceOf(deploy_account) == 1_000_000_000 * 1e18
+    ), "Insufficient LPT balance"
+
+    # deposit tokens to gauge
+    deposit_lp_tokens(lpt_L1, _gauge, deploy_account)
+
+    fastforward_chain(chain_time() + 10)
+    _distributor.distributeReward(_gauge, {"from": multisig_0})
+    assert _distributor.miningEpoch() == 0, "Unexpected epoch"
+
+    assert DFX.balanceOf(_gauge) == 0, "Gauge received rewards before first epoch"
+
+
+def test_start_distribution(
+    DFX, gauge_controller, _distributor, _gauge, lpt_L1, multisig_0, deploy_account
+):
+    assert _distributor.miningEpoch() == 0, "Unexpected epoch"
+
+    # deposit tokens to gauge
+    deposit_lp_tokens(lpt_L1, _gauge, deploy_account)
+
+    # fast-forward to start of epoch 1
+    fastforward_chain_weeks(num_weeks=0)
+    gauge_controller.gauge_relative_weight_write(_gauge, {"from": multisig_0})
+    weight = gauge_controller.gauge_relative_weight(_gauge)
+    assert weight == 1e18, "Unexpected gauge weight"
+    _distributor.distributeReward(_gauge, {"from": multisig_0})
+    assert (
+        DFX.balanceOf(_gauge) == 120020493396596944838400
+    ), "Unexpected amount of rewards"
+    assert _distributor.miningEpoch() == 1, "Unexpected epoch"
+
+    # fast-forward to start of epoch 2
+    fastforward_chain_weeks(num_weeks=0)
+    gauge_controller.gauge_relative_weight_write(_gauge, {"from": multisig_0})
+    weight = gauge_controller.gauge_relative_weight(_gauge)
+    assert weight == 1e18, "Unexpected gauge weight"
+    _distributor.distributeReward(_gauge, {"from": multisig_0})
+    assert (
+        DFX.balanceOf(_gauge) == 239108777417451531744000
+    ), "Unexpected amount of rewards"
+    assert _distributor.miningEpoch() == 2, "Unexpected epoch"
+
+
+# Can update mining parameters at start of epoch. Reverts if called too soon.
+def test_update_mining_parameters(_distributor, multisig_0):
+    with reverts():
+        _distributor.updateMiningParameters({"from": multisig_0})
+
+    fastforward_chain_weeks(num_weeks=0)
+    _distributor.updateMiningParameters({"from": multisig_0})
+
+    fastforward_chain(chain_time() + 10)
+    with reverts():
+        _distributor.updateMiningParameters({"from": multisig_0})
+
+    fastforward_chain_weeks(num_weeks=0)
+    _distributor.updateMiningParameters({"from": multisig_0})

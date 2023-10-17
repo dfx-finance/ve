@@ -108,7 +108,8 @@ contract DfxDistributor is DfxDistributorEvents, ReentrancyGuardUpgradeable, Acc
         rate = _initialRate;
         delegateGauge = _delegateGauge;
         distributionsOn = false;
-        startEpochTime = block.timestamp;
+        // DFX change: round down deployment time to this week's epoch
+        startEpochTime = block.timestamp / WEEK * WEEK;
         _setRoleAdmin(GOVERNOR_ROLE, GOVERNOR_ROLE);
         _setRoleAdmin(GUARDIAN_ROLE, GOVERNOR_ROLE);
         _setupRole(GUARDIAN_ROLE, guardian);

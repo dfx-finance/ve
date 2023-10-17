@@ -10,11 +10,8 @@ $ brownie test tests/<test_script_name>.py -s
 
 ### Forking Mainnet (for testing live contracts)
 
-Tests use the hardhat node configured in the `hh` directory.
-
 ```bash
-$ cd ./hh
-$ npx hardhat node
+$ anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/dRYOSLDw-_H1uT1bUtFKXipGKvKB1IX1 --fork-block-number 18366380
 ```
 
 ## VE Dependencies
