@@ -239,7 +239,7 @@ def _deploy_gauge_L1(
 # Deploys an LPT as found on Layer 1
 @pytest.fixture(scope="function")
 def lpt_L1(ERC20LP, deploy_account):
-    yield _deploy_lpt(ERC20LP, "L1 BTC/ETH LPT", deploy_account)
+    yield _deploy_lpt(ERC20LP, "L1 BTC/ETH LPT", "dfx-btc-eth-lpt", deploy_account)
 
 
 # Deploys a LiquidityGaugeV4 contract as found on Layer 1
