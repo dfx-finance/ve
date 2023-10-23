@@ -13,3 +13,4 @@ docs/
 # Dotenv file
 .env
 ve-venv/
+/lib/
