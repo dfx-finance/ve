@@ -13,6 +13,7 @@ contract SidechainGaugesTest is Test, Constants, Deploy, Setup {
     IVeBoostProxy public veBoostProxy;
     IGaugeController public gaugeController;
     DfxDistributor public distributor;
+    CcipSender public sender;
     MockCcipRouter public router;
 
     address multisig0 = makeAddr("MULTISIG_0");
@@ -30,6 +31,7 @@ contract SidechainGaugesTest is Test, Constants, Deploy, Setup {
         gaugeController = deployGaugeController(address(DFX), address(veDFX), multisig0);
         distributor = deployDistributor(address(DFX), address(gaugeController), multisig0, multisig0, multisig1);
         router = deployMockCcipRouter();
+        sender = deploySender(address(DFX), address(router), TARGET_CHAIN_SELECTOR, address(0), multisig0, multisig1);
 
         IERC20 lpt0 = deployLpt("DFX CADC-USDC LP Token", "cadcUsdc");
         IERC20 lpt1 = deployLpt("DFX EUROC-USDC LP Token", "eurocUsdc");
@@ -71,6 +73,9 @@ contract SidechainGaugesTest is Test, Constants, Deploy, Setup {
 
         setupGaugeController(address(gaugeController), gaugeAddrs, multisig0);
         setupDistributor(address(DFX), address(distributor), multisig0, EMISSION_RATE, TOTAL_DFX_REWARDS);
+
+        // Provide sender contract with CCIP gas money
+        fundEth(address(sender), 5e17);
     }
 
     function test_L2GaugeTimetravel() public {
@@ -87,14 +92,12 @@ contract SidechainGaugesTest is Test, Constants, Deploy, Setup {
         // epoch 2: deploy L2 gauge, add to gauge controller and distribute rewards
         vm.warp(block.timestamp + WEEK / WEEK * WEEK);
         CcipRootGauge rootGauge = deployRootGauge(
-            "L1 ETH/BTC Root Gauge", address(DFX), address(distributor), address(router), multisig0, multisig1
+            "L1 ETH/BTC Root Gauge", address(DFX), address(distributor), address(sender), multisig0, multisig1
         );
-        addToGaugeController(address(gaugeController), address(rootGauge), multisig0, true);
-
-        // provide root gauge with gas money
+        // Link mainnet and root gauge addresses
         vm.prank(multisig0);
-        (bool sent,) = address(rootGauge).call{value: 5e17}("");
-        require(sent, "Failed to fund root gauge");
+        sender.setL2Destination(address(rootGauge), MOCK_DESTINATION);
+        addToGaugeController(address(gaugeController), address(rootGauge), multisig0, true);
 
         // set l2 gauge as a delegate for automating distribution by calling RootGauge notifyReward function
         vm.prank(multisig0);

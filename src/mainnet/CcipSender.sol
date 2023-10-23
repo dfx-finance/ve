@@ -23,8 +23,8 @@ contract CcipSender is Initializable {
     uint64 public targetChainSelector;
     // The token used for paying fees in cross-chain interactions
     address public feeToken;
-    // The default gas price for the _ccipReceive function on the L2
-    uint256 public l2GasLimitFee = 200_000; // default gas price for _ccipReceive
+    // The gas price for the _ccipReceive function on the L2
+    uint256 public l2GasLimitFee;
 
     // The address with administrative privileges over this contract
     address public admin;
@@ -50,17 +50,23 @@ contract CcipSender is Initializable {
         uint256 fees
     );
 
-    /// @dev Modifier that checks whether the msg.sender is admin
+    /// @dev Modifier that checks whether the caller is admin
     modifier onlyAdmin() {
         require(msg.sender == admin, "Not admin");
         _;
     }
 
     /// @notice Contract constructor
+    /// @param _DFX Address of the DFX reward token
     constructor(address _DFX) initializer {
         DFX = _DFX;
     }
 
+    /// @notice Initialize the contract
+    /// @param _router Address of the CCIP Router contract
+    /// @param _selector Chain selector for the destination blockchain
+    /// @param _feeToken Address of the token used for paying fees
+    /// @param _admin Address with administrative privileges
     function initialize(address _router, uint64 _selector, address _feeToken, address _admin) public {
         router = IRouterClient(_router);
         targetChainSelector = _selector;
@@ -69,12 +75,16 @@ contract CcipSender is Initializable {
 
         // Max approve spending of rewards tokens by sender
         IERC20(DFX).approve(address(_router), type(uint256).max);
+
+        // Default gas price for _ccipReceive
+        l2GasLimitFee = 200_000;
     }
 
     function relayReward(uint256 amount) public returns (bytes32) {
         IERC20(DFX).transferFrom(msg.sender, address(this), amount);
 
         address destination = destinations[msg.sender];
+        require(destination != address(0), "No L2 destination");
 
         Client.EVM2AnyMessage memory message = _buildCcipMessage(destination, DFX, amount, feeToken);
         uint256 fees = router.getFee(targetChainSelector, message);
@@ -141,6 +151,15 @@ contract CcipSender is Initializable {
     }
 
     /* Admin */
+    /// @notice Set a new admin for the contract.
+    /// @dev Only callable by the current admin.
+    /// @param _newAdmin Address of the new admin.
+    function updateAdmin(address _newAdmin) external onlyAdmin {
+        admin = _newAdmin;
+    }
+
+    /// @notice Set a new chain selector for the destination blockchain
+    /// @param selector New chain selector value
     function setSelector(uint64 selector) public onlyAdmin {
         targetChainSelector = selector;
     }
@@ -160,7 +179,10 @@ contract CcipSender is Initializable {
         l2GasLimitFee = _newGasLimit;
     }
 
-    function addL2Destination(address rootGauge, address receiver) public onlyAdmin {
+    /// @notice Add a new L2 destination address
+    /// @param rootGauge Address of the root gauge on the L2 chain
+    /// @param receiver Address of the receiver on the L2 chain
+    function setL2Destination(address rootGauge, address receiver) public onlyAdmin {
         destinations[rootGauge] = receiver;
     }
 

@@ -12,7 +12,8 @@ contract Setup is Test {
     uint256 defaultGaugeTypeWeight = 1e18;
 
     function fundEth(address target, uint256 amount) public {
-        payable(target).transfer(amount);
+        (bool success,) = address(target).call{value: amount}("");
+        require(success, "failed to fund");
     }
 
     function sendToken(address token, uint256 amount, address from, address to) public {

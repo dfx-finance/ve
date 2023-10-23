@@ -35,7 +35,7 @@ contract RootGaugeTest is Test, Deploy, Setup {
 
         // Link mainnet and root gauge addresses
         vm.prank(multisig0);
-        sender.addL2Destination(address(gauge), MOCK_DESTINATION);
+        sender.setL2Destination(address(gauge), MOCK_DESTINATION);
 
         // Provide sender contract with CCIP gas money
         fundEth(address(sender), 5e17);
