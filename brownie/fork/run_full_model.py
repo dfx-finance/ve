@@ -3,11 +3,12 @@ import brownie
 from datetime import datetime, timedelta
 import pytest
 
-from fork.constants import EMISSION_RATE, WEEK
+from tests.fork.constants import EMISSION_RATE, TOTAL_DFX_REWARDS
 from utils.chain import fastforward_chain_weeks
-from utils.gauges import setup_distributor, setup_gauge_controller, TOTAL_DFX_REWARDS
+from utils.gauges import setup_distributor, setup_gauge_controller
 from utils.gas import gas_strategy
 from utils.helper import fund_multisigs
+from utils.constants import WEEK
 
 
 # handle setup logic required for each unit test

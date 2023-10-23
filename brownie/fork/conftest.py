@@ -5,9 +5,9 @@ import pytest
 
 from utils.chain import fastforward_chain_weeks
 from utils.gas import gas_strategy
-from utils.network import get_network_addresses
+from utils.network import network_info
 
-addresses = get_network_addresses()
+connected = network_info()
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -49,14 +49,14 @@ Contracts
 def dfx():
     # Load existing DFX ERC20 from mainnet fork
     abi = json.load(open("./tests/abis/Dfx.json"))
-    yield Contract.from_abi("DFX", addresses.DFX, abi)
+    yield Contract.from_abi("DFX", network.addresses.DFX, abi)
 
 
 @pytest.fixture(scope="module")
 def voting_escrow():
     # Load existing DFX ERC20 from mainnet fork
     abi = json.load(open("./tests/abis/veDfx.json"))
-    yield Contract.from_abi("veDFX", addresses.VEDFX, abi)
+    yield Contract.from_abi("veDFX", network.addresses.VEDFX, abi)
 
 
 @pytest.fixture(scope="module")
@@ -103,18 +103,18 @@ def distributor(
 
     # Deploy DfxDistributor proxy
     distributor_initializer_calldata = dfx_distributor.initialize.encode_input(
-        addresses.DFX,
+        network.addresses.DFX,
         gauge_controller,
         0,
         0,
         # should consider using another multisig to deal with access control
         new_master_account,
-        addresses.DFX_MULTISIG_0,
+        network.addresses.DFX_MULTISIG_0,
         ZERO_ADDRESS,
     )
     proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor.address,
-        addresses.DFX_MULTISIG_0,
+        network.addresses.DFX_MULTISIG_0,
         distributor_initializer_calldata,
         {"from": master_account, "gas_price": gas_strategy},
     )
@@ -161,15 +161,15 @@ def three_liquidity_gauges_v4(
         # deploy gauge behind proxy
         gauge_initializer_calldata = gauge.initialize.encode_input(
             lp_token,
-            addresses.DFX_MULTISIG_0,
-            addresses.DFX,
-            addresses.VEDFX,
+            network.addresses.DFX_MULTISIG_0,
+            network.addresses.DFX,
+            network.addresses.VEDFX,
             veboost_proxy,
             distributor,
         )
         dfx_upgradeable_proxy = DfxUpgradeableProxy.deploy(
             gauge.address,
-            addresses.DFX_MULTISIG_0,
+            network.addresses.DFX_MULTISIG_0,
             gauge_initializer_calldata,
             {"from": master_account, "gas_price": gas_strategy},
         )

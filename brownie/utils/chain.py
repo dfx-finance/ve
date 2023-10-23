@@ -8,7 +8,7 @@ from .constants import WEEK
 
 # Fast-forwards chain state to delta (seconds) after (or before if negative)
 # the next distribution epoch starts
-def fastforward_chain_weeks(num_weeks, delta, log=False):
+def fastforward_chain_weeks(num_weeks, delta=0, log=False):
     num_weeks += 1
     t0 = chain.time()
     t1 = (t0 + num_weeks * WEEK) // WEEK * WEEK + delta
