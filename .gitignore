@@ -1,23 +1,15 @@
-__pycache__
-.env
-.history
-.hypothesis/
-build/
-reports/
-ve-venv
-scripts/*.json
-node_modules/
-settings.json
+# Compiler files
 cache/
-node_modules
+out/
+
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
+
+# Dotenv file
 .env
-coverage
-coverage.json
-typechain
-typechain-types
-
-#Hardhat files
-cache
-artifacts
-
-layerzero/lib/
+ve-venv/
