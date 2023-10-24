@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: Foundry project
+    name: VE Contracts
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -33,6 +33,9 @@ jobs:
           python3 -m venv ve-venv
           source ve-venv/bin/activate
           pip install vyper
+
+      - name: Install NPM dependencies
+        run: npm install
         
       - name: Run Forge build
         run: |
