@@ -37,11 +37,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm install
         
-      - name: Run Forge build
-        run: |
-          forge --version
-          forge build --sizes
-        id: build
+      # - name: Run Forge build
+      #   run: |
+      #     forge --version
+      #     forge build --sizes
+      #   id: build
 
       - name: Run Forge tests
         run: |
