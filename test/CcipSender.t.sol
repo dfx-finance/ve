@@ -21,25 +21,31 @@ contract CcipSenderTest is Test, Deploy, Payable, Setup {
     function setUp() public {
         DFX = deployDfx(1e30);
         router = deployMockCcipRouter();
-        sender = deploySender(address(DFX), address(router), TARGET_CHAIN_SELECTOR, address(0), multisig0, multisig1);
+        sender = deploySender(address(DFX), address(router), multisig0, multisig1);
+
+        // Set L2 gas token and fee
+        vm.prank(multisig0);
+        sender.setL2Gas(TARGET_CHAIN_SELECTOR, address(0), 200_000);
 
         // Link mainnet and root gauge addresses
         vm.prank(multisig0);
-        sender.setL2Destination(address(this), destination);
+        sender.setL2Destination(address(this), destination, TARGET_CHAIN_SELECTOR);
 
         // Provide sender contract with CCIP gas money
         fundEth(address(sender), 5e17);
     }
 
     function test_L2GasLimit() public {
-        assertEq(sender.l2GasLimitFee(), 2e5); // default
+        (, uint256 gasLimitFee) = sender.chainFees(TARGET_CHAIN_SELECTOR);
+        assertEq(gasLimitFee, 2e5); // default
 
         vm.expectRevert("Not admin");
-        sender.setL2GasLimit(1e7);
+        sender.setL2Gas(TARGET_CHAIN_SELECTOR, address(0), 1e7);
 
         vm.prank(multisig0);
-        sender.setL2GasLimit(1e7);
-        assertEq(sender.l2GasLimitFee(), 1e7);
+        sender.setL2Gas(TARGET_CHAIN_SELECTOR, address(0), 1e7);
+        (, gasLimitFee) = sender.chainFees(TARGET_CHAIN_SELECTOR);
+        assertEq(gasLimitFee, 1e7);
     }
 
     function test_SetAdmin() public {
@@ -51,15 +57,6 @@ contract CcipSenderTest is Test, Deploy, Payable, Setup {
         vm.prank(multisig0);
         sender.updateAdmin(destination);
         assertEq(sender.admin(), destination);
-    }
-
-    function test_SetSelector() public {
-        vm.expectRevert("Not admin");
-        sender.setSelector(123);
-
-        vm.prank(multisig0);
-        sender.setSelector(123);
-        assertEq(sender.targetChainSelector(), 123);
     }
 
     function test_EmergencyWithdrawErc20() public {
@@ -84,7 +81,7 @@ contract CcipSenderTest is Test, Deploy, Payable, Setup {
 
     function test_RelayRewardZeroAddress() public {
         vm.prank(multisig0);
-        sender.setL2Destination(address(this), address(0));
+        sender.setL2Destination(address(this), address(0), TARGET_CHAIN_SELECTOR);
 
         DFX.approve(address(sender), 2e17);
         vm.expectRevert("No L2 destination");

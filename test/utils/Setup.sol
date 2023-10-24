@@ -59,4 +59,8 @@ contract Setup is Test {
         IGaugeController(gaugeController).add_gauge(gauge, 2, defaultGaugeTypeWeight);
         vm.stopPrank();
     }
+
+    function setL2GaugeReward(address gauge, address streamer, address token, address admin) public {
+        
+    }
 }

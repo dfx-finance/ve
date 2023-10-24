@@ -4,10 +4,13 @@ pragma solidity ^0.8.19;
 import "@snekmate/utils/VyperDeployer.sol";
 
 import "../../src/DfxUpgradeableProxy.sol";
+import "../../src/interfaces/IChildChainStreamer.sol";
 import "../../src/interfaces/IGaugeController.sol";
+import "../../src/interfaces/ILiquidityGaugeV4.sol";
+import "../../src/interfaces/IRewardsOnlyGauge.sol";
 import "../../src/interfaces/IVeDfx.sol";
 import "../../src/interfaces/IVeBoostProxy.sol";
-import "../../src/interfaces/ILiquidityGaugeV4.sol";
+import "../../src/layer2/ChildChainReceiver.sol";
 import "../../src/mainnet/CcipRootGauge.sol";
 import "../../src/mainnet/CcipSender.sol";
 import "../../src/mainnet/DfxDistributor.sol";
@@ -85,24 +88,6 @@ contract Deploy is Constants {
         return ILiquidityGaugeV4(address(proxy));
     }
 
-    function deploySender(
-        address DFX,
-        address router,
-        uint256 targetChainSelector,
-        address feeToken,
-        address admin,
-        address proxyAdmin
-    ) public returns (CcipSender) {
-        // Deploy CcipSender implementation
-        CcipSender _sender = new CcipSender(DFX);
-
-        // Deploy CcipSender proxy
-        bytes memory params =
-            abi.encodeWithSelector(CcipSender.initialize.selector, router, targetChainSelector, feeToken, admin);
-        DfxUpgradeableProxy proxy = new DfxUpgradeableProxy(address(_sender), proxyAdmin, params);
-        return CcipSender(payable(address(proxy)));
-    }
-
     function deployRootGauge(
         string memory name,
         address DFX,
@@ -126,5 +111,42 @@ contract Deploy is Constants {
         );
         DfxUpgradeableProxy proxy = new DfxUpgradeableProxy(address(_gauge), proxyAdmin, params);
         return CcipRootGauge(payable(address(proxy)));
+    }
+
+    function deploySender(address DFX, address router, address admin, address proxyAdmin) public returns (CcipSender) {
+        // Deploy CcipSender implementation
+        CcipSender _sender = new CcipSender(DFX);
+
+        // Deploy CcipSender proxy
+        bytes memory params = abi.encodeWithSelector(CcipSender.initialize.selector, router, admin);
+        DfxUpgradeableProxy proxy = new DfxUpgradeableProxy(address(_sender), proxyAdmin, params);
+        return CcipSender(payable(address(proxy)));
+    }
+
+    function deployChildChainReceiver(address router, address streamer, address admin)
+        public
+        returns (ChildChainReceiver)
+    {
+        return new ChildChainReceiver(router, streamer, admin);
+    }
+
+    function deployChildChainStreamer(address DFX, address gauge, address admin) public returns (IChildChainStreamer) {
+        // Deploy ChildChainStreamer
+        return IChildChainStreamer(
+            vyperDeployer.deployContract("src/layer2/", "ChildChainStreamer", abi.encode(admin, gauge, DFX))
+        );
+    }
+
+    function deployRewardsOnlyGauge(address lpt, address admin, address proxyAdmin)
+        public
+        returns (IRewardsOnlyGauge)
+    {
+        // Deploy RewardsOnlyGauge implementation
+        address _gaugeAddr = vyperDeployer.deployContract("src/layer2/", "RewardsOnlyGauge", "");
+
+        // Deploy RewardsOnlyGauge proxy
+        bytes memory params = abi.encodeWithSelector(IRewardsOnlyGauge.initialize.selector, admin, lpt);
+        DfxUpgradeableProxy proxy = new DfxUpgradeableProxy(_gaugeAddr, proxyAdmin, params);
+        return IRewardsOnlyGauge(address(proxy));
     }
 }

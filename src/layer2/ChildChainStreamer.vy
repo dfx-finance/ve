@@ -47,7 +47,7 @@ def add_reward(_token: address, _distributor: address, _duration: uint256):
     @param _duration Number of seconds that rewards of this token are streamed over
     """
     assert msg.sender == self.owner  # dev: owner only
-    assert self.reward_data[_token].distributor == ZERO_ADDRESS, "Reward token already added"
+    assert self.reward_data[_token].distributor == empty(address), "Reward token already added"
 
     idx: uint256 = self.reward_count
     self.reward_tokens[idx] = _token
@@ -64,7 +64,7 @@ def remove_reward(_token: address):
     @param _token Address of the reward token
     """
     assert msg.sender == self.owner  # dev: only owner
-    assert self.reward_data[_token].distributor != ZERO_ADDRESS, "Reward token not added"
+    assert self.reward_data[_token].distributor != empty(address), "Reward token not added"
 
     self.reward_data[_token] = empty(RewardToken)
     amount: uint256 = ERC20(_token).balanceOf(self)
@@ -84,7 +84,7 @@ def remove_reward(_token: address):
     for i in range(8):
         if self.reward_tokens[i] == _token:
             self.reward_tokens[i] = self.reward_tokens[idx]
-            self.reward_tokens[idx] = ZERO_ADDRESS
+            self.reward_tokens[idx] = empty(address)
             self.reward_count = idx
             return
     raise  # this should never be reached
@@ -130,7 +130,7 @@ def get_reward():
     """
     last_update: uint256 = self.last_update_time
     for token in self.reward_tokens:
-        if token == ZERO_ADDRESS:
+        if token == empty(address):
             break
         self._update_reward(token, last_update)
     self.last_update_time = block.timestamp
@@ -150,7 +150,7 @@ def notify_reward_amount(_token: address):
     last_update: uint256 = self.last_update_time
     is_updated: bool = False
     for token in self.reward_tokens:
-        if token == ZERO_ADDRESS:
+        if token == empty(address):
             break
 
         self._update_reward(token, last_update)

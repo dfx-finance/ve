@@ -22,7 +22,7 @@ contract RootGaugeTest is Test, Deploy, Setup {
         veDFX = deployVeDfx(address(DFX));
         veBoostProxy = deployVeBoostProxy(address(veDFX), multisig0);
         router = deployMockCcipRouter();
-        sender = deploySender(address(DFX), address(router), TARGET_CHAIN_SELECTOR, address(0), multisig0, multisig1);
+        sender = deploySender(address(DFX), address(router), multisig0, multisig1);
 
         gauge = deployRootGauge(
             "DFX BTC/ETH Root Gauge",
@@ -33,9 +33,13 @@ contract RootGaugeTest is Test, Deploy, Setup {
             multisig1
         );
 
+        // Set L2 gas token and fee
+        vm.prank(multisig0);
+        sender.setL2Gas(TARGET_CHAIN_SELECTOR, address(0), 200_000);
+
         // Link mainnet and root gauge addresses
         vm.prank(multisig0);
-        sender.setL2Destination(address(gauge), MOCK_DESTINATION);
+        sender.setL2Destination(address(gauge), MOCK_DESTINATION, TARGET_CHAIN_SELECTOR);
 
         // Provide sender contract with CCIP gas money
         fundEth(address(sender), 5e17);
