@@ -33,9 +33,9 @@ contract SidechainGaugesTest is Test, Constants, Deploy, Setup {
         router = deployMockCcipRouter();
         sender = deploySender(address(DFX), address(router), multisig0, multisig1);
 
-        IERC20 lpt0 = deployLpt("DFX CADC-USDC LP Token", "cadcUsdc");
-        IERC20 lpt1 = deployLpt("DFX EUROC-USDC LP Token", "eurocUsdc");
-        IERC20 lpt2 = deployLpt("DFX XSGD-USDC LP Token", "xsgdUsdc");
+        IERC20 lpt0 = deployLpt("DFX CADC-USDC LP Token", "cadcUsdc", address(this));
+        IERC20 lpt1 = deployLpt("DFX EUROC-USDC LP Token", "eurocUsdc", address(this));
+        IERC20 lpt2 = deployLpt("DFX XSGD-USDC LP Token", "xsgdUsdc", address(this));
 
         gaugeAddrs[0] = address(
             deployLiquidityGaugeV4(

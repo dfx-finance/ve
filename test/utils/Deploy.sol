@@ -26,8 +26,8 @@ contract Deploy is Constants {
         return new DFX_(mintAmount);
     }
 
-    function deployLpt(string memory name, string memory symbol) public returns (IERC20) {
-        return IERC20(vyperDeployer.deployContract("src/mocks/", "ERC20LP", abi.encode(name, symbol, 18, 1e9)));
+    function deployLpt(string memory name, string memory symbol, address minter) public returns (IERC20) {
+        return IERC20(vyperDeployer.deployContract("src/mocks/", "ERC20LP", abi.encode(name, symbol, 18, 1e9, minter)));
     }
 
     function deployVeDfx(address DFX) public returns (IVeDfx) {

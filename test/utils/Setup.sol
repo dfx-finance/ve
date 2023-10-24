@@ -5,6 +5,8 @@ import {Test, console2} from "forge-std/Test.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "../../src/interfaces/IGaugeController.sol";
+import "../../src/interfaces/IChildChainStreamer.sol";
+import "../../src/interfaces/IRewardsOnlyGauge.sol";
 import "../../src/mainnet/DfxDistributor.sol";
 
 contract Setup is Test {
@@ -60,7 +62,16 @@ contract Setup is Test {
         vm.stopPrank();
     }
 
-    function setL2GaugeReward(address gauge, address streamer, address token, address admin) public {
-        
+    function setL2GaugeReward(address gauge, address streamer, address router, address token, address admin) public {
+        // update authorized user for childchainstreamer rewards
+        // DEV: This will be the address of the CCTP contract which is calling "notify_reward_amount" on ChildChainStreamer
+        vm.prank(admin);
+        IChildChainStreamer(streamer).set_reward_distributor(token, router);
+
+        // set rewards contract on gauge
+        address[8] memory rewards;
+        rewards[0] = token;
+        vm.prank(admin);
+        IRewardsOnlyGauge(gauge).set_rewards(streamer, IChildChainStreamer(streamer).get_reward.selector, rewards);
     }
 }

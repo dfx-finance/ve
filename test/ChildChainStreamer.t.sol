@@ -12,6 +12,7 @@ import "./utils/Setup.sol";
 
 contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
     DFX_ public DFX;
+    IERC20 public lpt;
     IRewardsOnlyGauge public gauge;
     IChildChainStreamer public streamer;
     ChildChainReceiver public receiver;
@@ -19,10 +20,11 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
     address multisig0 = makeAddr("MULTISIG_0");
     address multisig1 = makeAddr("MULTISIG_1");
     address router = address(this);
+    address user = makeAddr("USER");
 
     function setUp() public {
         DFX = deployDfx(1e30);
-        IERC20 lpt = deployLpt("DFX CADC-USDC LP Token", "cadcUsdc");
+        lpt = deployLpt("DFX CADC-USDC LP Token", "cadcUsdc", address(this));
 
         gauge = deployRewardsOnlyGauge(address(lpt), multisig0, multisig1);
         streamer = deployChildChainStreamer(address(DFX), address(gauge), multisig0);
@@ -46,7 +48,21 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
     }
 
     function test_StreamToGauge() public {
-        
+        setL2GaugeReward(address(gauge), address(streamer), router, address(DFX), multisig0);
+
+        // give distributor rewards
+        sendToken(address(DFX), 1e23, address(this), address(streamer));
+        streamer.notify_reward_amount(address(DFX));
+
+        // deposit lpt to l2 gauge
+        lpt.transfer(user, 1e18);
+        vm.startPrank(user);
+        lpt.approve(address(gauge), type(uint256).max);
+        gauge.deposit(1e18);
+        vm.stopPrank();
+
+        assertEq(gauge.balanceOf(address(user)), 1e18);
+        assertEq(gauge.reward_tokens(0), address(DFX));
     }
 
     function test_TwoStakers() public {}

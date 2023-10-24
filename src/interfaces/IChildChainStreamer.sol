@@ -11,6 +11,7 @@ interface IChildChainStreamer {
         uint256 paid;
     }
 
+    function get_reward() external;
     function notify_reward_amount(address _token) external;
     function reward_data(address _token) external returns (RewardToken memory);
     function set_reward_distributor(address _token, address _distributor) external;
