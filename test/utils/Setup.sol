@@ -71,7 +71,11 @@ contract Setup is Test {
         // set rewards contract on gauge
         address[8] memory rewards;
         rewards[0] = token;
+        // bytes memory sig = keccak256();
+        // bytes32(IChildChainStreamer(streamer).get_reward.selector)
+        // bytes4 selector = IChildChainStreamer(streamer).get_reward.selector;
+        bytes32 claimSig = bytes32(uint256(uint32(IChildChainStreamer(streamer).get_reward.selector)));
         vm.prank(admin);
-        IRewardsOnlyGauge(gauge).set_rewards(streamer, IChildChainStreamer(streamer).get_reward.selector, rewards);
+        IRewardsOnlyGauge(gauge).set_rewards(streamer, claimSig, rewards);
     }
 }

@@ -124,10 +124,10 @@ def _checkpoint_rewards(_user: address, _total_supply: uint256, _claim: bool, _r
     # claim from reward contract
 
     reward_data: uint256 = self.reward_data
-    if _total_supply != 0 and reward_data != 0 and block.timestamp > (reward_data >> 160) + CLAIM_FREQUENCY:
+    if _total_supply != 0 and reward_data != 0 and block.timestamp > reward_data >> 160 + CLAIM_FREQUENCY:
         reward_contract: address = convert(reward_data % 2**160, address)
         raw_call(reward_contract, self.claim_sig)  # dev: bad claim sig
-        self.reward_data = convert(reward_contract, uint256) + (block.timestamp << 160)
+        self.reward_data = convert(reward_contract, uint256) + block.timestamp << 160
 
     receiver: address = _receiver
     if _claim and receiver == empty(address):
@@ -164,7 +164,7 @@ def _checkpoint_rewards(_user: address, _total_supply: uint256, _claim: bool, _r
             new_claimable = user_balance * (integral - integral_for) / 10**18
 
         claim_data: uint256 = self.claim_data[_user][token]
-        total_claimable: uint256 = (claim_data >> 128) + new_claimable
+        total_claimable: uint256 = claim_data >> 128 + new_claimable
         if total_claimable > 0:
             total_claimed: uint256 = claim_data % 2 ** 128
             if _claim:
@@ -184,7 +184,7 @@ def _checkpoint_rewards(_user: address, _total_supply: uint256, _claim: bool, _r
                 self.claim_data[_user][token] = total_claimed + total_claimable
             elif new_claimable > 0:
                 # update total_claimable (higher order bytes)
-                self.claim_data[_user][token] = total_claimed + (total_claimable << 128)
+                self.claim_data[_user][token] = total_claimed + total_claimable << 128
 
 
 @view

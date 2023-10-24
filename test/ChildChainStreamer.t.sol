@@ -63,6 +63,31 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
 
         assertEq(gauge.balanceOf(address(user)), 1e18);
         assertEq(gauge.reward_tokens(0), address(DFX));
+
+        for (uint256 i = 0; i < 3; i++) {
+            vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+            sendToken(address(DFX), 1e23, address(this), address(streamer));
+            streamer.notify_reward_amount(address(DFX));
+
+            // DFX balances ~= 1e23
+            assertApproxEqAbs(DFX.balanceOf(address(streamer)), 1e23, 1e8);
+            assertApproxEqAbs(DFX.balanceOf(address(gauge)), 1e23, 1e8);
+
+            // Claim rewards
+            uint256 availableRewards = gauge.claimable_reward_write(user, address(DFX));
+            vm.prank(user);
+            gauge.claim_rewards(user);
+            uint256 claimedRewards = gauge.claimed_reward(user, address(DFX));
+
+            // User staked LPT
+            assertEq(gauge.balanceOf(user), 1e18);
+            // User available rewards
+            assertApproxEqAbs(availableRewards, 1e23, 1e8);
+            // User claimed rewards
+            assertApproxEqAbs(claimedRewards, (i + 1) * 1e23, 1e18);
+            // User DFX balance
+            assertApproxEqAbs(DFX.balanceOf(user), (i + 1) * 1e23, 1e18);
+        }
     }
 
     function test_TwoStakers() public {}
