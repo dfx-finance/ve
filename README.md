@@ -1,66 +1,21 @@
-## Foundry
+## VE
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+### Run Scripts
 
-Foundry consists of:
+#### Mainnet RPC
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```
+$ anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/dRYOSLDw-_H1uT1bUtFKXipGKvKB1IX1 --fork-block-number 18415000 --chain-id 31337
 ```
 
-### Test
-
-```shell
-$ forge test
 ```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
+$ forge script script/mainnet/DeployVeDfx.s.sol --ffi --rpc-url http://127.0.0.1:8545 --broadcast
 ```
 
 ### Deploy
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+#### Eth Goerli
+
 ```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+$ forge script script/mainnet/DeployVeDfx.s.sol --ffi --rpc-url https://eth-goerli.g.alchemy.com/v2/e4EYqh1hqJrH3VaieDzOC3kTC48W3Dk0 --broadcast
 ```
