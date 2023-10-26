@@ -13,6 +13,9 @@ dotenv.load_dotenv()
 # globals
 INSTANCE_ID = os.getenv("INSTANCE_ID", "primary")
 DEPLOY_ACCT = accounts[0] if is_localhost else accounts.load("deploy-ve-test")
+DEPLOY_PROXY_ACCT = (
+    accounts[1] if is_localhost else accounts.load("deploy-ve-proxy-test")
+)
 VERIFY_CONTRACTS = False if is_localhost else True
 # globals -- gauge controller
 DEFAULT_GAUGE_TYPE = 0
@@ -22,6 +25,9 @@ DEFAULT_GAUGE_WEIGHT = 1e18
 # globals -- distributor
 REWARDS_RATE = 0
 PREV_DISTRIBUTED_REWARDS = 0
+# globals -- ccip
+ARBITRUM_CHAIN_SELECTOR = None
+POLYGON_CHAIN_SELECTOR = None
 
 # gas -- set default scaling gas price for all transactions
 current_gas_price = web3.eth.gas_price
