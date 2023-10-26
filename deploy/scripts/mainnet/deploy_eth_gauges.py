@@ -31,16 +31,14 @@ def deploy_implementation(verify_contracts=False):
 
 
 # deploy gauge as proxy
-def deploy_gauge(
-    gauge_logic: LiquidityGaugeV4, lpt: str, label: str
-) -> LiquidityGaugeV4:
+def deploy_gauge(gauge_logic: LiquidityGaugeV4, label: str) -> LiquidityGaugeV4:
     veboost_proxy = _veboost_proxy(deployed.read_addr("veBoostProxy"))
     dfx_distributor = _dfx_distributor(deployed.read_addr("dfxDistributor"))
 
     # deploy gauge behind proxy
     print(f"--- Deploying LiquidityGaugeV4 proxy contract to {connected_network} ---")
     gauge_initializer_calldata = gauge_logic.initialize.encode_input(
-        lpt,
+        existing.read_addr(f"{label}Lp"),
         DEPLOY_ACCT,
         existing.read_addr("DFX"),
         existing.read_addr("veDFX"),

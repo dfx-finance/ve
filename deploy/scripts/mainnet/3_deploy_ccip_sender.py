@@ -27,7 +27,7 @@ def deploy():
     print(f"--- Deploying CCIP Sender proxy contract to {connected_network} ---")
     distributor_initializer_calldata = ccip_sender_logic.initialize.encode_input(
         existing.read_addr("ccipRouter"),
-        existing.read_addr("multisig0"),
+        DEPLOY_ACCT,
     )
     proxy = DfxUpgradeableProxy.deploy(
         ccip_sender_logic.address,

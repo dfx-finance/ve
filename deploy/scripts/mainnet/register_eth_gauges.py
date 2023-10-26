@@ -40,7 +40,7 @@ def main():
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    admin = existing.read_addr("multisig0")
+    admin = DEPLOY_ACCT
     add_to_gauge_controller(deployed.read_addr("cadcUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("eurcUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("gbptUsdcGauge"), admin)
