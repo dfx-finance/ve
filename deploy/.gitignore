@@ -1,0 +1,9 @@
+.gitattributes
+__pycache__/
+
+/build/
+/contracts/
+
+/brownie-venv/
+/scripts/outputs/31337/*
+
