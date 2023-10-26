@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-import json
-import time
-
 from brownie import (
     RewardsOnlyGauge,
     DfxUpgradeableProxy,
