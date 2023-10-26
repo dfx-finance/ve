@@ -7,7 +7,7 @@ from utils.config import (
     verify_deploy_address,
     verify_deploy_network,
 )
-from utils.logger import load_inputs, load_outputs, write_contract
+from utils.logger import load_inputs, write_contract
 from utils.network import connected_network
 
 existing = load_inputs(INSTANCE_ID)
