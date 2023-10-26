@@ -1,15 +1,11 @@
 #!/usr/bin/env python
-# import json
-# import time
-
 from brownie import ZERO_ADDRESS, DfxDistributor, DfxUpgradeableProxy
 
 from utils.contracts import gauge_controller as _gauge_controller
 from utils.config import (
     DEPLOY_ACCT,
+    DEPLOY_PROXY_ACCT,
     INSTANCE_ID,
-    DEFAULT_GAUGE_TYPE_NAME,
-    DEFAULT_GAUGE_TYPE_WEIGHT,
     REWARDS_RATE,
     PREV_DISTRIBUTED_REWARDS,
     VERIFY_CONTRACTS,
@@ -17,7 +13,7 @@ from utils.config import (
     verify_deploy_network,
 )
 from utils.logger import load_inputs, load_outputs, write_contract
-from utils.network import connected_network, is_localhost
+from utils.network import connected_network
 
 existing = load_inputs(INSTANCE_ID)
 deployed = load_outputs(INSTANCE_ID)
@@ -45,7 +41,7 @@ def deploy():
     )
     proxy = DfxUpgradeableProxy.deploy(
         dfx_distributor_logic.address,
-        existing.read_addr("multisig1"),
+        DEPLOY_PROXY_ACCT,
         distributor_initializer_calldata,
         {"from": DEPLOY_ACCT},
         publish_source=VERIFY_CONTRACTS,
