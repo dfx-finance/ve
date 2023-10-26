@@ -14,6 +14,8 @@ dotenv.load_dotenv()
 INSTANCE_ID = os.getenv("INSTANCE_ID", "primary")
 DEPLOY_ACCT = accounts[0] if is_localhost else accounts.load("deploy-ve-test")
 DEFAULT_GAUGE_TYPE = 0
+DEFAULT_GAUGE_TYPE_NAME = "DFX LP Ethereum Gauge"
+DEFAULT_GAUGE_TYPE_WEIGHT = 1e18
 DEFAULT_GAUGE_WEIGHT = 1e18
 
 # gas -- set default scaling gas price for all transactions
