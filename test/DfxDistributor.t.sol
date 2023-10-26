@@ -68,4 +68,52 @@ contract DfxDistributorTest is Test, Constants, Deploy, Setup {
         assertEq(distributor.miningEpoch(), 0, "Unexpected epoch");
         assertEq(DFX.balanceOf(address(gauge)), 0, "Gauge received rewards before first epoch");
     }
+
+    function test_StartDistribution() public {
+        assertEq(distributor.miningEpoch(), 0, "Unexpected epoch");
+
+        // deposit tokens to L1 gauge
+        lpt.approve(address(gauge), type(uint256).max);
+        gauge.deposit(1e18);
+
+        // fast-forward to start of epoch 1
+        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+
+        // epoch 1: test weight
+        gaugeController.gauge_relative_weight_write(address(gauge));
+        uint256 weight = gaugeController.gauge_relative_weight(address(gauge));
+        assertEq(weight, 1e18, "Unexpected gauge weight");
+        // epoch 1: test rewards
+        distributor.distributeReward(address(gauge));
+        assertEq(DFX.balanceOf(address(gauge)), 120020493396596944838400, "Unexpected amount of rewards");
+        assertEq(distributor.miningEpoch(), 1, "Unexpected epoch");
+
+        // epoch 2: test weight
+        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        gaugeController.gauge_relative_weight_write(address(gauge));
+        weight = gaugeController.gauge_relative_weight(address(gauge));
+        assertEq(weight, 1e18, "Unexpected gauge weight");
+        // epoch 2: test rewards
+        distributor.distributeReward(address(gauge));
+        assertEq(DFX.balanceOf(address(gauge)), 239108777417451531744000, "Unexpected amount of rewards");
+        assertEq(distributor.miningEpoch(), 2, "Unexpected epoch");
+    }
+
+    function test_UpdateMiningParameters() public {
+        vm.expectRevert(bytes("108"));
+        distributor.updateMiningParameters();
+
+        // fast-forward to start of epoch 1
+        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        distributor.updateMiningParameters();
+
+        // fast-forward to start of epoch 1 + 10s
+        vm.warp(block.timestamp + 10);
+        vm.expectRevert(bytes("108"));
+        distributor.updateMiningParameters();
+
+        // fast-forward to start of epoch 2
+        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        distributor.updateMiningParameters();
+    }
 }
