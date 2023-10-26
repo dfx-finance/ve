@@ -106,4 +106,18 @@ contract RootGaugeTest is Test, Constants, Deploy, Setup {
             assertEq(gauge.claimable_reward(address(this), address(DFX)), expected[i]);
         }
     }
+
+    function test_SingleUserClaim() public {
+        test_SingleUserUnboosted();
+
+        ILiquidityGaugeV4 gauge = ILiquidityGaugeV4(gaugeAddrs[0]);
+        uint256 startingBal = DFX.balanceOf(address(this));
+
+        // claim staking reward
+        uint256 rewardAmount = gauge.claimable_reward(address(this), address(DFX));
+        gauge.claim_rewards(address(this));
+        assertEq(DFX.balanceOf(address(this)) - startingBal, rewardAmount);
+    }
+
+    function test_MultiUserBoosted() public {}
 }
