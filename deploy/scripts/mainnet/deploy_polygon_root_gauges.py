@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-from brownie import DfxUpgradeableProxy, RootGaugeCcip
+from brownie import DfxUpgradeableProxy, CcipRootGauge
 import time
 
 from utils.config import (
     DEPLOY_ACCT,
     DEPLOY_PROXY_ACCT,
     INSTANCE_ID,
-    POLYGON_CHAIN_SELECTOR,
     VERIFY_CONTRACTS,
     verify_deploy_address,
     verify_deploy_network,
@@ -18,9 +17,9 @@ existing = load_inputs(INSTANCE_ID)
 deployed = load_outputs(INSTANCE_ID)
 
 
-def deploy_implementation() -> RootGaugeCcip:
+def deploy_implementation() -> CcipRootGauge:
     print(f"--- Deploying Root Gauge CCIP contract to {connected_network} ---")
-    gauge_logic = RootGaugeCcip.deploy(
+    gauge_logic = CcipRootGauge.deploy(
         existing.read_addr("DFX"),  # source chain reward token
         {"from": DEPLOY_ACCT},
         publish_source=VERIFY_CONTRACTS,
@@ -29,27 +28,23 @@ def deploy_implementation() -> RootGaugeCcip:
     return gauge_logic
 
 
-def load_implementation() -> RootGaugeCcip:
+def load_implementation() -> CcipRootGauge:
     print(f"--- Loading Root Gauge CCIP contract on {connected_network.name} ---")
-    return RootGaugeCcip.at(deployed.read_addr("rootGaugeLogic"))
+    return CcipRootGauge.at(deployed.read_addr("rootGaugeLogic"))
 
 
 def deploy_gauge(
-    gauge_logic: RootGaugeCcip,
-    gauge_name: str,
-    destinationChainId: int,
-    destinationAddr: str,
+    gauge_logic: CcipRootGauge,
+    gauge_symbol: str,
     label: str,
 ):
     print(f"--- Deploying Root Gauge CCIP proxy contract to {connected_network} ---")
     # deploy gauge proxy and initialize
     gauge_initializer_calldata = gauge_logic.initialize.encode_input(
-        gauge_name,
+        f"Polygon {gauge_symbol.upper().replace('-', '/')}",
+        gauge_symbol,
         DEPLOY_ACCT,  # source chain distributor address
-        existing.read_addr("ccipRouter"),  # source chain ccip router address
-        destinationChainId,  # target chain selector
-        destinationAddr,  # child chain receiver address (l2 address)
-        "0x0000000000000000000000000000000000000000",  # fee token address (zero address for native)
+        deployed.read_addr("ccipSender"),  # ccip sender address
         DEPLOY_ACCT,
     )
 
@@ -84,31 +79,7 @@ def main():
         time.sleep(3)
 
     # deploy polygon root gauges
-    deploy_gauge(
-        gauge_logic,
-        "Polygon CADC/USDC Root Gauge",
-        POLYGON_CHAIN_SELECTOR,
-        deployed.readAddr("ccipSender"),
-        "polygonCadcUsdcRootGauge",
-    )
-    deploy_gauge(
-        gauge_logic,
-        "Polygon NGNC/USDC Root Gauge",
-        POLYGON_CHAIN_SELECTOR,
-        deployed.readAddr("ccipSender"),
-        "polygonNgncUsdcRootGauge",
-    )
-    deploy_gauge(
-        gauge_logic,
-        "Polygon TRYB/USDC Root Gauge",
-        POLYGON_CHAIN_SELECTOR,
-        deployed.readAddr("ccipSender"),
-        "polygonTrybUsdcRootGauge",
-    )
-    deploy_gauge(
-        gauge_logic,
-        "Polygon XSGD/USDC Root Gauge",
-        POLYGON_CHAIN_SELECTOR,
-        deployed.readAddr("ccipSender"),
-        "polygonXsgdUsdcRootGauge",
-    )
+    deploy_gauge(gauge_logic, "cadc-usdc", "polygonCadcUsdcRootGauge")
+    deploy_gauge(gauge_logic, "ngnc-usdc", "polygonNgncUsdcRootGauge")
+    deploy_gauge(gauge_logic, "tryb-usdc", "polygonTrybUsdcRootGauge")
+    deploy_gauge(gauge_logic, "xsgd-usdc", "polygonXsgdUsdcRootGauge")
