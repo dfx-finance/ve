@@ -31,12 +31,9 @@ interface ILiquidityGaugeV4 {
 
     function deposit_reward_token(address _rewardToken, uint256 _amount) external;
 
-    function deposit(
-        uint256 _value,
-        address _addr,
-        // solhint-disable-next-line
-        bool _claim_rewards
-    ) external;
+    function deposit(uint256 _value, address _addr, bool _claim_rewards) external;
+
+    function deposit(uint256 _value) external;
 
     function claim_rewards(address _addr) external;
 
