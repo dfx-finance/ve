@@ -43,8 +43,3 @@ def main():
     admin = existing.read_addr("multisig0")
     add_to_gauge_controller(deployed.read_addr("cadcUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("eurcUsdcGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("gbptUsdcGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("gyenUsdcGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("trybUsdcGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("xidrUsdcGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("xsgdUsdcGauge"), admin)
