@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../../src/interfaces/IGaugeController.sol";
 import "../../src/interfaces/IChildChainStreamer.sol";
 import "../../src/interfaces/IRewardsOnlyGauge.sol";
+import "../../src/interfaces/IVeDfx.sol";
 import "../../src/mainnet/DfxDistributor.sol";
 
 contract Setup is Test {

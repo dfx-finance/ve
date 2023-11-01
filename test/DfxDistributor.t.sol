@@ -77,7 +77,7 @@ contract DfxDistributorTest is Test, Constants, Deploy, Setup {
         gauge.deposit(1e18);
 
         // fast-forward to start of epoch 1
-        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
 
         // epoch 1: test weight
         gaugeController.gauge_relative_weight_write(address(gauge));
@@ -89,7 +89,7 @@ contract DfxDistributorTest is Test, Constants, Deploy, Setup {
         assertEq(distributor.miningEpoch(), 1, "Unexpected epoch");
 
         // epoch 2: test weight
-        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
         gaugeController.gauge_relative_weight_write(address(gauge));
         weight = gaugeController.gauge_relative_weight(address(gauge));
         assertEq(weight, 1e18, "Unexpected gauge weight");
@@ -104,7 +104,7 @@ contract DfxDistributorTest is Test, Constants, Deploy, Setup {
         distributor.updateMiningParameters();
 
         // fast-forward to start of epoch 1
-        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
         distributor.updateMiningParameters();
 
         // fast-forward to start of epoch 1 + 10s
@@ -113,7 +113,7 @@ contract DfxDistributorTest is Test, Constants, Deploy, Setup {
         distributor.updateMiningParameters();
 
         // fast-forward to start of epoch 2
-        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
         distributor.updateMiningParameters();
     }
 }

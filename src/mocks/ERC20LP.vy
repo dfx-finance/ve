@@ -45,7 +45,7 @@ def __init__(_name: String[64], _symbol: String[32], _decimals: uint256, _supply
 
 
 @external
-def set_minter(_minter: address):
+def setMinter(_minter: address):
     assert msg.sender == self.minter
     self.minter = _minter
 

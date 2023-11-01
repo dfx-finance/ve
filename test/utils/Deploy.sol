@@ -5,6 +5,7 @@ import "@snekmate/utils/VyperDeployer.sol";
 
 import "../../src/DfxUpgradeableProxy.sol";
 import "../../src/interfaces/IChildChainStreamer.sol";
+import "../../src/interfaces/IERC20LP.sol";
 import "../../src/interfaces/IGaugeController.sol";
 import "../../src/interfaces/ILiquidityGaugeV4.sol";
 import "../../src/interfaces/IRewardsOnlyGauge.sol";
@@ -16,6 +17,7 @@ import "../../src/mainnet/CcipSender.sol";
 import "../../src/mainnet/DfxDistributor.sol";
 import {DFX as DFX_} from "../../src/mocks/DFX.sol";
 import "../../src/mocks/MockCcipRouter.sol";
+import "../../src/mocks/MockSmartWalletChecker.sol";
 
 import "./Constants.sol";
 
@@ -26,8 +28,9 @@ contract Deploy is Constants {
         return new DFX_(mintAmount);
     }
 
-    function deployLpt(string memory name, string memory symbol, address minter) public returns (IERC20) {
-        return IERC20(vyperDeployer.deployContract("src/mocks/", "ERC20LP", abi.encode(name, symbol, 18, 1e9, minter)));
+    function deployLpt(string memory name, string memory symbol, address minter) public returns (IERC20LP) {
+        return
+            IERC20LP(vyperDeployer.deployContract("src/mocks/", "ERC20LP", abi.encode(name, symbol, 18, 1e9, minter)));
     }
 
     function deployVeDfx(address DFX) public returns (IVeDfx) {
@@ -148,5 +151,9 @@ contract Deploy is Constants {
         bytes memory params = abi.encodeWithSelector(IRewardsOnlyGauge.initialize.selector, admin, lpt);
         DfxUpgradeableProxy proxy = new DfxUpgradeableProxy(_gaugeAddr, proxyAdmin, params);
         return IRewardsOnlyGauge(address(proxy));
+    }
+
+    function deploySmartWalletChecker() public returns (SmartWalletChecker) {
+        return new SmartWalletChecker();
     }
 }

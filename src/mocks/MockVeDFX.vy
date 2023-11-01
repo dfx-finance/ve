@@ -170,8 +170,9 @@ def commit_smart_wallet_checker(addr: address):
     """
     @notice Set an external contract to check for approved smart contract wallets
     @param addr Address of Smart contract checker
+    @dev Assert disabled for Forge testing
     """
-    assert msg.sender == self.admin
+    # assert msg.sender == self.admin
     self.future_smart_wallet_checker = addr
 
 
@@ -179,8 +180,9 @@ def commit_smart_wallet_checker(addr: address):
 def apply_smart_wallet_checker():
     """
     @notice Apply setting external contract to check approved smart contract wallets
+    @dev Assert disabled for Forge testing
     """
-    assert msg.sender == self.admin
+    # assert msg.sender == self.admin
     self.smart_wallet_checker = self.future_smart_wallet_checker
 
 

@@ -99,13 +99,13 @@ contract RootGaugeTest is Test, Constants, Deploy, Setup {
         assertEq(DFX.balanceOf(address(distributor)), TOTAL_DFX_REWARDS);
 
         // epoch 1: distribute rewards to gauges
-        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
         vm.prank(multisig0);
         distributor.distributeRewardToMultipleGauges(gaugeAddrs);
         assertEq(distributor.miningEpoch(), 1);
 
         // epoch 2: deploy L2 gauge, add to gauge controller and distribute rewards
-        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
         setUpRootGauge("L1 ETH/BTC Root Gauge");
         assertEq(distributor.isInterfaceKnown(address(rootGauge)), true, "Rewards delegate is not set");
 
@@ -124,7 +124,7 @@ contract RootGaugeTest is Test, Constants, Deploy, Setup {
         assertEq(DFX.balanceOf(address(rootGauge)), 0);
 
         // epoch 3: distribute rewards to gauges
-        vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
         distributor.distributeRewardToMultipleGauges(allGauges);
         assertEq(distributor.miningEpoch(), 3);
 

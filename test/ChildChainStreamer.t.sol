@@ -65,7 +65,7 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
         assertEq(gauge.reward_tokens(0), address(DFX));
 
         for (uint256 i = 0; i < 3; i++) {
-            vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+            vm.warp(block.timestamp / WEEK * WEEK + WEEK);
             sendToken(address(DFX), 1e23, address(this), address(streamer));
             streamer.notify_reward_amount(address(DFX));
 
@@ -112,7 +112,7 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
         gauge.deposit(1e20);
 
         for (uint256 i = 0; i < 1; i++) {
-            vm.warp(block.timestamp + WEEK / WEEK * WEEK);
+            vm.warp(block.timestamp / WEEK * WEEK + WEEK);
             sendToken(address(DFX), 1e23, address(this), address(streamer));
             streamer.notify_reward_amount(address(DFX));
 

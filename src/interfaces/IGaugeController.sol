@@ -42,4 +42,8 @@ interface IGaugeController {
     function time_total() external view returns (uint256);
 
     function points_total(uint256) external view returns (uint256);
+
+    function vote_for_gauge_weights(address addr, uint256 weight) external;
+
+    function vote_user_power(address addr) external returns (uint256);
 }
