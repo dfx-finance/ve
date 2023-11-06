@@ -17,7 +17,7 @@ def deploy():
     print(f"--- Deploying veDFX contract to {connected_network} ---")
     # vedfx_params = eth_abi.encode_abi(
     #     ["address", "string", "string", "string"],
-    #     (Ethereum.DFX, "Vote-escrowed DFX", "veDFX", "veDFX_1.0.0"),
+    #     (existing.read_addr("DFX"), "Vote-escrowed DFX", "veDFX", "veDFX_1.0.0"),
     # ).hex()
     vedfx = VeDFX.deploy(
         existing.read_addr("DFX"),

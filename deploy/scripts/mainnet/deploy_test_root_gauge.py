@@ -41,7 +41,7 @@ def deploy_gauge(
     print(f"--- Deploying Root Gauge CCIP proxy contract to {connected_network} ---")
     # deploy gauge proxy and initialize
     gauge_initializer_calldata = gauge_logic.initialize.encode_input(
-        f"Arbitrum {gauge_symbol.upper().replace('-', '/')}",
+        f"{gauge_symbol.upper().replace('-', '/')}",
         gauge_symbol,
         DEPLOY_ACCT,  # source chain distributor address
         deployed.read_addr("ccipSender"),  # ccip sender address
@@ -78,5 +78,4 @@ def main():
     #     time.sleep(3)
 
     # deploy arbitrum root gauges
-    deploy_gauge(gauge_logic, "cadc-usdc", "arbitrumCadcUsdcRootGauge")
-    deploy_gauge(gauge_logic, "gyen-usdc", "arbitrumGyenUsdcRootGauge")
+    deploy_gauge(gauge_logic, "tester", "testerRootGauge")

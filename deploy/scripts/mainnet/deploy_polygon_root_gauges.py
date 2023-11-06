@@ -29,7 +29,7 @@ def deploy_implementation() -> CcipRootGauge:
 
 
 def load_implementation() -> CcipRootGauge:
-    print(f"--- Loading Root Gauge CCIP contract on {connected_network.name} ---")
+    print(f"--- Loading Root Gauge CCIP contract on {connected_network} ---")
     return CcipRootGauge.at(deployed.read_addr("rootGaugeLogic"))
 
 
@@ -62,21 +62,19 @@ def main():
     print(
         (
             "NOTE: This script expects configuration for:\n"
-            "\t1. clDFX Mainnet address\n"
+            "\t1. DFX Mainnet address\n"
             "\t2. DfxDistributor address\n"
-            "\t3. Chainlink selector for L2 chain\n"
-            "\t4. CCIP receiver address on L2 chain\n"
-            "\t5. Fee token address or zero address for native\n"
+            "\t3. CCIP sender address\n"
         )
     )
-
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    gauge_logic = deploy_implementation()
-    if not is_localhost:
-        print("Sleeping after deploy....")
-        time.sleep(3)
+    # gauge_logic = deploy_implementation()
+    gauge_logic = load_implementation()
+    # if not is_localhost:
+    #     print("Sleeping after deploy....")
+    #     time.sleep(3)
 
     # deploy polygon root gauges
     deploy_gauge(gauge_logic, "cadc-usdc", "polygonCadcUsdcRootGauge")
