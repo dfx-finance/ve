@@ -3,6 +3,8 @@ project_structure:
   tests: build # DEV: existing dir to suppress dir creation
   reports: build # DEV: existing dir to suppress dir creation
 
+dotenv: .env
+
 compiler:
   solc:
     remappings:
