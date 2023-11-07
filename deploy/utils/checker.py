@@ -28,16 +28,16 @@ class _Checker:
     def number(self, test_num, expected_num, label):
         Checker._value(test_num, expected_num, label)
 
-    def number_gte(self, test_num, expected_num, label):
+    def number_gt(self, test_num, expected_num, label):
         inner = f"{label}: {test_num}"
-        if test_num >= expected_num:
+        if test_num > expected_num:
             print(self.PASS_TEXT.format(msg=inner))
         else:
             print(self.FAIL_TEXT.format(msg=inner))
 
-    def number_lte(self, test_num, expected_num, label):
+    def number_lt(self, test_num, expected_num, label):
         inner = f"{label}: {test_num}"
-        if test_num <= expected_num:
+        if test_num < expected_num:
             print(self.PASS_TEXT.format(msg=inner))
         else:
             print(self.FAIL_TEXT.format(msg=inner))

@@ -58,7 +58,7 @@ def main():
             deployed.read_addr(streamer_key),
             "ChildChainReceiver streamer",
         )
-        Checker.number_gte(receiver.balance(), 0, "ChildChainReceiver gas money")
+        Checker.number_gt(receiver.balance(), 0, "ChildChainReceiver gas money")
 
         # ChildChainStreamer
         streamer = ChildChainStreamer.at(deployed.read_addr(streamer_key))
