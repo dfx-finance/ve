@@ -14,8 +14,6 @@ interface IBurnMintERC20 is IERC20Upgradeable {
 
 contract clDFX is Initializable, ERC20Upgradeable, OwnableUpgradeable, IBurnMintERC20 {
     address private _minter;
-    string private _name;
-    string private _symbol;
     string private _version;
 
     modifier onlyMinter() {

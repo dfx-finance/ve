@@ -14,6 +14,10 @@ dotenv.load_dotenv()
 INSTANCE_ID = os.getenv("INSTANCE_ID", "primary")
 DEPLOY_ACCT = accounts[0] if is_localhost else accounts.load("deploy-ve-v3")
 DEPLOY_PROXY_ACCT = accounts[1] if is_localhost else accounts.load("deploy-ve-proxy-v3")
+# DEPLOY_ACCT = accounts[0] if is_localhost else accounts.load("deployve")
+# DEPLOY_PROXY_ACCT = (
+#     accounts[1] if is_localhost else accounts.load("deployve-proxyadmin")
+# )
 VERIFY_CONTRACTS = False if is_localhost else True
 # globals -- gauge controller
 DEFAULT_GAUGE_TYPE = 0

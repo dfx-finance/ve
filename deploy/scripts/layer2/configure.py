@@ -2,7 +2,9 @@
 from brownie import ChildChainReceiver
 
 from utils.config import DEPLOY_ACCT
-# from utils.ccip import ETHEREUM_CHAIN_SELECTOR
+
+from utils.ccip import ETHEREUM_CHAIN_SELECTOR
+
 # from utils.constants_addresses import (
 #     Arbitrum,
 #     Ethereum,

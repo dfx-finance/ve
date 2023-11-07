@@ -26,6 +26,7 @@ Deploy scripts are run using Brownie:
    - Arbitrum: `./scripts/inputs/42161/primary.json`
 5. Run deploy script: `brownie run scripts/mainnet/<script-name>.py --network mainnet`
    - NOTE: Some scripts depend on only `existing` (inputs) addresses, others depend on `existing` (inputs) and `deployed` (outputs) addresses. Outputs are set by other scripts.
+   - Networks: `mainnet`, `polygon-main`, `arbitrum-main`
 
 ### Deploy (localhost)
 
