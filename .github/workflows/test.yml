@@ -25,14 +25,14 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10' 
+          python-version: '3.9' 
       
       - name: Install Vyper
         run: |
           pip install --upgrade pip
           python3 -m venv ve-venv
           source ve-venv/bin/activate
-          pip install vyper
+          pip install vyper==3.7
 
       - name: Install NPM dependencies
         run: npm install
