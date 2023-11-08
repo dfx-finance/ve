@@ -13,4 +13,4 @@ compiler:
       # - "@chainlink/contracts=/Users/kyle/Code/dfx/ve/deploy/node_modules/@chainlink/contracts"
       - "@chainlink/contracts-ccip=/Users/kyle/Code/dfx/ve/deploy/node_modules/@chainlink/contracts-ccip"
   vyper:
-    version: 0.3.10
+    version: 0.3.7
