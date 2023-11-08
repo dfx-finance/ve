@@ -1,0 +1,1 @@
+copy:; rm -rf ./contracts && mkdir contracts && cp -R ../src/* ./contracts

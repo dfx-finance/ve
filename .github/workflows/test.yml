@@ -1,0 +1,50 @@
+name: test
+
+on: [push, workflow_dispatch]
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: VE Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9' 
+      
+      - name: Install Vyper
+        run: |
+          pip install --upgrade pip
+          python3 -m venv ve-venv
+          source ve-venv/bin/activate
+          pip install vyper==0.3.7
+
+      - name: Install NPM dependencies
+        run: npm install
+        
+      # - name: Run Forge build
+      #   run: |
+      #     forge --version
+      #     forge build --sizes
+      #   id: build
+
+      - name: Run Forge tests
+        run: |
+          source ve-venv/bin/activate
+          forge test --ffi -vvv
+        id: test
