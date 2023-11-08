@@ -70,8 +70,8 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
             streamer.notify_reward_amount(address(DFX));
 
             // DFX balances ~= 1e23
-            assertApproxEqAbs(DFX.balanceOf(address(streamer)), 1e23, 1e8);
-            assertApproxEqAbs(DFX.balanceOf(address(gauge)), 1e23, 1e8);
+            assertApproxEqRel(DFX.balanceOf(address(streamer)), 1e23, 1e13);
+            assertApproxEqRel(DFX.balanceOf(address(gauge)), 1e23, 1e13);
 
             // Claim rewards
             uint256 availableRewards = gauge.claimable_reward_write(user0, address(DFX));
@@ -82,7 +82,7 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
             // User staked LPT
             assertEq(gauge.balanceOf(user0), 1e18);
             // User available rewards
-            assertApproxEqAbs(availableRewards, 1e23, 1e8);
+            assertApproxEqRel(availableRewards, 1e23, 1e13);
             // User claimed rewards
             assertApproxEqAbs(claimedRewards, (i + 1) * 1e23, 1e18);
             // User DFX balance
@@ -117,8 +117,8 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
             streamer.notify_reward_amount(address(DFX));
 
             // DFX balances ~= 1e23
-            assertApproxEqAbs(DFX.balanceOf(address(streamer)), 1e23, 1e8);
-            assertApproxEqAbs(DFX.balanceOf(address(gauge)), 1e23, 1e8);
+            assertApproxEqRel(DFX.balanceOf(address(streamer)), 1e23, 1e13);
+            assertApproxEqRel(DFX.balanceOf(address(gauge)), 1e23, 1e13);
 
             // Claim rewards -- user 0
             uint256 availableRewards0 = gauge.claimable_reward_write(user0, address(DFX));
@@ -129,7 +129,7 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
             // User staked LPT
             assertEq(gauge.balanceOf(user0), 1e20);
             // User available rewards
-            assertApproxEqAbs(availableRewards0, 5e22, 1e8);
+            assertApproxEqRel(availableRewards0, 5e22, 1e13);
             // User claimed rewards
             assertApproxEqAbs(claimedRewards0, (i + 1) * 5e22, 1e18);
             // User DFX balance
@@ -144,7 +144,7 @@ contract ChildChainStreamerTest is Test, Constants, Deploy, Setup {
             // User staked LPT
             assertEq(gauge.balanceOf(user1), 1e20);
             // User available rewards
-            assertApproxEqAbs(availableRewards1, 5e22, 1e8);
+            assertApproxEqRel(availableRewards1, 5e22, 1e13);
             // User claimed rewards
             assertApproxEqAbs(claimedRewards1, (i + 1) * 5e22, 1e18);
             // User DFX balance

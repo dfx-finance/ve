@@ -29,6 +29,10 @@ contract L1GaugesTest is Test, Constants, Deploy, Setup {
     address[] gaugeAddrs = new address[](3);
 
     function setUp() public {
+        // dev: advance 1 week to prevent initial DfxDistributor timestamp getting rounded to 0.
+        // This will cause it to fail by trying to safeApprove() the reward token twice.
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
+
         // fund multsig
         payable(multisig0).transfer(5e17);
 
@@ -127,35 +131,34 @@ contract L1GaugesTest is Test, Constants, Deploy, Setup {
     }
 
     function test_MultiUserBoosted() public {
-        ILiquidityGaugeV4 gauge = ILiquidityGaugeV4(gaugeAddrs[0]);
+        ILiquidityGaugeV4 gauge = ILiquidityGaugeV4(gaugeAddrs[1]);
 
         // mint 10,000 LPT
-        lpt0.mint(user0, 1e22);
-        lpt0.mint(user1, 1e22);
+        lpt1.mint(user0, 1e22);
+        lpt1.mint(user1, 1e22);
 
         // deposit lpt to gauge
         vm.prank(user0);
-        lpt0.approve(address(gauge), 1e22);
+        lpt1.approve(address(gauge), 1e22);
         vm.prank(user0);
         gauge.deposit(1e22);
 
         vm.prank(user1);
-        lpt0.approve(address(gauge), 1e22);
+        lpt1.approve(address(gauge), 1e22);
         vm.prank(user1);
         gauge.deposit(1e22);
 
         assertEq(distributor.miningEpoch(), 0);
 
-        // epoch 1: set chain to 10s before the week change and distribute available reward to gauges
-        console2.log(block.timestamp);
-        vm.warp(block.timestamp / WEEK * WEEK + (2 * WEEK - 10));
+        // epoch 1: set chain start of epoch 1 and distribute available reward to gauges
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
         vm.prank(multisig0);
         distributor.distributeRewardToMultipleGauges(gaugeAddrs);
         assertEq(distributor.miningEpoch(), 1);
 
-        // epoch 1: advance chain to 5h10s before next epoch change
-        console2.log(block.timestamp);
-        vm.warp((block.timestamp + 10) / WEEK * WEEK + (WEEK - 5 * 60 * 60 - 10));
+        // epoch 1: advance chain to 5h10s before epoch 1-to-2 change
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK - 5 * 60 * 60 - 10);
+        assertEq(distributor.miningEpoch(), 1);
 
         // mint 250,000 DFX
         DFX.mint(user0, 250_000e18);
@@ -173,51 +176,60 @@ contract L1GaugesTest is Test, Constants, Deploy, Setup {
             gaugeController.vote_for_gauge_weights(gaugeAddrs[i], gaugeWeights[i]);
         }
 
-        console2.log(block.timestamp);
-
         // all voting power is registered on controller
         assertEq(gaugeController.vote_user_power(user0), 10000);
+
         vm.prank(user0);
         gauge.user_checkpoint(user0);
+        uint256 rewardsDiff0 = gauge.claimable_reward(user0, address(DFX)) - gauge.claimable_reward(user1, address(DFX));
 
-        distributor.updateMiningParameters();
+        // epoch 1: advance chain to 1h10s before epoch 1-to-2 change
+        vm.warp(block.timestamp + 4 * 60 * 60);
+
+        // checkpoint for calculating boost
+        vm.prank(user0);
+        gauge.user_checkpoint(user0);
+        uint256 rewardsDiff1 = gauge.claimable_reward(user0, address(DFX)) - gauge.claimable_reward(user1, address(DFX));
+
+        // check that boost is enabled for user0
+        assertGt(rewardsDiff1, rewardsDiff0);
         assertEq(distributor.miningEpoch(), 1);
 
-        // // 10s before next epoch (2) begins
-        // vm.warp(block.timestamp / WEEK * WEEK + (WEEK - 10));
+        // epoch 2
+        vm.warp(block.timestamp / WEEK * WEEK + WEEK);
 
-        // // test next 5 epochs between naked and boosted rewards
-        // // 1. rewards are not claimed between rounds during test and therefore expected to accumulate
-        // // 2. expected rewards floored to nearest int value (whole DFX tokens) to allow for small variation between mining times
-        // uint256[5] memory expected0 = [
-        //     uint256(20258419425250659698000),
-        //     48789473353291484638000,
-        //     48966579206788884328000,
-        //     49144109504747051218000,
-        //     49322083938019853738000
-        // ];
-        // uint256[5] memory expected1 = [
-        //     uint256(19748411706948321500000),
-        //     31160833278164651476000,
-        //     31231675619563611352000,
-        //     31302687738746878108000,
-        //     31373877512055999116000
-        // ];
-        // for (uint256 i = 0; i < 5; i++) {
-        //     vm.prank(multisig0);
-        //     distributor.distributeRewardToMultipleGauges(gaugeAddrs);
-        //     assertEq(distributor.miningEpoch(), i + 3);
+        // test next 5 epochs between naked and boosted rewards
+        // 1. rewards are not claimed between rounds during test and therefore expected to accumulate
+        // 2. expected rewards floored to nearest int value (whole DFX tokens) to allow for small variation between mining times
+        uint256[5] memory expected0 = [
+            uint256(20258702920369226864000), // epoch 0 + epoch 1 rewards (mining epoch 2)
+            104965595372037993104000,
+            189010978932716389704000,
+            272399946591783154144000,
+            355137550452363291084000
+        ];
+        uint256[5] memory expected1 = [
+            uint256(19748128211829754328000),
+            53630885192497260824000,
+            87249038616768619464000,
+            120604625680395325240000,
+            153699667224627380016000
+        ];
+        for (uint256 i = 0; i < 5; i++) {
+            vm.prank(multisig0);
+            distributor.distributeRewardToMultipleGauges(gaugeAddrs);
+            assertEq(distributor.miningEpoch(), i + 2);
 
-        //     // checkpoint for calculating boost
-        //     vm.prank(user0);
-        //     gauge.user_checkpoint(user0);
-        //     vm.prank(user1);
-        //     gauge.user_checkpoint(user1);
+            // checkpoint for calculating boost
+            vm.prank(user0);
+            gauge.user_checkpoint(user0);
+            vm.prank(user1);
+            gauge.user_checkpoint(user1);
 
-        //     assertEq(gauge.claimable_reward(user0, address(DFX)), expected0[i]);
-        //     assertEq(gauge.claimable_reward(user1, address(DFX)), expected1[i]);
+            assertEq(gauge.claimable_reward(user0, address(DFX)), expected0[i]);
+            assertEq(gauge.claimable_reward(user1, address(DFX)), expected1[i]);
 
-        //     vm.warp(block.timestamp / WEEK * WEEK + WEEK);
-        // }
+            vm.warp(block.timestamp / WEEK * WEEK + WEEK);
+        }
     }
 }

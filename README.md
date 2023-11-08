@@ -1,10 +1,14 @@
 ## VE
 
+### Configuration
+
+- To keep packages isolated between `forge` and `eth-brownie`, there should be **TWO** Python virtual envs to manage. In most cases, they will be worked on in isolation, but this is something to be careful of. TBD if it is better to unify these into the root virtual env.
+
 ### Testing
 
 Tests are run using Foundry:
 
-1. Run tests: `forge test --vv`
+1. Run tests: `forge test --ffi -vv`
 
 ### Deploy
 

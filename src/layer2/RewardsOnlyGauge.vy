@@ -1,4 +1,4 @@
-# @version ^0.3.3
+# @version 0.3.7
 """
 @title Rewards-Only Gauge
 @author Curve Finance, DFX
@@ -124,10 +124,10 @@ def _checkpoint_rewards(_user: address, _total_supply: uint256, _claim: bool, _r
     # claim from reward contract
 
     reward_data: uint256 = self.reward_data
-    if _total_supply != 0 and reward_data != 0 and block.timestamp > (reward_data >> 160) + CLAIM_FREQUENCY:
+    if _total_supply != 0 and reward_data != 0 and block.timestamp > shift(reward_data, -160) + CLAIM_FREQUENCY:
         reward_contract: address = convert(reward_data % 2**160, address)
         raw_call(reward_contract, self.claim_sig)  # dev: bad claim sig
-        self.reward_data = convert(reward_contract, uint256) + (block.timestamp << 160)
+        self.reward_data = convert(reward_contract, uint256) + shift(block.timestamp, 160)
 
     receiver: address = _receiver
     if _claim and receiver == empty(address):
@@ -164,7 +164,7 @@ def _checkpoint_rewards(_user: address, _total_supply: uint256, _claim: bool, _r
             new_claimable = user_balance * (integral - integral_for) / 10**18
 
         claim_data: uint256 = self.claim_data[_user][token]
-        total_claimable: uint256 = (claim_data >> 128) + new_claimable
+        total_claimable: uint256 = shift(claim_data, -128) + new_claimable
         if total_claimable > 0:
             total_claimed: uint256 = claim_data % 2 ** 128
             if _claim:
@@ -184,7 +184,7 @@ def _checkpoint_rewards(_user: address, _total_supply: uint256, _claim: bool, _r
                 self.claim_data[_user][token] = total_claimed + total_claimable
             elif new_claimable > 0:
                 # update total_claimable (higher order bytes)
-                self.claim_data[_user][token] = total_claimed + (total_claimable << 128)
+                self.claim_data[_user][token] = total_claimed + shift(total_claimable, 128)
 
 
 @view
@@ -204,7 +204,7 @@ def last_claim() -> uint256:
     @notice Epoch timestamp of the last call to claim from `reward_contract`
     @dev Rewards are claimed at most once per hour in order to reduce gas costs
     """
-    return self.reward_data >> 160
+    return shift(self.reward_data, -160)
 
 
 @view
@@ -231,7 +231,7 @@ def claimable_reward(_addr: address, _token: address) -> uint256:
     @param _token Token to get reward amount for
     @return uint256 Claimable reward token amount
     """
-    return self.claim_data[_addr][_token] >> 128
+    return shift(self.claim_data[_addr][_token], -128)
 
 
 @external
@@ -247,7 +247,7 @@ def claimable_reward_write(_addr: address, _token: address) -> uint256:
     """
     if self.reward_tokens[0] != empty(address):
         self._checkpoint_rewards(_addr, self.totalSupply, False, empty(address))
-    return self.claim_data[_addr][_token] >> 128
+    return shift(self.claim_data[_addr][_token], -128)
 
 
 @external
