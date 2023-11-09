@@ -29,11 +29,9 @@ def deploy_gauge_implementation() -> RewardsOnlyGauge:
 
 
 # deploy gauge proxy and initialize
-def deploy_gauge(gauge_logic: RewardsOnlyGauge, lpt_addr: str) -> RewardsOnlyGauge:
+def deploy_gauge(gauge_logic: RewardsOnlyGauge, lpt: ERC20LP) -> RewardsOnlyGauge:
     print(f"--- Deploying L2 gauge proxy contract to {connected_network} ---")
-    gauge_initializer_calldata = gauge_logic.initialize.encode_input(
-        DEPLOY_ACCT, lpt_addr
-    )
+    gauge_initializer_calldata = gauge_logic.initialize.encode_input(DEPLOY_ACCT, lpt)
     proxy = DfxUpgradeableProxy.deploy(
         gauge_logic.address,
         DEPLOY_PROXY_ACCT,
@@ -46,12 +44,14 @@ def deploy_gauge(gauge_logic: RewardsOnlyGauge, lpt_addr: str) -> RewardsOnlyGau
 
 
 # deploy childchainstreamer
-def deploy_streamer(gauge: RewardsOnlyGauge, reward_token: str) -> ChildChainStreamer:
+def deploy_streamer(
+    gauge: RewardsOnlyGauge, rewards_token: ERC20LP
+) -> ChildChainStreamer:
     print(f"--- Deploying ChildChainStreamer contract to {connected_network} ---")
     streamer = ChildChainStreamer.deploy(
         DEPLOY_ACCT,
         gauge,
-        reward_token,
+        rewards_token,
         {"from": DEPLOY_ACCT},
     )
     return streamer
@@ -76,7 +76,7 @@ def configure(
     receiver: ChildChainReceiver,
     streamer: ChildChainStreamer,
     gauge: RewardsOnlyGauge,
-    rewards_token: str,
+    rewards_token: ERC20LP,
 ):
     print(
         f"--- Configuring ChildChainStreamer contract with ChildChainReceiver as reward distributor ---"
@@ -110,17 +110,23 @@ def configure(
 
 
 def main():
-    reward_token = ERC20LP.at("0x48Ef554e293392089A1E7b50631e10fBFbB57456")
+    rewards_token = ERC20LP.at("0x48Ef554e293392089A1E7b50631e10fBFbB57456")
     lpt = ERC20LP.at("0x90e19C5ef79Ad9BFb6E865A5214bFf432B27584c")
     ccip_router = DEPLOY_ACCT
 
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    gauge_logic = deploy_gauge_implementation()
-    gauge = deploy_gauge(gauge_logic, lpt.address)
-    streamer = deploy_streamer(gauge, reward_token.address)
-    deploy_receiver(streamer, ccip_router)
+    # gauge_logic = deploy_gauge_implementation()
+    # gauge = deploy_gauge(gauge_logic, lpt)
+    # streamer = deploy_streamer(gauge, rewards_token)
+    # deploy_receiver(streamer, ccip_router)
+
+    receiver = ChildChainReceiver.at("0xdd4388A4e76Cd8330004781363A1C2d5631b77B4")
+    streamer = ChildChainStreamer.at("0x1fc5e93ad39f5D483889b3092d088f649155E7f8")
+    gauge = RewardsOnlyGauge.at("0xBa38E95a19B02C1B581d4C3c3df5F22091c5c726")
+
+    configure(receiver, streamer, gauge, rewards_token)
 
 
 if __name__ == "__main___":
