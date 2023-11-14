@@ -139,6 +139,23 @@ def main():
     #     )
 
     """
+    Migrator
+    """
+    print("-- Checking Migrator: {addr}".format(addr=deployed.read_addr("migrator")))
+
+    migrator = Migrator.at(deployed.read_addr("migrator"))
+    # owner
+    Checker.address(migrator.owner(), existing.read_addr("multisig0"), "Migrator admin")
+    Checker.address(
+        migrator.bridgedDfx(),
+        existing.read_addr("bridgedDFX"),
+        "Migrator DFX (bridged)",
+    )
+    Checker.address(
+        migrator.ccipDfx(), existing.read_addr("DFX"), "Migrator DFX (CCIP)"
+    )
+
+    """
     MigrationReceiver
     """
     print(
@@ -161,22 +178,10 @@ def main():
         existing.read_addr("ccipSenderEth"),
         "MigrationReceiver source sender",
     )
-
-    """
-    Migrator
-    """
-    print("-- Checking Migrator: {addr}".format(addr=deployed.read_addr("migrator")))
-
-    migrator = Migrator.at(deployed.read_addr("migrator"))
-    # owner
-    Checker.address(migrator.owner(), existing.read_addr("multisig0"), "Migrator admin")
     Checker.address(
-        migrator.bridgedDfx(),
-        existing.read_addr("bridgedDFX"),
-        "Migrator DFX (bridged)",
-    )
-    Checker.address(
-        migrator.ccipDfx(), existing.read_addr("DFX"), "Migrator DFX (CCIP)"
+        receiver.migrator(),
+        deployed.read_addr("migrator"),
+        "MigrationReceiver migrator",
     )
 
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from brownie import web3, ZERO_ADDRESS
 from brownie import (
+    Contract,
     VeDFX,
     VeBoostProxy,
     GaugeController,
@@ -130,7 +131,9 @@ def main():
             addr=deployed.read_addr("dfxDistributor")
         )
     )
-    dfx_distributor = DfxDistributor.at(deployed.read_addr("dfxDistributor"))
+    dfx_distributor = Contract.from_abi(
+        "DfxDistributor", deployed.read_addr("dfxDistributor"), DfxDistributor.abi
+    )
 
     Checker.address(
         dfx_distributor.controller(),
@@ -165,14 +168,14 @@ def main():
         dfx_distributor,
         default_admin_role,
         existing.read_addr("multisig0"),
-        "DfxDistributor multsig admin",
+        "DfxDistributor multisig admin",
         reverse=True,
     )
     Checker.has_role(
         dfx_distributor,
         governor_role,
         existing.read_addr("multisig0"),
-        "DfxDistributor mulitsig governor",
+        "DfxDistributor multisig governor",
     )
     Checker.has_role(
         dfx_distributor,
@@ -216,10 +219,23 @@ def main():
                 receiver, ccip_info["receiver"], f"CCIPSender {key} receiver"
             )
 
+    # multisig distributor
+    receiver, chain_selector = ccipSender.destinations(existing.read_addr("multisig1"))
+    Checker.number(
+        chain_selector,
+        POLYGON_CHAIN_SELECTOR,
+        f"CCIPSender multisig chain selector is POLYGON",
+    )
+    Checker.address(
+        receiver,
+        existing.read_addr("polygonMigrationReceiver"),
+        f"CCIPSender multisig receiver",
+    )
+
     arb_fee_token, arb_fee_amount = ccipSender.chainFees(ARBITRUM_CHAIN_SELECTOR)
     Checker.address(arb_fee_token, ZERO_ADDRESS, "CCIPSender fee token (Arbitrum)")
     Checker.number(arb_fee_amount, 200_000, "CCIPSender fee amount (Arbitrum)")
-    pol_fee_token, pol_fee_amount = ccipSender.chainFees(ARBITRUM_CHAIN_SELECTOR)
+    pol_fee_token, pol_fee_amount = ccipSender.chainFees(POLYGON_CHAIN_SELECTOR)
     Checker.address(pol_fee_token, ZERO_ADDRESS, "CCIPSender fee token (Polygon)")
     Checker.number(pol_fee_amount, 200_000, "CCIPSender fee amount (Polygon)")
 
@@ -233,7 +249,9 @@ def main():
             )
         )
 
-        gauge = LiquidityGaugeV4.at(deployed.read_addr(key))
+        gauge = Contract.from_abi(
+            "LiquidityGaugeV4", deployed.read_addr(key), LiquidityGaugeV4.abi
+        )
         # owner
         Checker.address(
             gauge.admin(),

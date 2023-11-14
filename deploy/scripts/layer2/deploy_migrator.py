@@ -17,7 +17,7 @@ deployed = load_outputs(INSTANCE_ID)
 
 # deploy childchainreceiver
 def deploy_migrator() -> Migrator:
-    print(f"--- Deploying MigrationReceiver contract to {connected_network} ---")
+    print(f"--- Deploying Migrator contract to {connected_network} ---")
     receiver = Migrator.deploy(
         existing.read_addr("bridgedDFX"),
         existing.read_addr("DFX"),
