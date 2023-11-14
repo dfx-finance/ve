@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from brownie import DfxUpgradeableProxy, CcipRootGauge
-import time
 
 from utils.config import (
     DEPLOY_ACCT,
@@ -43,9 +42,9 @@ def deploy_gauge(
     gauge_initializer_calldata = gauge_logic.initialize.encode_input(
         f"Arbitrum {gauge_symbol.upper().replace('-', '/')}",
         gauge_symbol,
-        DEPLOY_ACCT,  # source chain distributor address
+        deployed.read_addr("dfxDistributor"),  # source chain distributor address
         deployed.read_addr("ccipSender"),  # ccip sender address
-        DEPLOY_ACCT,
+        existing.read_addr("multisig0"),
     )
 
     proxy = DfxUpgradeableProxy.deploy(
@@ -77,6 +76,7 @@ def main():
     #     print("Sleeping after deploy....")
     #     time.sleep(3)
 
-    # deploy arbitrum root gauges
-    deploy_gauge(gauge_logic, "cadc-usdc", "arbitrumCadcUsdcRootGauge")
-    deploy_gauge(gauge_logic, "gyen-usdc", "arbitrumGyenUsdcRootGauge")
+    ## deploy arbitrum root gauges
+    # deploy_gauge(gauge_logic, "cadc-usdc", "arbitrumCadcUsdcRootGauge")
+    # deploy_gauge(gauge_logic, "gyen-usdc", "arbitrumGyenUsdcRootGauge")
+    deploy_gauge(gauge_logic, "usdce-usdc", "arbitrumUsdceUsdcRootGauge")
