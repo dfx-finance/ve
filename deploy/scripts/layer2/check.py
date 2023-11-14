@@ -5,6 +5,7 @@ from brownie import (
     ChildChainReceiver,
     ChildChainStreamer,
     MigrationReceiver,
+    Migrator,
     RewardsOnlyGauge,
 )
 
@@ -32,7 +33,9 @@ GAUGES = {
 
 
 def main():
-    # clDFX
+    """
+    CCIP DFX
+    """
     dfx = clDFX.at(existing.read_addr("DFX"))
     Checker._value(dfx.name(), "DFX Token (L2)", "DFX token name")
     Checker._value(dfx.symbol(), "DFX", "DFX token symbol")
@@ -41,7 +44,15 @@ def main():
     for gauge_key_set in GAUGES[chain.id]:
         receiver_key, streamer_key, gauge_key, lpt_key = gauge_key_set
 
-        # ChildChainReceiver
+        """
+        ChildChainReceiver
+        """
+        print(
+            "-- Checking ChildChainReceiver ({key}): {addr}".format(
+                key=receiver_key, addr=deployed.read_addr(receiver_key)
+            )
+        )
+
         receiver = ChildChainReceiver.at(deployed.read_addr(receiver_key))
         # owner
         Checker.address(
@@ -67,7 +78,15 @@ def main():
         )
         Checker.number_gt(receiver.balance(), 0, "ChildChainReceiver gas money")
 
-        # ChildChainStreamer
+        """
+        ChildChainStreamer
+        """
+        print(
+            "-- Checking ChildChainStreamer ({key}): {addr}".format(
+                key=streamer_key, addr=deployed.read_addr(streamer_key)
+            )
+        )
+
         streamer = ChildChainStreamer.at(deployed.read_addr(streamer_key))
         # owner
         Checker.address(
@@ -93,7 +112,15 @@ def main():
             "ChildChainStreamer DFX receiver",
         )
 
-        # RewardsOnlyGauge
+        """
+        RewardsOnlyGauge
+        """
+        print(
+            "-- Checking RewardsOnlyGauge ({key}): {addr}".format(
+                key=gauge_key, addr=deployed.read_addr(gauge_key)
+            )
+        )
+
         gauge = RewardsOnlyGauge.at(deployed.read_addr(gauge_key))
         # owner
         Checker.address(
@@ -111,24 +138,51 @@ def main():
             "RewardOnlyGauge DFX reward",
         )
 
-    if chain.id == 137:
-        receiver = MigrationReceiver.at(deployed.read_addr("migrationReceiver"))
-        # owner
-        Checker.address(
-            receiver.owner(), existing.read_addr("multisig0"), "MigrationReceiver admin"
+    """
+    Migrator
+    """
+    print("-- Checking Migrator: {addr}".format(addr=deployed.read_addr("migrator")))
+
+    migrator = Migrator.at(deployed.read_addr("migrator"))
+    # owner
+    Checker.address(migrator.owner(), existing.read_addr("multisig0"), "Migrator admin")
+    Checker.address(
+        migrator.bridgedDfx(),
+        existing.read_addr("bridgedDFX"),
+        "Migrator DFX (bridged)",
+    )
+    Checker.address(
+        migrator.ccipDfx(), existing.read_addr("DFX"), "Migrator DFX (CCIP)"
+    )
+
+    """
+    MigrationReceiver
+    """
+    print(
+        "-- Checking MigrationReceiver: {addr}".format(
+            addr=deployed.read_addr("migrationReceiver")
         )
-        Checker.number(
-            receiver.whitelistedSourceChain(),
-            existing.read_addr("chainSelectorEth"),
-            "MigrationReceiver source chain selector",
-        )
-        Checker.address(
-            receiver.whitelistedSender(),
-            existing.read_addr("ccipSenderEth"),
-            "MigrationReceiver source sender",
-        )
-    else:
-        Checker.skip(f"MigrationReceiver skipped on {connected_network}")
+    )
+    receiver = MigrationReceiver.at(deployed.read_addr("migrationReceiver"))
+    # owner
+    Checker.address(
+        receiver.owner(), existing.read_addr("multisig0"), "MigrationReceiver admin"
+    )
+    Checker.number(
+        receiver.whitelistedSourceChain(),
+        existing.read_addr("chainSelectorEth"),
+        "MigrationReceiver source chain selector",
+    )
+    Checker.address(
+        receiver.whitelistedSender(),
+        existing.read_addr("ccipSenderEth"),
+        "MigrationReceiver source sender",
+    )
+    Checker.address(
+        receiver.migrator(),
+        deployed.read_addr("migrator"),
+        "MigrationReceiver migrator",
+    )
 
 
 if __name__ == "__main__":
