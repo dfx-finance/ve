@@ -73,8 +73,9 @@ contract RootGaugeTest is Test, Constants, Deploy, Setup {
     }
 
     // Manually call setUpRootGauge to control deploy order within tests
-    function setUpRootGauge(string memory name) public {
-        rootGauge = deployRootGauge(name, address(DFX), address(distributor), address(sender), multisig0, multisig1);
+    function setUpRootGauge(string memory name, string memory symbol) public {
+        rootGauge =
+            deployRootGauge(name, symbol, address(DFX), address(distributor), address(sender), multisig0, multisig1);
 
         // Link mainnet and root gauge addresses
         vm.prank(multisig0);
@@ -87,7 +88,7 @@ contract RootGaugeTest is Test, Constants, Deploy, Setup {
     }
 
     function test_NotifyReward() public {
-        setUpRootGauge("L1 ETH/BTC Root Gauge");
+        setUpRootGauge("L1 ETH/BTC Root Gauge", "l1-eth-btc");
         sendToken(address(DFX), 1000e18, address(this), address(rootGauge));
         vm.prank(address(distributor));
         rootGauge.notifyReward(1000e18);
@@ -106,7 +107,7 @@ contract RootGaugeTest is Test, Constants, Deploy, Setup {
 
         // epoch 2: deploy L2 gauge, add to gauge controller and distribute rewards
         vm.warp(block.timestamp / WEEK * WEEK + WEEK);
-        setUpRootGauge("L1 ETH/BTC Root Gauge");
+        setUpRootGauge("L1 ETH/BTC Root Gauge", "l1-eth-btc");
         assertEq(distributor.isInterfaceKnown(address(rootGauge)), true, "Rewards delegate is not set");
 
         address[] memory allGauges = new address[](3);

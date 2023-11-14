@@ -49,15 +49,19 @@ contract CcipRootGauge is Initializable {
     }
 
     /// @notice Contract initializer
+    /// @param _name Gauge base symbol
     /// @param _symbol Gauge base symbol
     /// @param _distributor Address of the mainnet rewards distributor
     /// @param _sender Address of the CCIP message sender
     /// @param _admin Admin who can kill the gauge
-    function initialize(string memory _symbol, address _distributor, address _sender, address _admin)
-        external
-        initializer
-    {
-        name = string(abi.encodePacked("DFX ", _symbol, " Gauge"));
+    function initialize(
+        string memory _name,
+        string memory _symbol,
+        address _distributor,
+        address _sender,
+        address _admin
+    ) external initializer {
+        name = string(abi.encodePacked("DFX ", _name, " Root Gauge"));
         symbol = string(abi.encodePacked(_symbol, "-gauge"));
 
         distributor = _distributor;
