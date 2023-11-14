@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import MigrationReceiver
+from brownie import Migrator
 
 from utils.config import (
     DEPLOY_ACCT,
@@ -16,32 +16,27 @@ deployed = load_outputs(INSTANCE_ID)
 
 
 # deploy childchainreceiver
-def deploy_receiver() -> MigrationReceiver:
+def deploy_migrator() -> Migrator:
     print(f"--- Deploying MigrationReceiver contract to {connected_network} ---")
-    receiver = MigrationReceiver.deploy(
-        existing.read_addr("ccipRouter"),
-        existing.read_addr("chainSelectorEth"),
-        existing.read_addr("ccipSenderEth"),
-        deployed.read_addr("migrator"),
-        existing.read_addr("multisig0"),
+    receiver = Migrator.deploy(
+        existing.read_addr("bridgedDFX"),
+        existing.read_addr("DFX"),
         {"from": DEPLOY_ACCT},
         publish_source=True,
     )
-    write_contract(INSTANCE_ID, "migrationReceiver", receiver.address)
+    write_contract(INSTANCE_ID, "migrator", receiver.address)
 
 
 def main():
     print(
         (
             "NOTE: This script expects configuration for:\n"
-            "\t1. CCIP Router address\n"
-            "\t2. CCIP source chain selector\n"
-            "\t3. Mainnet sender address\n"
-            "\t4. Migrator address\n"
+            "\t1. Bridged DFX address\n"
+            "\t2. CCIP DFX address\n"
         )
     )
 
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    deploy_receiver()
+    deploy_migrator()
