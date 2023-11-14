@@ -25,6 +25,7 @@ contract MigrationReceiver is CCIPReceiver {
     address private lastReceivedTokenAddress; // Store the last received token address.
     uint256 private lastReceivedTokenAmount; // Store the last received amount.
 
+    address public migrator;
     address public owner;
 
     // Custom errors to provide more descriptive revert messages.
@@ -57,9 +58,12 @@ contract MigrationReceiver is CCIPReceiver {
         _;
     }
 
-    constructor(address _router, uint64 _sourceChain, address _sender, address _owner) CCIPReceiver(_router) {
+    constructor(address _router, uint64 _sourceChain, address _sender, address _migrator, address _owner)
+        CCIPReceiver(_router)
+    {
         whitelistedSourceChain = _sourceChain;
         whitelistedSender = _sender;
+        migrator = _migrator;
         owner = _owner;
     }
 
@@ -72,20 +76,20 @@ contract MigrationReceiver is CCIPReceiver {
     {
         lastReceivedMessageId = message.messageId; // fetch the messageId
         // Expect one token to be transferred at once, but you can transfer several tokens.
-        address rewardToken = message.destTokenAmounts[0].token;
-        uint256 rewardAmount = message.destTokenAmounts[0].amount;
-        lastReceivedTokenAddress = rewardToken;
-        lastReceivedTokenAmount = rewardAmount;
+        address token = message.destTokenAmounts[0].token;
+        uint256 amount = message.destTokenAmounts[0].amount;
+        lastReceivedTokenAddress = token;
+        lastReceivedTokenAmount = amount;
 
-        // Send received tokens to owner
-        IERC20(rewardToken).transfer(owner, rewardAmount);
+        // Send received tokens to migrator contract
+        IERC20(token).transfer(migrator, amount);
 
         emit RewardReceived(
             message.messageId,
             message.sourceChainSelector, // fetch the source chain identifier (aka selector)
             abi.decode(message.sender, (address)), // abi-decoding of the sender address,
-            rewardToken,
-            rewardAmount
+            token,
+            amount
         );
     }
 
@@ -94,6 +98,18 @@ contract MigrationReceiver is CCIPReceiver {
     /// @dev This function has no function body, making it a default function for receiving Ether.
     /// It is automatically called when Ether is transferred to the contract without any data.
     receive() external payable {}
+
+    /// @notice Allows the owner to set a new contract owner.
+    /// @param newOwner The address of the new contract owner.
+    function setOwner(address newOwner) external onlyOwner {
+        owner = newOwner;
+    }
+
+    /// @notice Allows the owner to set a new migrator contract.
+    /// @param newMigrator The address of the new migrator contract.
+    function setMigrator(address newMigrator) external onlyOwner {
+        migrator = newMigrator;
+    }
 
     /// @notice Emergency withdraw
     /// @param _token Address of token to withdraw

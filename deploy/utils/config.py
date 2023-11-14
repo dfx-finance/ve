@@ -28,7 +28,7 @@ DEFAULT_GAUGE_TYPE_NAME = "DFX LP Ethereum Gauge"
 DEFAULT_GAUGE_TYPE_WEIGHT = 1e18
 DEFAULT_GAUGE_WEIGHT = 1e18
 # globals -- distributor
-REWARDS_RATE = 0
+REWARDS_RATE = 0  # 126417399130000000 (2023)
 PREV_DISTRIBUTED_REWARDS = 0
 
 # gas -- set default scaling gas price for all transactions

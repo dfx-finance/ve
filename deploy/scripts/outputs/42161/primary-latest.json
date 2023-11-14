@@ -1,3 +1,4 @@
 {
-  "migrationReceiver": "0xC6E2231D6c4c81c4383122B1Dcb496c7a2c73dB3"
+  "migrator": "0xB48cCFcE88E7E321E4A582b62844d814Cf092aD1",
+  "migrationReceiver": "0x52257E7e7617374c1f0981bb17DD115c2f382a74"
 }
