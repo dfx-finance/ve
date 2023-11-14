@@ -11,8 +11,6 @@ import "../interfaces/ILiquidityGaugeV4.sol";
 import "../interfaces/IDfxMiddlemanGauge.sol";
 import "../interfaces/IStakingRewards.sol";
 
-// import "../external/AccessControlUpgradeable.sol";
-
 /// @title DfxDistributorEvents
 /// @author Forked from contracts developed by Angle and adapted by DFX
 /// - AngleDistributorEvents.sol (https://github.com/AngleProtocol/angle-core/blob/main/contracts/staking/AngleDistributorEvents.sol)

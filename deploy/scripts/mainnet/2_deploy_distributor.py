@@ -20,18 +20,17 @@ deployed = load_outputs(INSTANCE_ID)
 
 
 def deploy():
-    gauge_controller = _gauge_controller(deployed.read_addr("gaugeController"))
-
     print(f"--- Deploying Distributor contract to {connected_network} ---")
     dfx_distributor_logic = DfxDistributor.deploy(
         {"from": DEPLOY_ACCT},
         publish_source=VERIFY_CONTRACTS,
     )
+    write_contract(INSTANCE_ID, "dfxDistributorLogic", dfx_distributor_logic.address)
 
     print(f"--- Deploying Distributor proxy contract to {connected_network} ---")
     distributor_initializer_calldata = dfx_distributor_logic.initialize.encode_input(
         existing.read_addr("DFX"),
-        gauge_controller.address,
+        deployed.read_addr("gaugeController"),
         REWARDS_RATE,
         PREV_DISTRIBUTED_REWARDS,
         # needs another multisig to deal with access control behind proxy (ideally 2)
@@ -40,14 +39,12 @@ def deploy():
         ZERO_ADDRESS,  # delegate gauge for pulling type 2 gauge rewards
     )
     proxy = DfxUpgradeableProxy.deploy(
-        dfx_distributor_logic.address,
+        deployed.read_addr("dfxDistributorLogic"),
         DEPLOY_PROXY_ACCT,
         distributor_initializer_calldata,
         {"from": DEPLOY_ACCT},
         publish_source=VERIFY_CONTRACTS,
     )
-
-    write_contract(INSTANCE_ID, "dfxDistributorLogic", dfx_distributor_logic.address)
     write_contract(INSTANCE_ID, "dfxDistributor", proxy.address)
 
 
