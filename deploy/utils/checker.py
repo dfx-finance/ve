@@ -7,6 +7,7 @@ class _Checker:
     FAIL_TEXT = Fore.RED + "FAIL - {msg}" + Style.RESET_ALL
     PASS_DEBUG_TEXT = Fore.YELLOW + "PASS - {msg} (debug)" + Style.RESET_ALL
     FAIL_DEBUG_TEXT = Fore.MAGENTA + "FAIL - {msg} (debug)" + Style.RESET_ALL
+    SKIP_TEXT = "SKIP - {msg}"
 
     def _value(self, test_val, expected_val, label, debug_val=None):
         inner = f"{label}: {test_val}"
@@ -50,6 +51,9 @@ class _Checker:
             print(self.PASS_TEXT.format(msg=f"{label}: {test_addr} has role"))
         else:
             print(self.FAIL_TEXT.format(msg=f"{label}: {test_addr} missing role"))
+
+    def skip(self, label):
+        print(self.SKIP_TEXT.format(msg=label))
 
 
 Checker = _Checker()

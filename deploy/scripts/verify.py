@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import Contract, DfxUpgradeableProxy, CcipRootGauge
+from brownie import Contract, DfxUpgradeableProxy, CcipRootGauge, MigrationReceiver
 
 from utils.config import DEPLOY_ACCT, DEPLOY_PROXY_ACCT, INSTANCE_ID
 from utils.logger import load_outputs
@@ -21,5 +21,8 @@ def main():
     # )
     # CcipRootGauge.publish_source(gauge)
 
-    proxy = DfxUpgradeableProxy.at(deployed.read_addr("arbitrumCadcUsdcRootGauge"))
-    DfxUpgradeableProxy.publish_source(proxy)
+    # proxy = DfxUpgradeableProxy.at(deployed.read_addr("arbitrumCadcUsdcRootGauge"))
+    # DfxUpgradeableProxy.publish_source(proxy)
+
+    receiver = MigrationReceiver.at("0x85aD6DCfd14696da299e6a5097DFEf0ACEaE902d")
+    MigrationReceiver.publish_source(receiver)
