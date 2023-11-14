@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 from brownie import chain
-from brownie import clDFX, ChildChainReceiver, ChildChainStreamer, RewardsOnlyGauge
+from brownie import (
+    clDFX,
+    ChildChainReceiver,
+    ChildChainStreamer,
+    MigrationReceiver,
+    RewardsOnlyGauge,
+)
 
 from utils.ccip import ETHEREUM_CHAIN_SELECTOR
 from utils.checker import Checker
 from utils.config import INSTANCE_ID
 from utils.logger import load_inputs, load_outputs
+from utils.network import connected_network
 
 existing = load_inputs(INSTANCE_ID)
 deployed = load_outputs(INSTANCE_ID)
@@ -49,7 +56,7 @@ def main():
             "ChildChainReceiver whitelisted source chain",
         )
         Checker._value(
-            receiver.whitelistedSenders(existing.read_addr("ccipSender")),
+            receiver.whitelistedSenders(existing.read_addr("ccipSenderEth")),
             True,
             "ChildChainReceiver whitelisted sender",
         )
@@ -103,6 +110,25 @@ def main():
             existing.read_addr("DFX"),
             "RewardOnlyGauge DFX reward",
         )
+
+    if chain.id == 137:
+        receiver = MigrationReceiver.at(deployed.read_addr("migrationReceiver"))
+        # owner
+        Checker.address(
+            receiver.owner(), existing.read_addr("multisig0"), "MigrationReceiver admin"
+        )
+        Checker.number(
+            receiver.whitelistedSourceChain(),
+            existing.read_addr("chainSelectorEth"),
+            "MigrationReceiver source chain selector",
+        )
+        Checker.address(
+            receiver.whitelistedSender(),
+            existing.read_addr("ccipSenderEth"),
+            "MigrationReceiver source sender",
+        )
+    else:
+        Checker.skip(f"MigrationReceiver skipped on {connected_network}")
 
 
 if __name__ == "__main__":

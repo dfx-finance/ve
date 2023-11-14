@@ -11,5 +11,6 @@
   "trybUsdcReceiver": "0x83361A4bc7Abe70D922da5aB50bBC3dbdfE45b7B",
   "xsgdUsdcGauge": "0xCCAE31078ed968ebD41623D59e79585d036B7Cd5",
   "xsgdUsdcStreamer": "0x2c532c4D8D45698EAf9705FeFb1968C70ee17bDa",
-  "xsgdUsdcReceiver": "0x857e06AD40fbB4DE3C1A914135394870a0f8103e"
+  "xsgdUsdcReceiver": "0x857e06AD40fbB4DE3C1A914135394870a0f8103e",
+  "migrationReceiver": "0xB90C770BecEa7F075bbdBAE6429dbe0b11F178D1"
 }

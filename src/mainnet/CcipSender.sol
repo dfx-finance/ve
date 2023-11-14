@@ -177,7 +177,7 @@ contract CcipSender is Initializable {
     }
 
     /// @notice Add a new L2 destination address
-    /// @param rootGauge Address of the root gauge on the L2 chain
+    /// @param rootGauge Address of the root gauge on mainnet
     /// @param receiver Address of the receiver on the L2 chain
     /// @param chainSelector Selector of the destination L2 chain
     function setL2Destination(address rootGauge, address receiver, uint64 chainSelector) public onlyAdmin {
