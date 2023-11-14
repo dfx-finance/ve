@@ -159,14 +159,14 @@ def main():
 
     # Polygon
     if chain.id == 137:
-        # # Deploy all contracts
-        # labels = ["cadcUsdc", "ngncUsdc", "trybUsdc", "xsgdUsdc"]
-        # for label in labels:
-        #     try:
-        #         deploy_contract_set(gauge_logic, label)
-        #     except Exception as e:
-        #         print(f"Failed on: {label}")
-        #         raise e
+        # Deploy all contracts
+        labels = ["cadcUsdc", "ngncUsdc", "trybUsdc", "xsgdUsdc"]
+        for label in labels:
+            try:
+                deploy_contract_set(gauge_logic, label)
+            except Exception as e:
+                print(f"ERROR - Failed deploying: {label}")
+                raise e
 
         # Configure ChildChainStreamer distributor address (router), gauge
         # reward token address (clDFX on L2), and whitelisting on ChildChainReceiver

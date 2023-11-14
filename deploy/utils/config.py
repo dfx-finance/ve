@@ -19,8 +19,6 @@ DEPLOY_ACCT = (
 DEPLOY_PROXY_ACCT = (
     accounts[1] if is_localhost else accounts.load(os.getenv("PROXY_ADMIN_WALLET_ID"))
 )
-
-
 VERIFY_CONTRACTS = False if is_localhost else True
 # globals -- gauge controller
 DEFAULT_GAUGE_TYPE = 0
