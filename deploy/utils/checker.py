@@ -44,7 +44,7 @@ class _Checker:
             print(self.FAIL_TEXT.format(msg=inner))
 
     def has_role(self, contract, role, test_addr, label, reverse=False):
-        _has_role = contract.has_role(role, test_addr)
+        _has_role = contract.hasRole(role, test_addr)
         if reverse:
             _has_role = not _has_role
         if _has_role:

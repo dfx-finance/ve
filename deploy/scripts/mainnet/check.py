@@ -22,12 +22,12 @@ ARBITRUM_CHAIN_SELECTOR = 4949039107694359620
 POLYGON_CHAIN_SELECTOR = 4051577828743386545
 GAUGES = [
     # mainnet
-    ["ethereum", "ethereumCadcUsdcGauge", None, None],
-    ["ethereum", "ethereumGbptUsdcGauge", None, None],
-    ["ethereum", "ethereumGyenUsdcGauge", None, None],
-    ["ethereum", "ethereumTrybUsdcGauge", None, None],
-    ["ethereum", "ethereumXidrUsdcGauge", None, None],
-    ["ethereum", "ethereumXsgdUsdcGauge", None, None],
+    ["ethereum", "cadcUsdcGauge", None, None],
+    ["ethereum", "gbptUsdcGauge", None, None],
+    ["ethereum", "gyenUsdcGauge", None, None],
+    ["ethereum", "trybUsdcGauge", None, None],
+    ["ethereum", "xidrUsdcGauge", None, None],
+    ["ethereum", "xsgdUsdcGauge", None, None],
     # arbitrum
     ["arbitrum", "arbitrumCadcUsdcRootGauge", ARBITRUM_CHAIN_SELECTOR, None],
     ["arbitrum", "arbitrumGyenUsdcRootGauge", ARBITRUM_CHAIN_SELECTOR, None],
@@ -48,6 +48,7 @@ def main():
     """
     veDFX
     """
+    print("-- Checking veDFX: {addr}".format(addr=existing.read_addr("veDFX")))
     veDFX = VeDFX.at(existing.read_addr("veDFX"))
     # owner
     Checker.address(
@@ -62,6 +63,11 @@ def main():
     """
     veBoostProxy
     """
+    print(
+        "-- Checking veBoostProxy: {addr}".format(
+            addr=deployed.read_addr("veBoostProxy")
+        )
+    )
     veBoostProxy = VeBoostProxy.at(deployed.read_addr("veBoostProxy"))
     # owner
     Checker.address(
@@ -77,6 +83,11 @@ def main():
     """
     Gauge Controller
     """
+    print(
+        "-- Checking GaugeController: {addr}".format(
+            addr=deployed.read_addr("gaugeController")
+        )
+    )
     gaugeController = GaugeController.at(deployed.read_addr("gaugeController"))
     # owner
     Checker.address(
@@ -114,67 +125,69 @@ def main():
     """
     DfxDistributor
     """
-    print("SKIP - DfxDistributor not available")
-    # dfx_distributor = DfxDistributor.at(deployed.read_addr("dfxDistributor"))
-    # # owner
-    # Checker.address(
-    #     dfx_distributor.admin(),
-    #     existing.read_addr("multisig0"),
-    #     "DfxDistributor admin",
-    #     debug_addr=existing.read_addr("deployer1"),
-    # )
-    # Checker.address(
-    #     dfx_distributor.controller(),
-    #     existing.read_addr("gaugeController"),
-    #     "DfxDistributor gauge controller",
-    # )
-    # Checker.address(
-    #     dfx_distributor.reward_token(),
-    #     existing.read_addr("DFX"),
-    #     "DfxDistributor reward token (DFX)",
-    # )
-    # # roles
-    # default_admin_role = dfx_distributor.DEFAULT_ADMIN_ROLE()
-    # governor_role = dfx_distributor.GOVERNOR_ROLE()
-    # guardian_role = dfx_distributor.GUARDIAN_ROLE()
-    # Checker.address(
-    #     dfx_distributor.getRoleAdmin(default_admin_role),
-    #     ZERO_ADDRESS,  # Default admin should not be set
-    #     "DfxDistributor default admin",
-    # )
-    # Checker.address(
-    #     dfx_distributor.getRoleAdmin(governor_role),
-    #     governor_role,  # Governor should be own admin
-    #     "DfxDistributor governor admin",
-    # )
-    # Checker.address(
-    #     dfx_distributor.getRoleAdmin(guardian_role),
-    #     governor_role,  # Governor should be guardian admin
-    #     "DfxDistributor guardian admin",
-    # )
-    # Checker.has_role(
-    #     dfx_distributor,
-    #     default_admin_role,
-    #     existing.read_addr("multsig0"),
-    #     "DfxDistributor multsig admin",
-    #     reverse=True,
-    # )
-    # Checker.has_role(
-    #     dfx_distributor,
-    #     governor_role,
-    #     existing.read_addr("multsig0"),
-    #     "DfxDistributor mulitsig governor",
-    # )
-    # Checker.has_role(
-    #     dfx_distributor,
-    #     guardian_role,
-    #     existing.read_addr("multsig0"),
-    #     "DfxDistributor mulitsig guardian",
-    # )
+    print(
+        "-- Checking DfxDistributor: {addr}".format(
+            addr=deployed.read_addr("dfxDistributor")
+        )
+    )
+    dfx_distributor = DfxDistributor.at(deployed.read_addr("dfxDistributor"))
+
+    Checker.address(
+        dfx_distributor.controller(),
+        deployed.read_addr("gaugeController"),
+        "DfxDistributor gauge controller",
+    )
+    Checker.address(
+        dfx_distributor.rewardToken(),
+        existing.read_addr("DFX"),
+        "DfxDistributor reward token (DFX)",
+    )
+    # roles
+    default_admin_role = dfx_distributor.DEFAULT_ADMIN_ROLE()
+    governor_role = dfx_distributor.GOVERNOR_ROLE()
+    guardian_role = dfx_distributor.GUARDIAN_ROLE()
+    Checker.address(
+        dfx_distributor.getRoleAdmin(default_admin_role),
+        ZERO_ADDRESS,  # Default admin should not be set
+        "DfxDistributor default admin",
+    )
+    Checker.address(
+        dfx_distributor.getRoleAdmin(governor_role),
+        governor_role,  # Governor should be own admin
+        "DfxDistributor governor admin",
+    )
+    Checker.address(
+        dfx_distributor.getRoleAdmin(guardian_role),
+        governor_role,  # Governor should be guardian admin
+        "DfxDistributor guardian admin",
+    )
+    Checker.has_role(
+        dfx_distributor,
+        default_admin_role,
+        existing.read_addr("multisig0"),
+        "DfxDistributor multsig admin",
+        reverse=True,
+    )
+    Checker.has_role(
+        dfx_distributor,
+        governor_role,
+        existing.read_addr("multisig0"),
+        "DfxDistributor mulitsig governor",
+    )
+    Checker.has_role(
+        dfx_distributor,
+        guardian_role,
+        existing.read_addr("multisig0"),
+        "DfxDistributor mulitsig guardian",
+    )
 
     """
     CcipSender
     """
+    print(
+        "-- Checking CcipSender: {addr}".format(addr=deployed.read_addr("ccipSender"))
+    )
+
     ccipSender = CcipSender.at(deployed.read_addr("ccipSender"))
     # owner
     Checker.address(
@@ -205,55 +218,67 @@ def main():
 
     arb_fee_token, arb_fee_amount = ccipSender.chainFees(ARBITRUM_CHAIN_SELECTOR)
     Checker.address(arb_fee_token, ZERO_ADDRESS, "CCIPSender fee token (Arbitrum)")
-    Checker.number(arb_fee_amount, 200_00, "CCIPSender fee amount (Arbitrum)")
+    Checker.number(arb_fee_amount, 200_000, "CCIPSender fee amount (Arbitrum)")
     pol_fee_token, pol_fee_amount = ccipSender.chainFees(ARBITRUM_CHAIN_SELECTOR)
     Checker.address(pol_fee_token, ZERO_ADDRESS, "CCIPSender fee token (Polygon)")
-    Checker.number(pol_fee_amount, 200_00, "CCIPSender fee amount (Polygon)")
+    Checker.number(pol_fee_amount, 200_000, "CCIPSender fee amount (Polygon)")
 
     """
     LiquidityGaugeV4
     """
-    ## DEV: eth gauges not yet deployed (Nov 6, 2023)
-    # for key in ETHEREUM_GAUGE_KEYS:
-    #     gauge = LiquidityGaugeV4.at(deployed.read_addr(key))
-    #     # owner
-    #     Checker.address(
-    #         gauge.admin(),
-    #         existing.read_addr("multisig0"),
-    #         f"{key} admin",
-    #         debug_addr=existing.read_addr("deployer1"),
-    #     )
-    #     Checker.address(gauge.DFX(), existing.read_addr("DFX"), f"{key} DFX")
-    #     Checker.address(
-    #         gauge.distributor(),
-    #         deployed.read_addr("dfxDistributor"),
-    #         f"{key} distributor",
-    #         debug_addr=existing.read_addr("deployer1"),
-    #     )
-    #     Checker.address(
-    #         gauge.veBoost_proxy(),
-    #         deployed.read_addr("veBoostProxy"),
-    #         f"{key} veBoostProxy",
-    #     )
+    for key in ETHEREUM_GAUGE_KEYS:
+        print(
+            "-- Checking LiquidityGaugeV4 ({key}): {addr}".format(
+                key=key, addr=deployed.read_addr(key)
+            )
+        )
 
-    """
-    RootChainGauges
-    """
-
-    def _check_root_chain_gauge(json_key):
-        gauge = CcipRootGauge.at(deployed.read_addr(json_key))
+        gauge = LiquidityGaugeV4.at(deployed.read_addr(key))
         # owner
         Checker.address(
             gauge.admin(),
             existing.read_addr("multisig0"),
-            f"{json_key} admin",
+            f"{key} admin",
             debug_addr=existing.read_addr("deployer1"),
         )
-        Checker.address(gauge.DFX(), existing.read_addr("DFX"), f"{json_key} DFX")
+        Checker.address(gauge.DFX(), existing.read_addr("DFX"), f"{key} DFX")
+
+        dfx_reward_data = gauge.reward_data(existing.read_addr("DFX"))
+        Checker.address(
+            dfx_reward_data[1],
+            deployed.read_addr("dfxDistributor"),
+            f"{key} distributor",
+            debug_addr=existing.read_addr("deployer1"),
+        )
+        Checker.address(
+            gauge.veBoost_proxy(),
+            deployed.read_addr("veBoostProxy"),
+            f"{key} veBoostProxy",
+        )
+
+    """
+    RootChainGauges
+    """
+    for key in L2_GAUGE_KEYS:
+        print(
+            "-- Checking RootGauge ({key}): {addr}".format(
+                key=key, addr=deployed.read_addr("ccipSender")
+            )
+        )
+
+        gauge = CcipRootGauge.at(deployed.read_addr(key))
+        # owner
+        Checker.address(
+            gauge.admin(),
+            existing.read_addr("multisig0"),
+            f"{key} admin",
+            debug_addr=existing.read_addr("deployer1"),
+        )
+        Checker.address(gauge.DFX(), existing.read_addr("DFX"), f"{key} DFX")
         Checker.address(
             gauge.distributor(),
             deployed.read_addr("dfxDistributor"),
-            f"{json_key} distributor",
+            f"{key} distributor",
             debug_addr=existing.read_addr("deployer1"),
         )
         ## DEV: method not public
@@ -263,9 +288,6 @@ def main():
         #     f"{json_key} distributor",
         #     debug_addr=existing.read_addr("deployer1"),
         # )
-
-    for key in L2_GAUGE_KEYS:
-        _check_root_chain_gauge(key)
 
 
 if __name__ == "__main__":
