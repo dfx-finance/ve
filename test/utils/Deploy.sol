@@ -93,9 +93,10 @@ contract Deploy is Constants {
 
     function deployRootGauge(
         string memory name,
+        string memory symbol,
         address DFX,
         address distributor,
-        address router,
+        address sender,
         address admin,
         address proxyAdmin
     ) public returns (CcipRootGauge) {
@@ -103,15 +104,8 @@ contract Deploy is Constants {
         CcipRootGauge _gauge = new CcipRootGauge(DFX);
 
         // Deploy CcipRootGauge gauge
-        bytes memory params = abi.encodeWithSelector(
-            CcipRootGauge.initialize.selector,
-            name,
-            distributor,
-            router,
-            TARGET_CHAIN_SELECTOR, // mock target chain selector
-            address(0), // mock fee token address
-            admin
-        );
+        bytes memory params =
+            abi.encodeWithSelector(CcipRootGauge.initialize.selector, name, symbol, distributor, sender, admin);
         DfxUpgradeableProxy proxy = new DfxUpgradeableProxy(address(_gauge), proxyAdmin, params);
         return CcipRootGauge(payable(address(proxy)));
     }
