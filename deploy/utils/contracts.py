@@ -19,7 +19,7 @@ def dfx_distributor(address):
     return brownie.interface.IDfxDistributor(address)
 
 
-def root_gauge_cctp(address):
+def ccip_root_gauge(address):
     return brownie.interface.IDfxDistributor(address)
 
 

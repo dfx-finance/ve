@@ -3,7 +3,7 @@ from utils.contracts import gauge as _gauge, gauge_controller as _gauge_controll
 from utils.config import (
     DEPLOY_ACCT,
     INSTANCE_ID,
-    DEFAULT_GAUGE_TYPE,
+    SIDECHAIN_GAUGE_TYPE,
     DEFAULT_GAUGE_WEIGHT,
     verify_deploy_address,
     verify_deploy_network,
@@ -22,7 +22,7 @@ def add_to_gauge_controller(gaugeAddr: str, admin: str):
     print(f"--- Add {gauge.name()} gauge to GaugeController ---")
     gauge_controller.add_gauge(
         gauge.address,
-        DEFAULT_GAUGE_TYPE,
+        SIDECHAIN_GAUGE_TYPE,
         DEFAULT_GAUGE_WEIGHT,
         {"from": admin},
     )
@@ -40,7 +40,12 @@ def main():
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    print("ENSURE PLACEHOLDER TYPE EXISTS BEFORE RUNNING")
-    # admin = DEPLOY_ACCT
-    # add_to_gauge_controller(deployed.read_addr("cadcUsdcGauge"), admin)
-    # add_to_gauge_controller(deployed.read_addr("eurcUsdcGauge"), admin)
+    add_to_gauge_controller(
+        deployed.read_addr("arbitrumCadcUsdcRootGauge"), DEPLOY_ACCT
+    )
+    add_to_gauge_controller(
+        deployed.read_addr("arbitrumGyenUsdcRootGauge"), DEPLOY_ACCT
+    )
+    add_to_gauge_controller(
+        deployed.read_addr("arbitrumUsdceUsdcRootGauge"), DEPLOY_ACCT
+    )
