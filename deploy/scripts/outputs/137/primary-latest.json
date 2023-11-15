@@ -1,4 +1,6 @@
 {
+  "migrator": "0xF626AcB046CC03EC45aCff7F02792044Cc225fe4",
+  "migrationReceiver": "0x9CF4e0da7Dc2200ad4B936bEddb8345F349cf37F",
   "gaugeImplementation": "0xdd0B3Ec7e8F077932F63fB2058b80bC6AB833Db4",
   "cadcUsdcGauge": "0x7ace867b3a503C6C76834ac223993FBD8963BED2",
   "cadcUsdcStreamer": "0x6C6C8e237b8A63804e3862f5731c5e429BbD675B",
@@ -12,6 +14,7 @@
   "xsgdUsdcGauge": "0xCCAE31078ed968ebD41623D59e79585d036B7Cd5",
   "xsgdUsdcStreamer": "0x2c532c4D8D45698EAf9705FeFb1968C70ee17bDa",
   "xsgdUsdcReceiver": "0x857e06AD40fbB4DE3C1A914135394870a0f8103e",
-  "migrator": "0xF626AcB046CC03EC45aCff7F02792044Cc225fe4",
-  "migrationReceiver": "0x9CF4e0da7Dc2200ad4B936bEddb8345F349cf37F"
+  "usdceUsdcGauge": "0xD3E7444d5DB4dDF0F9A1B52d62367C339B7bE8A9",
+  "usdceUsdcStreamer": "0xDc573b21f1F4d240cCA4b27B334B7FcFF06489e6",
+  "usdceUsdcReceiver": "0xcDa7D3Bc7AfEe6Cd31E1ce873D5Ece2d31ab3045"
 }

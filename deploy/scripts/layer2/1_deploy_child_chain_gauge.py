@@ -162,8 +162,9 @@ def main():
 
     # Polygon
     if chain.id == 137:
-        # Deploy all contracts
+        Deploy all contracts
         labels = ["cadcUsdc", "ngncUsdc", "trybUsdc", "xsgdUsdc", "usdceUsdc"]
+        labels = ["usdceUsdc"]
         for label in labels:
             print((f"Deploying: {label}"))
             deploy_contract_set(gauge_logic, label)
@@ -175,7 +176,7 @@ def main():
             ["ngncUsdcReceiver", "ngncUsdcStreamer", "ngncUsdcGauge"],
             ["trybUsdcReceiver", "trybUsdcStreamer", "trybUsdcGauge"],
             ["xsgdUsdcReceiver", "xsgdUsdcStreamer", "xsgdUsdcGauge"],
-            ["usdceUsdcReceiver", "usdceUsdcStreamer", "uscdeUsdcGauge"],
+            ["usdceUsdcReceiver", "usdceUsdcStreamer", "usdceUsdcGauge"],
         ]
         for receiver_key, streamer_key, gauge_key in json_keys:
             print((f"Configuring: {receiver_key}, {streamer_key}, {gauge_key}"))
