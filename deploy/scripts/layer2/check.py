@@ -24,10 +24,12 @@ GAUGES = {
         ["ngncUsdcReceiver", "ngncUsdcStreamer", "ngncUsdcGauge", "ngncUsdcLpt"],
         ["trybUsdcReceiver", "trybUsdcStreamer", "trybUsdcGauge", "trybUsdcLpt"],
         ["xsgdUsdcReceiver", "xsgdUsdcStreamer", "xsgdUsdcGauge", "xsgdUsdcLpt"],
+        ["usdceUsdcReceiver", "uscdeUsdcStreamer", "usdceUsdcGauge", "usdceUsdcLpt"],
     ],
     42161: [
         ["cadcUsdcReceiver", "cadcUsdcStreamer", "cadcUsdcGauge", "cadcUsdcLpt"],
         ["gyenUsdcReceiver", "gyenUsdcStreamer", "gyenUsdcGauge", "gyenUsdcLpt"],
+        ["usdceUsdcReceiver", "uscdeUsdcStreamer", "usdceUsdcGauge", "usdceUsdcLpt"],
     ],
 }
 
