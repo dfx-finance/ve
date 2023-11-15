@@ -61,7 +61,7 @@ def main():
             receiver.owner(),
             existing.read_addr("multisig0"),
             "ChildChainReceiver admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker._value(
             receiver.whitelistedSourceChains(ETHEREUM_CHAIN_SELECTOR),
@@ -95,7 +95,7 @@ def main():
             streamer.owner(),
             existing.read_addr("multisig0"),
             "ChildChainStreamer admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(
             streamer.reward_receiver(),
@@ -131,7 +131,7 @@ def main():
             gauge.admin(),
             existing.read_addr("multisig0"),
             "RewardOnlyGauge admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(
             gauge.lp_token(), existing.read_addr(lpt_key), "RewardOnlyGauge lpt"
