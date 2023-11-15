@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import chain
+from brownie import chain, Contract
 from brownie import (
     clDFX,
     ChildChainReceiver,
@@ -123,7 +123,9 @@ def main():
             )
         )
 
-        gauge = RewardsOnlyGauge.at(deployed.read_addr(gauge_key))
+        gauge = Contract.from_abi(
+            "RewardsOnlyGauge", deployed.read_addr(gauge_key), RewardsOnlyGauge.abi
+        )
         # owner
         Checker.address(
             gauge.admin(),

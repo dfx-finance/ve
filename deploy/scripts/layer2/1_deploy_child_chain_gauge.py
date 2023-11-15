@@ -26,9 +26,7 @@ deployed = load_outputs(INSTANCE_ID)
 # deploy l2 rewards-only gauge
 def deploy_gauge_implementation() -> RewardsOnlyGauge:
     print(f"--- Deploying L2 gauge implementation contract to {connected_network} ---")
-    gauge_logic = RewardsOnlyGauge.deploy(
-        {"from": DEPLOY_ACCT}, publish_source=VERIFY_CONTRACTS
-    )
+    gauge_logic = RewardsOnlyGauge.deploy({"from": DEPLOY_ACCT})
     write_contract(INSTANCE_ID, "gaugeImplementation", gauge_logic.address)
     return gauge_logic
 

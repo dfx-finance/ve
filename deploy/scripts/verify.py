@@ -29,11 +29,11 @@ def main():
     # )
     # CcipRootGauge.publish_source(gauge)
 
-    # proxy = DfxUpgradeableProxy.at(deployed.read_addr("cadcUsdcGauge"))
-    # DfxUpgradeableProxy.publish_source(proxy)
+    proxy = DfxUpgradeableProxy.at(deployed.read_addr("cadcUsdcGauge"))
+    DfxUpgradeableProxy.publish_source(proxy)
 
     # receiver = MigrationReceiver.at(deployed.read_addr("migrationReceiver"))
     # MigrationReceiver.publish_source(receiver)
 
-    distributorLogic = DfxDistributor.at(deployed.read_addr("dfxDistributorLogic"))
-    DfxDistributor.publish_source(distributorLogic)
+    # distributorLogic = DfxDistributor.at(deployed.read_addr("dfxDistributorLogic"))
+    # DfxDistributor.publish_source(distributorLogic)
