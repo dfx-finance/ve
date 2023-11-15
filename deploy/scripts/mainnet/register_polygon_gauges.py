@@ -3,7 +3,7 @@ from utils.contracts import gauge as _gauge, gauge_controller as _gauge_controll
 from utils.config import (
     DEPLOY_ACCT,
     INSTANCE_ID,
-    DEFAULT_GAUGE_TYPE,
+    SIDECHAIN_GAUGE_TYPE,
     DEFAULT_GAUGE_WEIGHT,
     verify_deploy_address,
     verify_deploy_network,
@@ -22,7 +22,7 @@ def add_to_gauge_controller(gaugeAddr: str, admin: str):
     print(f"--- Add {gauge.name()} gauge to GaugeController ---")
     gauge_controller.add_gauge(
         gauge.address,
-        DEFAULT_GAUGE_TYPE,
+        SIDECHAIN_GAUGE_TYPE,
         DEFAULT_GAUGE_WEIGHT,
         {"from": admin},
     )
@@ -40,8 +40,10 @@ def main():
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    admin = DEPLOY_ACCT
-    add_to_gauge_controller(deployed.read_addr("polygonCadcUsdcRootGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("polygonNgncUsdcRootGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("polygonTrybUsdcRootGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("polygonXsgdUsdcRootGauge"), admin)
+    add_to_gauge_controller(deployed.read_addr("polygonCadcUsdcRootGauge"), DEPLOY_ACCT)
+    add_to_gauge_controller(deployed.read_addr("polygonNgncUsdcRootGauge"), DEPLOY_ACCT)
+    add_to_gauge_controller(deployed.read_addr("polygonTrybUsdcRootGauge"), DEPLOY_ACCT)
+    add_to_gauge_controller(deployed.read_addr("polygonXsgdUsdcRootGauge"), DEPLOY_ACCT)
+    add_to_gauge_controller(
+        deployed.read_addr("polygonUsdceUsdcRootGauge"), DEPLOY_ACCT
+    )

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from brownie import (
     Contract,
+    ChildChainStreamer,
     DfxDistributor,
     DfxUpgradeableProxy,
     CcipRootGauge,
@@ -8,8 +9,9 @@ from brownie import (
 )
 
 from utils.config import DEPLOY_ACCT, DEPLOY_PROXY_ACCT, INSTANCE_ID
-from utils.logger import load_outputs
+from utils.logger import load_inputs, load_outputs
 
+existing = load_inputs(INSTANCE_ID)
 deployed = load_outputs(INSTANCE_ID)
 
 
@@ -27,11 +29,11 @@ def main():
     # )
     # CcipRootGauge.publish_source(gauge)
 
-    # proxy = DfxUpgradeableProxy.at(deployed.read_addr("arbitrumCadcUsdcRootGauge"))
-    # DfxUpgradeableProxy.publish_source(proxy)
+    proxy = DfxUpgradeableProxy.at(deployed.read_addr("cadcUsdcGauge"))
+    DfxUpgradeableProxy.publish_source(proxy)
 
     # receiver = MigrationReceiver.at(deployed.read_addr("migrationReceiver"))
     # MigrationReceiver.publish_source(receiver)
 
-    distributorLogic = DfxDistributor.at(deployed.read_addr("dfxDistributorLogic"))
-    DfxDistributor.publish_source(distributorLogic)
+    # distributorLogic = DfxDistributor.at(deployed.read_addr("dfxDistributorLogic"))
+    # DfxDistributor.publish_source(distributorLogic)

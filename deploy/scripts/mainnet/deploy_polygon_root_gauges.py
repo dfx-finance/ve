@@ -43,9 +43,9 @@ def deploy_gauge(
     gauge_initializer_calldata = gauge_logic.initialize.encode_input(
         f"Polygon {gauge_symbol.upper().replace('-', '/')}",
         gauge_symbol,
-        DEPLOY_ACCT,  # source chain distributor address
+        deployed.read_addr("dfxDistributor"),  # source chain distributor address
         deployed.read_addr("ccipSender"),  # ccip sender address
-        DEPLOY_ACCT,
+        existing.read_addr("multisig0"),
     )
 
     proxy = DfxUpgradeableProxy.deploy(
@@ -71,13 +71,14 @@ def main():
     verify_deploy_address(DEPLOY_ACCT)
 
     # gauge_logic = deploy_implementation()
-    gauge_logic = load_implementation()
     # if not is_localhost:
     #     print("Sleeping after deploy....")
     #     time.sleep(3)
+    gauge_logic = load_implementation()
 
     # deploy polygon root gauges
     deploy_gauge(gauge_logic, "cadc-usdc", "polygonCadcUsdcRootGauge")
     deploy_gauge(gauge_logic, "ngnc-usdc", "polygonNgncUsdcRootGauge")
     deploy_gauge(gauge_logic, "tryb-usdc", "polygonTrybUsdcRootGauge")
     deploy_gauge(gauge_logic, "xsgd-usdc", "polygonXsgdUsdcRootGauge")
+    deploy_gauge(gauge_logic, "usdce-usdc", "polygonUsdceUsdcRootGauge")

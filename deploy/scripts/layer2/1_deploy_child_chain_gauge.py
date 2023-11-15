@@ -28,8 +28,6 @@ def deploy_gauge_implementation() -> RewardsOnlyGauge:
     print(f"--- Deploying L2 gauge implementation contract to {connected_network} ---")
     gauge_logic = RewardsOnlyGauge.deploy({"from": DEPLOY_ACCT})
     write_contract(INSTANCE_ID, "gaugeImplementation", gauge_logic.address)
-    if not is_localhost:
-        time.sleep(3)  # wait to prevent "contract not available"
     return gauge_logic
 
 
@@ -155,18 +153,18 @@ def main():
     verify_deploy_address(DEPLOY_ACCT)
 
     # gauge_logic = deploy_gauge_implementation()
+    # if not is_localhost:
+    #     print("Sleeping after deploy....")
+    #     time.sleep(3)
     gauge_logic = load_gauge_implementation()
 
     # Polygon
     if chain.id == 137:
         # Deploy all contracts
-        labels = ["cadcUsdc", "ngncUsdc", "trybUsdc", "xsgdUsdc"]
+        labels = ["cadcUsdc", "ngncUsdc", "trybUsdc", "xsgdUsdc", "usdceUsdc"]
         for label in labels:
-            try:
-                deploy_contract_set(gauge_logic, label)
-            except Exception as e:
-                print(f"ERROR - Failed deploying: {label}")
-                raise e
+            print((f"Deploying: {label}"))
+            deploy_contract_set(gauge_logic, label)
 
         # Configure ChildChainStreamer distributor address (router), gauge
         # reward token address (clDFX on L2), and whitelisting on ChildChainReceiver
@@ -175,33 +173,27 @@ def main():
             ["ngncUsdcReceiver", "ngncUsdcStreamer", "ngncUsdcGauge"],
             ["trybUsdcReceiver", "trybUsdcStreamer", "trybUsdcGauge"],
             ["xsgdUsdcReceiver", "xsgdUsdcStreamer", "xsgdUsdcGauge"],
+            ["usdceUsdcReceiver", "usdceUsdcStreamer", "usdceUsdcGauge"],
         ]
         for receiver_key, streamer_key, gauge_key in json_keys:
-            try:
-                configure(receiver_key, streamer_key, gauge_key)
-            except Exception as e:
-                print(f"Failed on: {receiver_key}, {streamer_key}, {gauge_key}")
-                raise e
+            print((f"Configuring: {receiver_key}, {streamer_key}, {gauge_key}"))
+            configure(receiver_key, streamer_key, gauge_key)
+
     # Arbitrum
-    elif chain.id == 42161:
+    if chain.id == 42161:
         # Deploy all contracts
-        labels = ["cadcUsdc", "gyenUdsc"]
+        labels = ["cadcUsdc", "gyenUsdc", "usdceUsdc"]
         for label in labels:
-            try:
-                deploy_contract_set(gauge_logic, label)
-            except Exception as e:
-                print(f"Failed on: {label}")
-                raise e
+            print((f"Deploying: {label}"))
+            deploy_contract_set(gauge_logic, label)
 
         # Configure ChildChainStreamer distributor address (router), gauge
         # reward token address (clDFX on L2), and whitelisting on ChildChainReceiver
         json_keys = [
             ["cadcUsdcReceiver", "cadcUsdcStreamer", "cadcUsdcGauge"],
             ["gyenUsdcReceiver", "gyenUsdcStreamer", "gyenUsdcGauge"],
+            ["usdceUsdcReceiver", "usdceUsdcStreamer", "usdceUsdcGauge"],
         ]
         for receiver_key, streamer_key, gauge_key in json_keys:
-            try:
-                configure(receiver_key, streamer_key, gauge_key)
-            except Exception as e:
-                print(f"Failed on: {receiver_key}, {streamer_key}, {gauge_key}")
-                raise e
+            print((f"Configuring: {receiver_key}, {streamer_key}, {gauge_key}"))
+            configure(receiver_key, streamer_key, gauge_key)

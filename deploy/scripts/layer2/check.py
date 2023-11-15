@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from brownie import chain
+from brownie import chain, Contract
 from brownie import (
     clDFX,
     ChildChainReceiver,
@@ -24,10 +24,12 @@ GAUGES = {
         ["ngncUsdcReceiver", "ngncUsdcStreamer", "ngncUsdcGauge", "ngncUsdcLpt"],
         ["trybUsdcReceiver", "trybUsdcStreamer", "trybUsdcGauge", "trybUsdcLpt"],
         ["xsgdUsdcReceiver", "xsgdUsdcStreamer", "xsgdUsdcGauge", "xsgdUsdcLpt"],
+        ["usdceUsdcReceiver", "usdceUsdcStreamer", "usdceUsdcGauge", "usdceUsdcLpt"],
     ],
     42161: [
         ["cadcUsdcReceiver", "cadcUsdcStreamer", "cadcUsdcGauge", "cadcUsdcLpt"],
         ["gyenUsdcReceiver", "gyenUsdcStreamer", "gyenUsdcGauge", "gyenUsdcLpt"],
+        ["usdceUsdcReceiver", "usdceUsdcStreamer", "usdceUsdcGauge", "usdceUsdcLpt"],
     ],
 }
 
@@ -59,7 +61,7 @@ def main():
             receiver.owner(),
             existing.read_addr("multisig0"),
             "ChildChainReceiver admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker._value(
             receiver.whitelistedSourceChains(ETHEREUM_CHAIN_SELECTOR),
@@ -93,7 +95,7 @@ def main():
             streamer.owner(),
             existing.read_addr("multisig0"),
             "ChildChainStreamer admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(
             streamer.reward_receiver(),
@@ -121,13 +123,15 @@ def main():
             )
         )
 
-        gauge = RewardsOnlyGauge.at(deployed.read_addr(gauge_key))
+        gauge = Contract.from_abi(
+            "RewardsOnlyGauge", deployed.read_addr(gauge_key), RewardsOnlyGauge.abi
+        )
         # owner
         Checker.address(
             gauge.admin(),
             existing.read_addr("multisig0"),
             "RewardOnlyGauge admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(
             gauge.lp_token(), existing.read_addr(lpt_key), "RewardOnlyGauge lpt"

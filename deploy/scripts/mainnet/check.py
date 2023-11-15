@@ -21,22 +21,67 @@ deployed = load_outputs(INSTANCE_ID)
 
 ARBITRUM_CHAIN_SELECTOR = 4949039107694359620
 POLYGON_CHAIN_SELECTOR = 4051577828743386545
+# [[network, gaugeKey, chainSelector, receiverKey]]
 GAUGES = [
     # mainnet
     ["ethereum", "cadcUsdcGauge", None, None],
+    ["ethereum", "eurcUsdcGauge", None, None],
     ["ethereum", "gbptUsdcGauge", None, None],
     ["ethereum", "gyenUsdcGauge", None, None],
+    ["ethereum", "nzdsUsdcGauge", None, None],
     ["ethereum", "trybUsdcGauge", None, None],
     ["ethereum", "xidrUsdcGauge", None, None],
     ["ethereum", "xsgdUsdcGauge", None, None],
     # arbitrum
-    ["arbitrum", "arbitrumCadcUsdcRootGauge", ARBITRUM_CHAIN_SELECTOR, None],
-    ["arbitrum", "arbitrumGyenUsdcRootGauge", ARBITRUM_CHAIN_SELECTOR, None],
+    [
+        "arbitrum",
+        "arbitrumCadcUsdcRootGauge",
+        ARBITRUM_CHAIN_SELECTOR,
+        "arbitrumCadcUsdcReceiver",
+    ],
+    [
+        "arbitrum",
+        "arbitrumGyenUsdcRootGauge",
+        ARBITRUM_CHAIN_SELECTOR,
+        "arbitrumGyenUsdcReceiver",
+    ],
+    [
+        "arbitrum",
+        "arbitrumUsdceUsdcRootGauge",
+        ARBITRUM_CHAIN_SELECTOR,
+        "arbitrumUsdceUsdcReceiver",
+    ],
     # polygon
-    ["polygon", "polygonCadcUsdcRootGauge", POLYGON_CHAIN_SELECTOR, None],
-    ["polygon", "polygonNgncUsdcRootGauge", POLYGON_CHAIN_SELECTOR, None],
-    ["polygon", "polygonTrybUsdcRootGauge", POLYGON_CHAIN_SELECTOR, None],
-    ["polygon", "polygonXsgdUsdcRootGauge", POLYGON_CHAIN_SELECTOR, None],
+    [
+        "polygon",
+        "polygonCadcUsdcRootGauge",
+        POLYGON_CHAIN_SELECTOR,
+        "polygonCadcUsdcReceiver",
+    ],
+    [
+        "polygon",
+        "polygonNgncUsdcRootGauge",
+        POLYGON_CHAIN_SELECTOR,
+        "polygonNgncUsdcReceiver",
+    ],
+    [
+        "polygon",
+        "polygonTrybUsdcRootGauge",
+        POLYGON_CHAIN_SELECTOR,
+        "polygonTrybUsdcReceiver",
+    ],
+    [
+        "polygon",
+        "polygonXsgdUsdcRootGauge",
+        POLYGON_CHAIN_SELECTOR,
+        "polygonXsgdUsdcReceiver",
+    ],
+    [
+        "polyon",
+        "polygonUsdceUsdcRootGauge",
+        POLYGON_CHAIN_SELECTOR,
+        "polygonUsdceUsdcReceiver",
+    ],
 ]
 CCIP_GAUGE_MAP = {
     row[1]: {"selector": row[2], "receiver": row[3]} for row in GAUGES if row[2]
@@ -95,7 +140,7 @@ def main():
         gaugeController.admin(),
         existing.read_addr("multisig0"),
         "GaugeController admin",
-        debug_addr=existing.read_addr("deployer0"),
+        # debug_addr=existing.read_addr("deployer0"),
     )
     Checker.address(
         gaugeController.token(),
@@ -107,21 +152,19 @@ def main():
         existing.read_addr("veDFX"),
         "GaugeController voting token (veDFX)",
     )
-    print("SKIP - GaugeController gauges not registered (Nov 6, 2023)")
-    # Checker.number(gaugeController.n_gauges(), 10, "GaugeController num gauges")
-    # for key in [*ETHEREUM_GAUGE_KEYS, *L2_GAUGE_KEYS]:
-    #     if gaugeController.gauge_types(deployed.read_addr(key)) == 0:
-    #         print(
-    #             Fore.GREEN
-    #             + f"PASS - GaugeController: {key} is registered"
-    #             + Style.RESET_ALL
-    #         )
-    #     else:
-    #         print(
-    #             Fore.RED
-    #             + f"FAIL - GaugeController: {key} is not registered"
-    #             + Style.RESET_ALL
-    #         )
+    Checker.number(gaugeController.n_gauges(), 16, "GaugeController num gauges")
+    for key in ETHEREUM_GAUGE_KEYS:
+        Checker.number(
+            gaugeController.gauge_types(deployed.read_addr(key)),
+            0,
+            f"GaugeController: {key} is registered",
+        )
+    for key in L2_GAUGE_KEYS:
+        Checker.number(
+            gaugeController.gauge_types(deployed.read_addr(key)),
+            2,
+            f"GaugeController: {key} is registered",
+        )
 
     """
     DfxDistributor
@@ -197,7 +240,7 @@ def main():
         ccipSender.admin(),
         existing.read_addr("multisig0"),
         "CCIPSender admin",
-        debug_addr=existing.read_addr("deployer1"),
+        # debug_addr=existing.read_addr("deployer1"),
     )
     Checker.address(
         ccipSender.DFX(), existing.read_addr("DFX"), "CCIPSender token (DFX)"
@@ -216,7 +259,9 @@ def main():
                 f"CCIPSender {key} chain selector",
             )
             Checker.address(
-                receiver, ccip_info["receiver"], f"CCIPSender {key} receiver"
+                receiver,
+                existing.read_addr(ccip_info["receiver"]),
+                f"CCIPSender {key} receiver",
             )
 
     # multisig distributor
@@ -257,7 +302,7 @@ def main():
             gauge.admin(),
             existing.read_addr("multisig0"),
             f"{key} admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(gauge.DFX(), existing.read_addr("DFX"), f"{key} DFX")
 
@@ -266,7 +311,7 @@ def main():
             dfx_reward_data[1],
             deployed.read_addr("dfxDistributor"),
             f"{key} distributor",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(
             gauge.veBoost_proxy(),
@@ -284,20 +329,22 @@ def main():
             )
         )
 
-        gauge = CcipRootGauge.at(deployed.read_addr(key))
+        gauge = Contract.from_abi(
+            "CcipRootGauge", deployed.read_addr(key), CcipRootGauge.abi
+        )
         # owner
         Checker.address(
             gauge.admin(),
             existing.read_addr("multisig0"),
             f"{key} admin",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(gauge.DFX(), existing.read_addr("DFX"), f"{key} DFX")
         Checker.address(
             gauge.distributor(),
             deployed.read_addr("dfxDistributor"),
             f"{key} distributor",
-            debug_addr=existing.read_addr("deployer1"),
+            # debug_addr=existing.read_addr("deployer1"),
         )
         ## DEV: method not public
         # Checker.address(

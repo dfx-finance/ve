@@ -45,6 +45,7 @@ def main():
     add_to_gauge_controller(deployed.read_addr("eurcUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("gbptUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("gyenUsdcGauge"), admin)
+    add_to_gauge_controller(deployed.read_addr("nzdsUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("trybUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("xidrUsdcGauge"), admin)
     add_to_gauge_controller(deployed.read_addr("xsgdUsdcGauge"), admin)
