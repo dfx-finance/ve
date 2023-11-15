@@ -40,8 +40,9 @@ def main():
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    admin = DEPLOY_ACCT
-    add_to_gauge_controller(deployed.read_addr("polygonCadcUsdcRootGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("polygonNgncUsdcRootGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("polygonTrybUsdcRootGauge"), admin)
-    add_to_gauge_controller(deployed.read_addr("polygonXsgdUsdcRootGauge"), admin)
+    print("ENSURE PLACEHOLDER TYPE EXISTS BEFORE RUNNING")
+    # admin = DEPLOY_ACCT
+    # add_to_gauge_controller(deployed.read_addr("polygonCadcUsdcRootGauge"), admin)
+    # add_to_gauge_controller(deployed.read_addr("polygonNgncUsdcRootGauge"), admin)
+    # add_to_gauge_controller(deployed.read_addr("polygonTrybUsdcRootGauge"), admin)
+    # add_to_gauge_controller(deployed.read_addr("polygonXsgdUsdcRootGauge"), admin)
