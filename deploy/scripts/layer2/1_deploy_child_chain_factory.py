@@ -33,6 +33,7 @@ def deploy_gauge_implementation() -> RewardsOnlyGauge:
     print(f"--- Deploying L2 gauge implementation contract to {connected_network} ---")
     gauge_logic = RewardsOnlyGauge.deploy({"from": DEPLOY_ACCT})
     write_contract(INSTANCE_ID, "gaugeImplementation", gauge_logic.address)
+    return gauge_logic
 
 
 # deploy childchainreceiver
@@ -56,17 +57,12 @@ def deploy_example_streamer():
 
 
 # rewards-only gauge is vyper: manually verify
-def deploy_example_upgradeable_gauge():
+def deploy_example_upgradeable_gauge(gauge_logic: RewardsOnlyGauge):
     print(f"--- Deploying RewardsOnlyGauge contract to {connected_network} ---")
     fake_lpt = ERC20LP.deploy(
         "Tester LPT", "fake-lpt", 18, 100e18, DEPLOY_ACCT, {"from": DEPLOY_ACCT}
     )
 
-    gauge_logic = Contract.from_abi(
-        "RewardsOnlyGauge",
-        deployed.read_addr("gaugeImplementation"),
-        RewardsOnlyGauge.abi,
-    )
     gauge_initializer_calldata = gauge_logic.initialize.encode_input(
         DEPLOY_ACCT,
         fake_lpt,
@@ -86,7 +82,7 @@ def deploy_factory() -> ChildChainFactory:
 
     print(f"--- Deploying ChildChainFactory contract to {connected_network} ---")
     factory = ChildChainFactory.deploy(
-        existing.read_addr("multisig0"),
+        DEPLOY_ACCT,
         CHILD_CHAIN_STREAMER_BYTECODE,
         {"from": DEPLOY_ACCT},
         publish_source=VERIFY_CONTRACTS,
@@ -106,11 +102,11 @@ def main():
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    deploy_gauge_implementation()
+    gauge_logic = deploy_gauge_implementation()
 
     deploy_example_receiver()
     deploy_example_streamer()
-    deploy_example_upgradeable_gauge()
+    deploy_example_upgradeable_gauge(gauge_logic)
 
     ## VERIFY ALL ABOVE CONTRACTS BEFORE DEPLOYING FACTORY
-    # deploy_factory()
+    deploy_factory()

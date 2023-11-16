@@ -1,7 +1,7 @@
 {
   "migrator": "0xF626AcB046CC03EC45aCff7F02792044Cc225fe4",
   "migrationReceiver": "0x9CF4e0da7Dc2200ad4B936bEddb8345F349cf37F",
-  "gaugeImplementation": "0xdd0B3Ec7e8F077932F63fB2058b80bC6AB833Db4",
+  "gaugeImplementationOld": "0xdd0B3Ec7e8F077932F63fB2058b80bC6AB833Db4",
   "cadcUsdcGauge": "0x2FD595d3DF1F9ECFe8f9fA3378Ca26fDF087A40A",
   "cadcUsdcStreamer": "0xAE946F37Ee783FAC5619A6B130fc99bb90D9B6EA",
   "cadcUsdcReceiver": "0xEEdb542d94E82e598810681B2E5A749aDCdf7575",

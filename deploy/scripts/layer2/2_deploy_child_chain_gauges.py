@@ -40,7 +40,7 @@ def main():
         labels = ["cadcUsdc", "ngncUsdc", "trybUsdc", "xsgdUsdc", "usdceUsdc"]
         for label in labels:
             print((f"Deploying: {label} gauge set"))
-            receiver, streamer, gauge = factory.deployGaugeSet(
+            factory.deployGaugeSet(
                 existing.read_addr(f"{label}RootGauge"),
                 existing.read_addr("ccipRouter"),
                 deployed.read_addr("gaugeImplementation"),
@@ -48,10 +48,15 @@ def main():
                 existing.read_addr("multisig0"),
                 DEPLOY_PROXY_ACCT,
                 existing.read_addr("DFX"),
+                {"from": DEPLOY_ACCT},
             )
-            write_contract(INSTANCE_ID, "{label}Receiver", receiver)
-            write_contract(INSTANCE_ID, "{label}Streamer", streamer)
-            write_contract(INSTANCE_ID, "{label}Gauge", gauge)
+
+            receiver, streamer, gauge = factory.gaugeSets(
+                existing.read_addr(f"{label}RootGauge")
+            )
+            write_contract(INSTANCE_ID, f"{label}Receiver", receiver)
+            write_contract(INSTANCE_ID, f"{label}Streamer", streamer)
+            write_contract(INSTANCE_ID, f"{label}Gauge", gauge)
 
     # Arbitrum
     if chain.id == 42161:
@@ -67,6 +72,7 @@ def main():
                 existing.read_addr("multisig0"),
                 DEPLOY_PROXY_ACCT,
                 existing.read_addr("DFX"),
+                {"from": DEPLOY_ACCT},
             )
             write_contract(INSTANCE_ID, "{label}Receiver", receiver)
             write_contract(INSTANCE_ID, "{label}Streamer", streamer)

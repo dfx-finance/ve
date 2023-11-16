@@ -17,10 +17,20 @@ contract ChildChainFactory {
 
     bytes public streamerBytecode;
 
-    struct GaugeSet {
+    struct GaugeSetInfo {
         address rootGauge;
+        address ccipRouter;
+        address childGaugeImplementation;
+        address lpt;
+        address deployedOwner;
+        address deployedProxyOwner;
+        address rewardToken;
+    }
+
+    struct GaugeSet {
         address receiver;
         address sender;
+        address childGauge;
     }
 
     mapping(address => GaugeSet) public gaugeSets;
@@ -65,6 +75,42 @@ contract ChildChainFactory {
         return newContract;
     }
 
+    function _deployGaugeSet(GaugeSetInfo memory info)
+        internal
+        returns (address receiver, address streamer, address gauge)
+    {
+        // Deploy RewardsOnlyGauge contract
+        bytes memory gaugeParams =
+            abi.encodeWithSelector(IRewardsOnlyGauge.initialize.selector, address(this), info.lpt);
+        DfxUpgradeableProxy _gauge =
+            new DfxUpgradeableProxy(info.childGaugeImplementation, info.deployedProxyOwner, gaugeParams);
+        gauge = address(_gauge);
+
+        // Deploy ChildChainStreamer contract
+        streamer = _deployVyperContract(streamerBytecode, abi.encode(address(this), gauge, info.rewardToken));
+
+        // Deploy ChildChainReceiver contract
+        ChildChainReceiver _receiver = new ChildChainReceiver(info.ccipRouter, streamer, info.deployedOwner);
+        receiver = address(_receiver);
+
+        // Configure contracts
+        IChildChainStreamer(streamer).set_reward_distributor(info.rewardToken, gauge);
+        address[8] memory rewards =
+            [info.rewardToken, address(0), address(0), address(0), address(0), address(0), address(0), address(0)];
+        IRewardsOnlyGauge(gauge).set_rewards(streamer, IChildChainStreamer.get_reward.selector, rewards);
+
+        IChildChainStreamer(streamer).commit_transfer_ownership(info.deployedOwner);
+        IRewardsOnlyGauge(gauge).commit_transfer_ownership(info.deployedOwner);
+
+        // Track gauge sets in registry
+        gaugeSets[info.rootGauge] = GaugeSet(receiver, streamer, gauge);
+
+        emit Deployed(info.rootGauge, info.ccipRouter, receiver, streamer, gauge, info.deployedOwner);
+        emit Registered(info.rootGauge, receiver, streamer, gauge);
+
+        return (receiver, streamer, gauge);
+    }
+
     /// @notice Deploys and configures all contracts comprising a sidechain gauge
     /// @param rootGauge The mainnet address of the placeholder RootGauge
     /// @param ccipRouter The CCIP router address for the sidechain
@@ -81,33 +127,11 @@ contract ChildChainFactory {
         address deployedOwner,
         address deployedProxyOwner,
         address rewardToken
-    ) public onlyOwner returns (address receiver, address streamer, address gauge) {
-        // Deploy RewardsOnlyGauge contract
-        bytes memory gaugeParams = abi.encodeWithSelector(IRewardsOnlyGauge.initialize.selector, address(this), lpt);
-        DfxUpgradeableProxy _gauge = new DfxUpgradeableProxy(childGaugeImplementation, deployedProxyOwner, gaugeParams);
-        gauge = address(_gauge);
-
-        // Deploy ChildChainStreamer contract
-        streamer = _deployVyperContract(streamerBytecode, abi.encode(address(this), gauge, rewardToken));
-
-        // Deploy ChildChainReceiver contract
-        ChildChainReceiver _receiver = new ChildChainReceiver(ccipRouter, streamer, deployedOwner);
-        receiver = address(_receiver);
-
-        // Configure contracts
-        IChildChainStreamer(streamer).set_reward_distributor(rewardToken, gauge);
-        address[8] memory rewards =
-            [rewardToken, address(0), address(0), address(0), address(0), address(0), address(0), address(0)];
-        IRewardsOnlyGauge(gauge).set_rewards(streamer, IChildChainStreamer.get_reward.selector, rewards);
-
-        IChildChainStreamer(streamer).commit_transfer_ownership(deployedOwner);
-        IRewardsOnlyGauge(gauge).commit_transfer_ownership(deployedOwner);
-
-        // Track gauge sets in registry
-        gaugeSets[gauge] = GaugeSet(rootGauge, receiver, streamer);
-
-        emit Deployed(rootGauge, ccipRouter, receiver, streamer, gauge, deployedOwner);
-        emit Registered(rootGauge, receiver, streamer, gauge);
+    ) external onlyOwner returns (address receiver, address streamer, address gauge) {
+        GaugeSetInfo memory setInfo = GaugeSetInfo(
+            rootGauge, ccipRouter, childGaugeImplementation, lpt, deployedOwner, deployedProxyOwner, rewardToken
+        );
+        return _deployGaugeSet(setInfo);
     }
 
     /**
@@ -118,7 +142,7 @@ contract ChildChainFactory {
         public
         onlyOwner
     {
-        gaugeSets[childGauge] = GaugeSet(rootGauge, receiver, streamer);
+        gaugeSets[rootGauge] = GaugeSet(receiver, streamer, childGauge);
         emit Registered(rootGauge, receiver, streamer, childGauge);
     }
 
@@ -127,7 +151,7 @@ contract ChildChainFactory {
         public
         onlyOwner
     {
-        delete gaugeSets[childGauge];
+        delete gaugeSets[rootGauge];
         emit Unregistered(rootGauge, receiver, streamer, childGauge);
     }
 
