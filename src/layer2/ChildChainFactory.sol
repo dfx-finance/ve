@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
-// vyper -f bytecode ChildChainStreamer.vy > streamer_bytecode.txt
+// vyper -f bytecode --evm-version istanbul ChildChainStreamer.vy > streamer_bytecode.txt
 pragma solidity ^0.8.19;
 
 import "../DfxUpgradeableProxy.sol";
 import "../interfaces/IRewardsOnlyGauge.sol";
+import "../interfaces/IChildChainStreamer.sol";
 import "./ChildChainReceiver.sol";
 
 contract ChildChainFactory {
@@ -74,16 +75,25 @@ contract ChildChainFactory {
         address rewardToken
     ) public onlyOwner returns (address receiver, address streamer, address gauge) {
         // Deploy RewardsOnlyGauge contract
-        bytes memory gaugeParams = abi.encodeWithSelector(IRewardsOnlyGauge.initialize.selector, deployedOwner, lpt);
+        bytes memory gaugeParams = abi.encodeWithSelector(IRewardsOnlyGauge.initialize.selector, address(this), lpt);
         DfxUpgradeableProxy _gauge = new DfxUpgradeableProxy(childGaugeImplementation, deployedProxyOwner, gaugeParams);
         gauge = address(_gauge);
 
         // Deploy ChildChainStreamer contract
-        streamer = _deployVyperContract(streamerBytecode, abi.encode(deployedOwner, gauge, rewardToken));
+        streamer = _deployVyperContract(streamerBytecode, abi.encode(address(this), gauge, rewardToken));
 
         // Deploy ChildChainReceiver contract
         ChildChainReceiver _receiver = new ChildChainReceiver(ccipRouter, streamer, deployedOwner);
         receiver = address(_receiver);
+
+        // Configure contracts
+        IChildChainStreamer(streamer).set_reward_distributor(rewardToken, gauge);
+        address[8] memory rewards =
+            [rewardToken, address(0), address(0), address(0), address(0), address(0), address(0), address(0)];
+        IRewardsOnlyGauge(gauge).set_rewards(streamer, IChildChainStreamer.get_reward.selector, rewards);
+
+        IChildChainStreamer(streamer).commit_transfer_ownership(deployedOwner);
+        IRewardsOnlyGauge(gauge).commit_transfer_ownership(deployedOwner);
 
         emit Deployed(rootGauge, ccipRouter, receiver, streamer, gauge, deployedOwner);
         emit Registered(rootGauge, receiver, streamer, gauge);
