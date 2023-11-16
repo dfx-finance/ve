@@ -17,6 +17,14 @@ contract ChildChainFactory {
 
     bytes public streamerBytecode;
 
+    struct GaugeSet {
+        address rootGauge;
+        address receiver;
+        address sender;
+    }
+
+    mapping(address => GaugeSet) public gaugeSets;
+
     address public owner;
 
     /// @dev Modifier that checks whether the msg.sender is owner
@@ -95,6 +103,9 @@ contract ChildChainFactory {
         IChildChainStreamer(streamer).commit_transfer_ownership(deployedOwner);
         IRewardsOnlyGauge(gauge).commit_transfer_ownership(deployedOwner);
 
+        // Track gauge sets in registry
+        gaugeSets[gauge] = GaugeSet(rootGauge, receiver, streamer);
+
         emit Deployed(rootGauge, ccipRouter, receiver, streamer, gauge, deployedOwner);
         emit Registered(rootGauge, receiver, streamer, gauge);
     }
@@ -107,6 +118,7 @@ contract ChildChainFactory {
         public
         onlyOwner
     {
+        gaugeSets[childGauge] = GaugeSet(rootGauge, receiver, streamer);
         emit Registered(rootGauge, receiver, streamer, childGauge);
     }
 
@@ -115,6 +127,7 @@ contract ChildChainFactory {
         public
         onlyOwner
     {
+        delete gaugeSets[childGauge];
         emit Unregistered(rootGauge, receiver, streamer, childGauge);
     }
 
