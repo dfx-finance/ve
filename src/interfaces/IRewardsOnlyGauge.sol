@@ -25,4 +25,6 @@ interface IRewardsOnlyGauge {
     function deposit(uint256 _value) external;
 
     function withdraw(uint256 _value) external;
+
+    function admin() external returns (address);
 }

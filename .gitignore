@@ -14,3 +14,6 @@ docs/
 .env
 ve-venv/
 /lib/
+
+src/layer2/*_bytecode.txt
+

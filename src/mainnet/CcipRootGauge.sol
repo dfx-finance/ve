@@ -22,7 +22,7 @@ contract CcipRootGauge is Initializable {
     // The address of the DFX reward token
     address public immutable DFX;
     // The address of the CCIP Sender
-    ICcipSender sender;
+    ICcipSender public sender;
     // The address of the rewards distributor on the mainnet (source chain)
     address public distributor;
 
