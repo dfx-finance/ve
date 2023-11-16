@@ -11,6 +11,7 @@ import "../../src/interfaces/ILiquidityGaugeV4.sol";
 import "../../src/interfaces/IRewardsOnlyGauge.sol";
 import "../../src/interfaces/IVeDfx.sol";
 import "../../src/interfaces/IVeBoostProxy.sol";
+import "../../src/layer2/ChildChainFactory.sol";
 import "../../src/layer2/ChildChainReceiver.sol";
 import "../../src/mainnet/CcipRootGauge.sol";
 import "../../src/mainnet/CcipSender.sol";
@@ -145,6 +146,10 @@ contract Deploy is Constants {
         bytes memory params = abi.encodeWithSelector(IRewardsOnlyGauge.initialize.selector, admin, lpt);
         DfxUpgradeableProxy proxy = new DfxUpgradeableProxy(_gaugeAddr, proxyAdmin, params);
         return IRewardsOnlyGauge(address(proxy));
+    }
+
+    function deployChildChainFactory(address owner, bytes memory contractBytecode) public returns (ChildChainFactory) {
+        return new ChildChainFactory(owner, contractBytecode);
     }
 
     function deploySmartWalletChecker() public returns (SmartWalletChecker) {

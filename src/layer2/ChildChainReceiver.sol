@@ -72,11 +72,6 @@ contract ChildChainReceiver is CCIPReceiver {
         owner = _owner;
     }
 
-    /* Parameters */
-    function updateOwner(address _newOwner) external onlyOwner {
-        owner = _newOwner;
-    }
-
     /**
      * @notice Returns the details of the last CCIP received message.
      * @dev This function retrieves the ID, text, token address, and token amount of the last received CCIP message.
@@ -119,6 +114,10 @@ contract ChildChainReceiver is CCIPReceiver {
     }
 
     /* Admin */
+    function setOwner(address _newOwner) external onlyOwner {
+        owner = _newOwner;
+    }
+
     /// @notice Fallback function to allow the contract to receive Ether.
     /// @dev This function has no function body, making it a default function for receiving Ether.
     /// It is automatically called when Ether is transferred to the contract without any data.
