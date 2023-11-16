@@ -17,3 +17,4 @@ ve-venv/
 
 src/layer2/*_bytecode.txt
 
+deploy/*_bytecode.txt

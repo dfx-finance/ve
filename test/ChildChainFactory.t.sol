@@ -57,7 +57,13 @@ contract ChildChainFactoryTest is Test, Constants, Deploy, Setup {
         );
 
         assertEq(IChildChainReceiver(receiver).owner(), multisig0);
+
+        vm.prank(multisig0);
+        IChildChainStreamer(streamer).accept_transfer_ownership();
         assertEq(IChildChainStreamer(streamer).owner(), multisig0);
+
+        vm.prank(multisig0);
+        IRewardsOnlyGauge(gauge).accept_transfer_ownership();
         assertEq(IRewardsOnlyGauge(gauge).admin(), multisig0);
     }
 }

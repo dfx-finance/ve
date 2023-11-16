@@ -15,5 +15,7 @@ interface IChildChainStreamer {
     function notify_reward_amount(address _token) external;
     function reward_data(address _token) external returns (RewardToken memory);
     function set_reward_distributor(address _token, address _distributor) external;
+    function commit_transfer_ownership(address _newOwner) external;
+    function accept_transfer_ownership() external;
     function owner() external returns (address _owner);
 }
