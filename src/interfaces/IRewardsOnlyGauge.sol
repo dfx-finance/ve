@@ -25,4 +25,10 @@ interface IRewardsOnlyGauge {
     function deposit(uint256 _value) external;
 
     function withdraw(uint256 _value) external;
+
+    function commit_transfer_ownership(address _newOwner) external;
+
+    function accept_transfer_ownership() external;
+
+    function admin() external returns (address);
 }

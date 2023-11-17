@@ -14,14 +14,14 @@
   "trybUsdcLpt": "0x0a62A05cD19CDF1065BB92D3A885470B920b7Bb7",
   "xidrUsdcLpt": "0x64423386B619e0f50f2619a67070688edbDA80b7",
   "xsgdUsdcLpt": "0x512c1d73c2c3b68FDc0424ebb6Ed4734984CD20d",
-  "arbitrumMigrationReceiver": null,
+  "arbitrumMigrationReceiver": "0x52257E7e7617374c1f0981bb17DD115c2f382a74",
   "polygonMigrationReceiver": "0x9CF4e0da7Dc2200ad4B936bEddb8345F349cf37F",
-  "arbitrumCadcUsdcReceiver": "0xBAbDbB7d38Af430a79c05003c88787f0fdCf1506",
-  "arbitrumGyenUsdcReceiver": "0xE8A1E6e278B5016794Cc56dF60783763C7b06959",
-  "arbitrumUsdceUsdcReceiver": "0xCCAE31078ed968ebD41623D59e79585d036B7Cd5",
-  "polygonCadcUsdcReceiver": "0xEEdb542d94E82e598810681B2E5A749aDCdf7575",
-  "polygonNgncUsdcReceiver": "0x31E933BEb1105bB2baD60b5Dda58dA4Ac3619670",
-  "polygonTrybUsdcReceiver": "0xCa21C267500a14Afab53D03bF56E7625deA7F4A5",
-  "polygonXsgdUsdcReceiver": "0xe49D1Dc62f48Ad2241613b9B16BEAE41D61D2dd9",
-  "polygonUsdceUsdcReceiver": "0xb6724888Dd54b1cDB302f5B38DAC70672223fe3b"
+  "arbitrumCadcUsdcReceiver": "0x006413a0106d84719B4b7e7d8D0C8640646852E6",
+  "arbitrumGyenUsdcReceiver": "0xf7bD3CF63446Fc87967072E106F139D4f1A111D6",
+  "arbitrumUsdceUsdcReceiver": "0x1474af5e312cA659C7f88b81a69b966Aa38bB531",
+  "polygonCadcUsdcReceiver": "0x3F9B17f34eaD899bFA9b3b0e709709fFc40e237c",
+  "polygonNgncUsdcReceiver": "0x27f1b83e96A581dB6637d1955e90Af217E943246",
+  "polygonTrybUsdcReceiver": "0x8f59521B76AC7a1129eC1f2657D344dA87F9264c",
+  "polygonXsgdUsdcReceiver": "0x47c46657F7076665568257A6A2D971650644477d",
+  "polygonUsdceUsdcReceiver": "0x19f99840161414C9dA58a0f80B6809b4977CB2c4"
 }
