@@ -31,6 +31,8 @@ CHILD_CHAIN_STREAMER_BYTECODE = "6020610c686000396000518060a01c610c6357604052602
 # deploy RewardsGauge implmentation
 def deploy_gauge_implementation() -> RewardsOnlyGauge:
     print(f"--- Deploying L2 gauge implementation contract to {connected_network} ---")
+    if deployed.read_addr("gaugeImplementation"):
+        return RewardsOnlyGauge.at(deployed.read_addr("gaugeImplementation"))
     gauge_logic = RewardsOnlyGauge.deploy({"from": DEPLOY_ACCT})
     write_contract(INSTANCE_ID, "gaugeImplementation", gauge_logic.address)
     return gauge_logic
@@ -50,7 +52,7 @@ def deploy_example_receiver():
 
 # childchainstreamer is vyper: manually verify
 def deploy_example_streamer():
-    print(f"--- Deploying Receiver contract to {connected_network} ---")
+    print(f"--- Deploying Streamer contract to {connected_network} ---")
     ChildChainStreamer.deploy(
         DEPLOY_ACCT, DEPLOY_ACCT, DEPLOY_ACCT, {"from": DEPLOY_ACCT}
     )

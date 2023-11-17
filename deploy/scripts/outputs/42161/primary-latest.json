@@ -1,14 +1,15 @@
 {
   "migrator": "0xB48cCFcE88E7E321E4A582b62844d814Cf092aD1",
   "migrationReceiver": "0x52257E7e7617374c1f0981bb17DD115c2f382a74",
-  "gaugeImplementationOld": "0xdd0B3Ec7e8F077932F63fB2058b80bC6AB833Db4",
-  "cadcUsdcGauge": "0x7ace867b3a503C6C76834ac223993FBD8963BED2",
-  "cadcUsdcStreamer": "0x6C6C8e237b8A63804e3862f5731c5e429BbD675B",
-  "cadcUsdcReceiver": "0xBAbDbB7d38Af430a79c05003c88787f0fdCf1506",
-  "gyenUsdcGauge": "0x94627cfE1B4A90FBfEe438D8a1716Ecce030b481",
-  "gyenUsdcStreamer": "0x8890E58993EE5c0276B9355306cBa78a2F3Ecf69",
-  "gyenUsdcReceiver": "0xE8A1E6e278B5016794Cc56dF60783763C7b06959",
-  "usdceUsdcGauge": "0x41e464C979853D4714d5453d22223258C14F78ba",
-  "usdceUsdcStreamer": "0x83361A4bc7Abe70D922da5aB50bBC3dbdfE45b7B",
-  "usdceUsdcReceiver": "0xCCAE31078ed968ebD41623D59e79585d036B7Cd5"
+  "gaugeImplementation": "0x23613f27Ff87B46420c55385260F79b857f9c29a",
+  "gaugeFactory": "0xcDa7D3Bc7AfEe6Cd31E1ce873D5Ece2d31ab3045",
+  "cadcUsdcReceiver": "0xcd143387d323bc343ed5f184bdceb587bf35cc58",
+  "cadcUsdcStreamer": "0x827286c523cbf0981fcb86fc9b8dfdce06f5b5d1",
+  "cadcUsdcGauge": "0x9e273a9018683e8f96ccd33ce3aa6c239467d292",
+  "gyenUsdcReceiver": "0x76a05e842900757d02f16c6b7fb05532838532c0",
+  "gyenUsdcStreamer": "0xda552c2ab52dc68e4fd0cb00047237a0c8027cb3",
+  "gyenUsdcGauge": "0x4077bc9654e68edfa2c8dea6dc349ab687b6e4a1",
+  "usdceUsdcReceiver": "0xc16047239913fC2E1B89CA5507d0617BB0288441",
+  "usdceUsdcStreamer": "0xa4B34009225f0CE1182F8371149170c03506deBc",
+  "usdceUsdcGauge": "0x6f348463877b8707f49F7Fad035A041Acf772BFb"
 }

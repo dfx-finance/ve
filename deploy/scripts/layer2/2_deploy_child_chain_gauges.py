@@ -10,7 +10,7 @@ from utils.config import (
     verify_deploy_network,
 )
 from utils.logger import load_inputs, load_outputs, write_contract
-from utils.network import connected_network, is_localhost
+from utils.network import connected_network
 
 existing = load_inputs(INSTANCE_ID)
 deployed = load_outputs(INSTANCE_ID)
@@ -74,6 +74,9 @@ def main():
                 existing.read_addr("DFX"),
                 {"from": DEPLOY_ACCT},
             )
-            write_contract(INSTANCE_ID, "{label}Receiver", receiver)
-            write_contract(INSTANCE_ID, "{label}Streamer", streamer)
-            write_contract(INSTANCE_ID, "{label}Gauge", gauge)
+            receiver, streamer, gauge = factory.gaugeSets(
+                existing.read_addr(f"{label}RootGauge")
+            )
+            write_contract(INSTANCE_ID, f"{label}Receiver", receiver)
+            write_contract(INSTANCE_ID, f"{label}Streamer", streamer)
+            write_contract(INSTANCE_ID, f"{label}Gauge", gauge)
