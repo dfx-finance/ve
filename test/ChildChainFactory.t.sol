@@ -32,6 +32,8 @@ contract ChildChainFactoryTest is Test, Constants, Deploy, Setup {
     address multisig0 = makeAddr("MULTISIG_0");
     address multisig1 = makeAddr("MULTISIG_1");
     address router = makeAddr("CCIP_ROUTER");
+    address sender = makeAddr("CCIP_SENDER");
+    uint64 chainSelector = 1234567890;
     address rootGauge = makeAddr("ROOT_GAUGE");
 
     function setUp() public {
@@ -53,7 +55,15 @@ contract ChildChainFactoryTest is Test, Constants, Deploy, Setup {
 
     function test_DeployGauge() public {
         (address receiver, address streamer, address gauge) = factory.deployGaugeSet(
-            rootGauge, router, gaugeImplementation, address(lpt), multisig0, multisig1, address(DFX)
+            rootGauge,
+            router,
+            sender,
+            chainSelector,
+            gaugeImplementation,
+            address(lpt),
+            multisig0,
+            multisig1,
+            address(DFX)
         );
 
         assertEq(IChildChainReceiver(receiver).owner(), multisig0);
