@@ -2,6 +2,7 @@
 from brownie import chain
 from brownie import ChildChainFactory
 
+from utils.ccip import ETHEREUM_CHAIN_SELECTOR
 from utils.config import (
     DEPLOY_ACCT,
     DEPLOY_PROXY_ACCT,
@@ -43,6 +44,8 @@ def main():
             factory.deployGaugeSet(
                 existing.read_addr(f"{label}RootGauge"),
                 existing.read_addr("ccipRouter"),
+                existing.read_addr("ccipSenderEth"),
+                ETHEREUM_CHAIN_SELECTOR,
                 deployed.read_addr("gaugeImplementation"),
                 existing.read_addr(f"{label}Lpt"),
                 existing.read_addr("multisig0"),
@@ -67,6 +70,8 @@ def main():
             factory.deployGaugeSet(
                 existing.read_addr(f"{label}RootGauge"),
                 existing.read_addr("ccipRouter"),
+                existing.read_addr("ccipSenderEth"),
+                ETHEREUM_CHAIN_SELECTOR,
                 deployed.read_addr("gaugeImplementation"),
                 existing.read_addr(f"{label}Lpt"),
                 existing.read_addr("multisig0"),

@@ -20,6 +20,8 @@ contract ChildChainFactory {
     struct GaugeSetInfo {
         address rootGauge;
         address ccipRouter;
+        address ccipSender;
+        uint64 sourceChainSelector;
         address childGaugeImplementation;
         address lpt;
         address deployedOwner;
@@ -90,15 +92,18 @@ contract ChildChainFactory {
         streamer = _deployVyperContract(streamerBytecode, abi.encode(address(this), gauge, info.rewardToken));
 
         // Deploy ChildChainReceiver contract
-        ChildChainReceiver _receiver = new ChildChainReceiver(info.ccipRouter, streamer, info.deployedOwner);
+        ChildChainReceiver _receiver = new ChildChainReceiver(info.ccipRouter, streamer, address(this));
         receiver = address(_receiver);
 
         // Configure contracts
-        IChildChainStreamer(streamer).set_reward_distributor(info.rewardToken, gauge);
+        _receiver.whitelistSender(info.ccipSender);
+        _receiver.whitelistSourceChain(info.sourceChainSelector);
+        IChildChainStreamer(streamer).set_reward_distributor(info.rewardToken, receiver);
         address[8] memory rewards =
             [info.rewardToken, address(0), address(0), address(0), address(0), address(0), address(0), address(0)];
         IRewardsOnlyGauge(gauge).set_rewards(streamer, IChildChainStreamer.get_reward.selector, rewards);
 
+        _receiver.setOwner(info.deployedOwner);
         IChildChainStreamer(streamer).commit_transfer_ownership(info.deployedOwner);
         IRewardsOnlyGauge(gauge).commit_transfer_ownership(info.deployedOwner);
 
@@ -114,6 +119,7 @@ contract ChildChainFactory {
     /// @notice Deploys and configures all contracts comprising a sidechain gauge
     /// @param rootGauge The mainnet address of the placeholder RootGauge
     /// @param ccipRouter The CCIP router address for the sidechain
+    /// @param ccipRouter The mainnet address of the CCIP sender contract to whitelist
     /// @param childGaugeImplementation Implementation address for gauge proxy
     /// @param lpt Address of gauge staking token
     /// @param deployedOwner Address of contracts owner
@@ -122,6 +128,8 @@ contract ChildChainFactory {
     function deployGaugeSet(
         address rootGauge,
         address ccipRouter,
+        address ccipSender,
+        uint64 sourceChainSelector,
         address childGaugeImplementation,
         address lpt,
         address deployedOwner,
@@ -129,7 +137,15 @@ contract ChildChainFactory {
         address rewardToken
     ) external onlyOwner returns (address receiver, address streamer, address gauge) {
         GaugeSetInfo memory setInfo = GaugeSetInfo(
-            rootGauge, ccipRouter, childGaugeImplementation, lpt, deployedOwner, deployedProxyOwner, rewardToken
+            rootGauge,
+            ccipRouter,
+            ccipSender,
+            sourceChainSelector,
+            childGaugeImplementation,
+            lpt,
+            deployedOwner,
+            deployedProxyOwner,
+            rewardToken
         );
         return _deployGaugeSet(setInfo);
     }
