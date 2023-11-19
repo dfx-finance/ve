@@ -19,9 +19,9 @@
   "arbitrumCadcUsdcReceiver": "0x006413a0106d84719B4b7e7d8D0C8640646852E6",
   "arbitrumGyenUsdcReceiver": "0xf7bD3CF63446Fc87967072E106F139D4f1A111D6",
   "arbitrumUsdceUsdcReceiver": "0x1474af5e312cA659C7f88b81a69b966Aa38bB531",
-  "polygonCadcUsdcReceiver": "0x3F9B17f34eaD899bFA9b3b0e709709fFc40e237c",
-  "polygonNgncUsdcReceiver": "0x27f1b83e96A581dB6637d1955e90Af217E943246",
-  "polygonTrybUsdcReceiver": "0x8f59521B76AC7a1129eC1f2657D344dA87F9264c",
-  "polygonXsgdUsdcReceiver": "0x47c46657F7076665568257A6A2D971650644477d",
-  "polygonUsdceUsdcReceiver": "0x19f99840161414C9dA58a0f80B6809b4977CB2c4"
+  "polygonCadcUsdcReceiver": "0x249A48AF9305dFD934877AE8fa1082Ff65196f36",
+  "polygonNgncUsdcReceiver": "0x1E28E93108863416d4651095E47FB90dbc235a43",
+  "polygonTrybUsdcReceiver": "0xE66A2622e578F730fB6FdfC32a8EB3595CD3173a",
+  "polygonXsgdUsdcReceiver": "0x137e745807bD1fe9203E79A8DFbC897FcDC7232d",
+  "polygonUsdceUsdcReceiver": "0x73956b479468e751F7A4E17904825fC2b66a1beB"
 }
