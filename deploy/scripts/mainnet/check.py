@@ -268,12 +268,12 @@ def main():
     receiver, chain_selector = ccipSender.destinations(existing.read_addr("multisig1"))
     Checker.number(
         chain_selector,
-        POLYGON_CHAIN_SELECTOR,
-        f"CCIPSender multisig chain selector is POLYGON",
+        ARBITRUM_CHAIN_SELECTOR,
+        f"CCIPSender multisig chain selector is ARBITRUM",
     )
     Checker.address(
         receiver,
-        existing.read_addr("polygonMigrationReceiver"),
+        existing.read_addr("arbitrumMigrationReceiver"),
         f"CCIPSender multisig receiver",
     )
 

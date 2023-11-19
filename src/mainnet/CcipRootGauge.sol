@@ -14,7 +14,7 @@ import "../interfaces/ICcipSender.sol";
 contract CcipRootGauge is Initializable {
     // The name of the gauge
     string public name;
-    // The symbole of the gauge
+    // The symbol of the gauge
     string public symbol;
     // The start time (in seconds since Unix epoch) of the current period
     uint256 public startEpochTime;
