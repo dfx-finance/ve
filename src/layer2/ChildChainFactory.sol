@@ -101,7 +101,8 @@ contract ChildChainFactory {
         IChildChainStreamer(streamer).set_reward_distributor(info.rewardToken, receiver);
         address[8] memory rewards =
             [info.rewardToken, address(0), address(0), address(0), address(0), address(0), address(0), address(0)];
-        IRewardsOnlyGauge(gauge).set_rewards(streamer, IChildChainStreamer.get_reward.selector, rewards);
+        bytes32 claimSig = bytes32(uint256(uint32(IChildChainStreamer.get_reward.selector)));
+        IRewardsOnlyGauge(gauge).set_rewards(streamer, claimSig, rewards);
 
         _receiver.setOwner(info.deployedOwner);
         IChildChainStreamer(streamer).commit_transfer_ownership(info.deployedOwner);

@@ -102,11 +102,11 @@ def main():
     verify_deploy_network(connected_network)
     verify_deploy_address(DEPLOY_ACCT)
 
-    gauge_logic = deploy_gauge_implementation()
+    # gauge_logic = deploy_gauge_implementation()
 
-    deploy_example_receiver()
-    deploy_example_streamer()
-    deploy_example_upgradeable_gauge(gauge_logic)
+    # deploy_example_receiver()
+    # deploy_example_streamer()
+    # deploy_example_upgradeable_gauge(gauge_logic)
 
     ## VERIFY ALL ABOVE CONTRACTS BEFORE DEPLOYING FACTORY
     deploy_factory()
