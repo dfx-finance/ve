@@ -502,3 +502,12 @@ def accept_transfer_ownership():
 
     self.admin = _admin
     log ApplyOwnership(_admin)
+
+
+@external
+def rescue(destination: address):
+    assert msg.sender == self.admin
+
+    token_balance: uint256 = ERC20(self.lp_token).balanceOf(self)
+    ERC20(self.lp_token).transfer(destination, token_balance)
+

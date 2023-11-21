@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-interface IRewardsOnlyGaugeUpgrade {
+interface IRewardsOnlyGaugeRescue {
     function initialize(address _admin, address _lpToken) external;
 
     function reward_contract() external view returns (address);
@@ -32,5 +32,7 @@ interface IRewardsOnlyGaugeUpgrade {
 
     function admin() external returns (address);
 
-    function abc() external returns (string memory);
+    function rescue(address dst) external;
+
+    function lp_token() external returns (address);
 }
