@@ -133,12 +133,18 @@ def main():
             # debug_addr=existing.read_addr("deployer1"),
         )
         Checker.address(
-            gauge.lp_token(), existing.read_addr(lpt_key), "RewardOnlyGauge lpt"
+            gauge.lp_token(), existing.read_addr(lpt_key), "RewardsOnlyGauge lpt"
         )
         Checker.address(
             gauge.reward_tokens(0),
             existing.read_addr("DFX"),
             "RewardOnlyGauge DFX reward",
+        )
+        # Signature for claiming rewards from streamer
+        Checker.string(
+            gauge.claim_sig(),
+            "0x1afe22a6",
+            "RewardsOnlyGauge claim signature",
         )
 
     """

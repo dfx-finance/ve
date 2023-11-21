@@ -43,6 +43,13 @@ class _Checker:
         else:
             print(self.FAIL_TEXT.format(msg=inner))
 
+    def string(self, test_val, expected_val, label):
+        inner = f"{label}: {test_val}"
+        if str(test_val) == str(expected_val):
+            print(self.PASS_TEXT.format(msg=inner))
+        else:
+            print(self.FAIL_TEXT.format(msg=inner))
+
     def has_role(self, contract, role, test_addr, label, reverse=False):
         _has_role = contract.hasRole(role, test_addr)
         if reverse:
