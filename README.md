@@ -67,6 +67,12 @@ For end-to-end testing of the sidechain contracts:
 6. Edit `scripts/testnet/deploy_child_chain_gauge.py` with LPT address
 7. Deploy test child chain gauge set script: `brownie run scripts/testnet/deploy_child_chain_gauge.py --network sepolia`
 
+### Compiling Vyper
+
+```
+$ vyper -f bytecode ChildChainStreamer.vy > streamer_bytecode.txt
+```
+
 ### Documenting
 
 Any contracts that failed to verify or must be verified manually (Vyper contracts) must be done on their respective block explorers (Etherscan, Polygonscan, Arbiscan). After deployment of any contract(s), new addresses are then to be added to the protocol addresses spreadsheet.
