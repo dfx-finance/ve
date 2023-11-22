@@ -2,15 +2,15 @@
 from brownie import web3, ZERO_ADDRESS
 from brownie import (
     Contract,
-    VeDFX,
-    VeBoostProxy,
-    GaugeController,
-    DfxDistributor,
-    CcipSender,
-    LiquidityGaugeV4,
     CcipRootGauge,
+    CcipSender,
+    DfxDistributor,
+    DfxUpgradeableProxy,
+    GaugeController,
+    LiquidityGaugeV4,
+    VeBoostProxy,
+    VeDFX,
 )
-
 
 from utils.checker import Checker
 from utils.config import INSTANCE_ID
@@ -88,6 +88,14 @@ CCIP_GAUGE_MAP = {
 }
 ETHEREUM_GAUGE_KEYS = [row[1] for row in filter(lambda g: g[0] == "ethereum", GAUGES)]
 L2_GAUGE_KEYS = [row[1] for row in filter(lambda g: g[0] != "ethereum", GAUGES)]
+
+
+def _load_proxy(addr):
+    return Contract.from_abi(
+        "DfxUpgradeableProxy",
+        addr,
+        DfxUpgradeableProxy.abi,
+    )
 
 
 def main():
@@ -354,6 +362,28 @@ def main():
         #     debug_addr=existing.read_addr("deployer1"),
         # )
 
+    """
+    DfxUpgradeableProxy
+    """
+    _dfx_distributor = _load_proxy(deployed.read_addr("dfxDistributor"))
+    Checker.address(
+        _dfx_distributor.getAdmin(),
+        existing.read_addr("multisig1"),
+        "DfxDistributor proxy admin",
+    )
 
-if __name__ == "__main__":
-    main()
+    _ccip_sender = _load_proxy(deployed.read_addr("ccipSender"))
+    Checker.address(
+        _ccip_sender.getAdmin(),
+        existing.read_addr("multisig1"),
+        "CCIPSender proxy admin",
+    )
+
+    # mainnet and root gauges
+    for _, label, _, _ in GAUGES:
+        _gauge = _load_proxy(deployed.read_addr(label))
+        Checker.address(
+            _gauge.getAdmin(),
+            existing.read_addr("multisig1"),
+            f"Gauge {label} proxy admin",
+        )
