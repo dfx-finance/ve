@@ -4,6 +4,7 @@ from brownie import (
     clDFX,
     ChildChainReceiver,
     ChildChainStreamer,
+    DfxUpgradeableProxy,
     MigrationReceiver,
     Migrator,
     RewardsOnlyGauge,
@@ -32,6 +33,14 @@ GAUGES = {
         ["usdceUsdcReceiver", "usdceUsdcStreamer", "usdceUsdcGauge", "usdceUsdcLpt"],
     ],
 }
+
+
+def _load_proxy(addr):
+    return Contract.from_abi(
+        "DfxUpgradeableProxy",
+        addr,
+        DfxUpgradeableProxy.abi,
+    )
 
 
 def main():
@@ -193,6 +202,11 @@ def main():
         "MigrationReceiver migrator",
     )
 
-
-if __name__ == "__main__":
-    main()
+    # mainnet and root gauges
+    for _, _, label, _ in GAUGES[chain.id]:
+        _gauge = _load_proxy(deployed.read_addr(label))
+        Checker.address(
+            _gauge.getAdmin(),
+            existing.read_addr("multisig1"),
+            f"Gauge {label} proxy admin",
+        )

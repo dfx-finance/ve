@@ -4,6 +4,7 @@ from brownie import (
     GaugeController,
     LiquidityGaugeV4,
     CcipRootGauge,
+    CcipSender,
     VeBoostProxy,
     VeDFX,
 )
@@ -26,6 +27,7 @@ ETH_GAUGES = [
 ARBITRUM_GAUGES = [
     deployed.read_addr("arbitrumCadcUsdcRootGauge"),
     deployed.read_addr("arbitrumGyenUsdcRootGauge"),
+    deployed.read_addr("arbitrumUsdceUsdcRootGauge"),
 ]
 POLYGON_GAUGES = [
     deployed.read_addr("polygonCadcUsdcRootGauge"),
@@ -48,8 +50,9 @@ def set_veBoostProxy_admin():
     veBoostProxy = Contract.from_abi(
         "veBoostProxy", deployed.read_addr("veBoostProxy"), VeBoostProxy.abi
     )
+    # print(veBoostProxy.admin())
     veBoostProxy.commit_admin(existing.read_addr("multisig0"), {"from": DEPLOY_ACCT})
-    veBoostProxy.accept_transfer_ownership({"from": existing.read_addr("multisig0")})
+    # veBoostProxy.accept_transfer_ownership({"from": existing.read_addr("multisig0")})
 
 
 def set_gauge_controller_admin():
@@ -59,9 +62,16 @@ def set_gauge_controller_admin():
     gauge_controller.commit_transfer_ownership(
         existing.read_addr("multisig0"), {"from": DEPLOY_ACCT}
     )
-    gauge_controller.accept_transfer_ownership(
-        {"from": existing.read_addr("multisig0")}
-    )
+    # gauge_controller.accept_transfer_ownership(
+    #     {"from": existing.read_addr("multisig0")}
+    # )
+
+
+# def set_ccip_sender_admin():
+#     ccip_sender = Contract.from_abi(
+#         "CcipSender", deployed.read_addr("ccipSender"), CcipSender.abi
+#     )
+#     ccip_sender.update_admin()
 
 
 def set_eth_gauge_admin(gauge_addr: str):
@@ -77,54 +87,54 @@ def set_l2_root_gauge_admin(gauge_addr: str):
     gauge.updateAdmin(existing.read_addr("multisig0"), {"from": DEPLOY_ACCT})
 
 
-def add_l2_gauge_type():
-    gauge_controller = Contract.from_abi(
-        "GaugeController", deployed.read_addr("gaugeController"), GaugeController.abi
-    )
+# def add_l2_gauge_type():
+#     gauge_controller = Contract.from_abi(
+#         "GaugeController", deployed.read_addr("gaugeController"), GaugeController.abi
+#     )
 
-    # add placeholder gauge type `1` to keep consistent with Angle distributor contract
-    gauge_controller.add_type(
-        "Staking Rewards",
-        0,
-        {"from": existing.read_addr("multisig0")},
-    )
-    # add new l2 gauge type to gauge controller
-    gauge_controller.add_type(
-        "L2 Liquidity Pools",
-        1e18,
-        {"from": existing.read_addr("multisig0")},
-    )
-
-
-def add_eth_gauge(gauge_addr: str):
-    gauge_controller = Contract.from_abi(
-        "GaugeController", deployed.read_addr("gaugeController"), GaugeController.abi
-    )
-    gauge_controller.add_gauge(
-        gauge_addr,
-        0,  # ETH gauge type
-        1e18,  # Default weight
-        {"from": existing.read_addr("multisig0")},
-    )
+#     # add placeholder gauge type `1` to keep consistent with Angle distributor contract
+#     gauge_controller.add_type(
+#         "Staking Rewards",
+#         0,
+#         {"from": existing.read_addr("multisig0")},
+#     )
+#     # add new l2 gauge type to gauge controller
+#     gauge_controller.add_type(
+#         "L2 Liquidity Pools",
+#         1e18,
+#         {"from": existing.read_addr("multisig0")},
+#     )
 
 
-def add_l2_root_gauge(gauge_addr: str):
-    gauge_controller = Contract.from_abi(
-        "GaugeController", deployed.read_addr("gaugeController"), GaugeController.abi
-    )
-    gauge_controller.add_gauge(
-        gauge_addr,
-        2,  # L2 gauge type
-        1e18,  # Default weight
-        {"from": existing.read_addr("multisig0")},
-    )
+# def add_eth_gauge(gauge_addr: str):
+#     gauge_controller = Contract.from_abi(
+#         "GaugeController", deployed.read_addr("gaugeController"), GaugeController.abi
+#     )
+#     gauge_controller.add_gauge(
+#         gauge_addr,
+#         0,  # ETH gauge type
+#         1e18,  # Default weight
+#         {"from": existing.read_addr("multisig0")},
+#     )
 
 
-def set_l2_root_gauge_distributor(gauge_addr: str):
-    gauge = Contract.from_abi("RootGaugeCcip", gauge_addr, CcipRootGauge.abi)
-    gauge.setDistributor(
-        deployed.read_addr("dfxDistributor"), {"from": existing.read_addr("multisig0")}
-    )
+# def add_l2_root_gauge(gauge_addr: str):
+#     gauge_controller = Contract.from_abi(
+#         "GaugeController", deployed.read_addr("gaugeController"), GaugeController.abi
+#     )
+#     gauge_controller.add_gauge(
+#         gauge_addr,
+#         2,  # L2 gauge type
+#         1e18,  # Default weight
+#         {"from": existing.read_addr("multisig0")},
+#     )
+
+
+# def set_l2_root_gauge_distributor(gauge_addr: str):
+#     gauge = Contract.from_abi("RootGaugeCcip", gauge_addr, CcipRootGauge.abi)
+#     gauge.setDistributor(
+#         deployed.read_addr("dfxDistributor"), {"from": existing.read_addr("multisig0")}
+#     )
 
 
 def main():
@@ -133,7 +143,8 @@ def main():
 
     # set_veDFX_admin()
     # set_veBoostProxy_admin()
-    # set_gauge_controller_admin()
+    set_gauge_controller_admin()
+    # set_ccip_sender_admin()
 
     # for gauge_addr in ETH_GAUGES:
     #     set_eth_gauge_admin(gauge_addr)
@@ -150,4 +161,5 @@ def main():
     # for gauge_addr in L2_GAUGES:
     #     add_l2_root_gauge(gauge_addr)
     #     set_l2_root_gauge_distributor(gauge_addr)
+
     pass
