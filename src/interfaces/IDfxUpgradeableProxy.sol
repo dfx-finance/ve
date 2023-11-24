@@ -5,7 +5,7 @@ pragma solidity ^0.8.19;
 /// @title IDfxUpgradeableProxy
 /// @notice Interface for the DFX upgradeable proxy contract
 interface IDfxUpgradeableProxy {
-    function admin() external view returns (address _addr);
+    function getAdmin() external view returns (address _addr);
 
     function implementation() external view returns (address _implementation);
 

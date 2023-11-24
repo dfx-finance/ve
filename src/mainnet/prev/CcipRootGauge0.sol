@@ -9,9 +9,9 @@ pragma solidity ^0.8.19;
  */
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "../interfaces/ICcipSender.sol";
+import "../../interfaces/ICcipSender0.sol";
 
-contract CcipRootGauge is Initializable {
+contract CcipRootGauge0 is Initializable {
     // The name of the gauge
     string public name;
     // The symbol of the gauge
@@ -22,7 +22,7 @@ contract CcipRootGauge is Initializable {
     // The address of the DFX reward token
     address public immutable DFX;
     // The address of the CCIP Sender
-    ICcipSender public sender;
+    ICcipSender0 public sender;
     // The address of the rewards distributor on the mainnet (source chain)
     address public distributor;
 
@@ -65,7 +65,7 @@ contract CcipRootGauge is Initializable {
         symbol = string(abi.encodePacked(_symbol, "-gauge"));
 
         distributor = _distributor;
-        sender = ICcipSender(_sender);
+        sender = ICcipSender0(_sender);
         admin = _admin;
     }
 
@@ -108,12 +108,5 @@ contract CcipRootGauge is Initializable {
     /// @param _newDistributor Reward distributor on source chain.
     function setDistributor(address _newDistributor) external onlyAdmin {
         distributor = _newDistributor;
-    }
-
-    /// @notice Set a new reward sender.
-    /// @dev Only callable by the current admin.
-    /// @param _newSender Reward sender on source chain.
-    function setSender(address _newSender) external onlyAdmin {
-        sender = ICcipSender(_newSender);
     }
 }
