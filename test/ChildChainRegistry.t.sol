@@ -61,6 +61,15 @@ contract ChildChainRegistryTest is Test, Constants, Deploy, Setup {
         assertEq(registry.nActiveGauges(), 1, "unexpected number of gauges");
     }
 
+    function test_GaugeSetAlreadyExists() public {
+        vm.startPrank(multisig0);
+        registry.registerGaugeSet(rootGauge, receiver, streamer, childGauge);
+
+        vm.expectRevert("gauge set for root gauge address already exists");
+        registry.registerGaugeSet(rootGauge, receiver, streamer, childGauge);
+        vm.stopPrank();
+    }
+
     function test_EditGaugeSet() public {
         vm.prank(multisig0);
         registry.registerGaugeSet(rootGauge, receiver, streamer, childGauge);

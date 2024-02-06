@@ -54,6 +54,8 @@ contract ChildChainRegistry is Ownable {
         public
         onlyOwnerOrFactory
     {
+        require(gaugeSets[rootGauge].childGauge == address(0), "gauge set for root gauge address already exists");
+
         rootGaugeHistory.push(rootGauge);
         gaugeSets[rootGauge] = GaugeSet(receiver, streamer, childGauge, block.timestamp);
         nActiveGauges++;
