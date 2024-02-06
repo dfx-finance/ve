@@ -22,5 +22,6 @@
   "polygonTrybUsdcRootGauge": "0x41e464C979853D4714d5453d22223258C14F78ba",
   "polygonXsgdUsdcRootGauge": "0x83361A4bc7Abe70D922da5aB50bBC3dbdfE45b7B",
   "polygonUsdceUsdcRootGauge": "0xCa21C267500a14Afab53D03bF56E7625deA7F4A5",
-  "testerRootGauge": "0xCCAE31078ed968ebD41623D59e79585d036B7Cd5"
+  "testerRootGauge": "0xCCAE31078ed968ebD41623D59e79585d036B7Cd5",
+  "polygonPaxgUsdcRootGauge": "0xbFDaD093F2266553eA6DC3EB42F4B269B3Bde3c8"
 }

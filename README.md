@@ -8,7 +8,8 @@
 
 Tests are run using Foundry:
 
-1. Run tests: `forge test --ffi -vv`
+1. Activate Python environment to make Vyper available: `. ve-venv/bin/activate`
+2. Run tests: `forge test --ffi -vv`
 
 ### Deploy
 
