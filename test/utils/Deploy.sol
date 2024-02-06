@@ -13,6 +13,7 @@ import "../../src/interfaces/IVeDfx.sol";
 import "../../src/interfaces/IVeBoostProxy.sol";
 import "../../src/layer2/ChildChainFactory.sol";
 import "../../src/layer2/ChildChainReceiver.sol";
+import "../../src/layer2/ChildChainRegistry.sol";
 import "../../src/mainnet/CcipRootGauge.sol";
 import "../../src/mainnet/CcipSender.sol";
 import "../../src/mainnet/DfxDistributor.sol";
@@ -150,6 +151,10 @@ contract Deploy is Constants {
 
     function deployChildChainFactory(address owner, bytes memory contractBytecode) public returns (ChildChainFactory) {
         return new ChildChainFactory(owner, contractBytecode);
+    }
+
+    function deployChildChainRegistry() public returns (ChildChainRegistry) {
+        return new ChildChainRegistry();
     }
 
     function deploySmartWalletChecker() public returns (SmartWalletChecker) {
