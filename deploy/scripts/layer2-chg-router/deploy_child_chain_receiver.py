@@ -53,12 +53,15 @@ def main():
                 existing.read_addr("ccipSenderEth"), {"from": DEPLOY_ACCT}
             )
             receiver.setOwner(existing.read_addr("multisig0"), {"from": DEPLOY_ACCT})
-            write_contract(INSTANCE_ID, f"{label}Receiver", receiver)
-            break
+            write_contract(INSTANCE_ID, f"{label}Receiver", receiver.address)
 
     # Arbitrum
     if chain.id == 42161:
-        pairs = ["cadcUsdc", "gyenUsdc", "usdceUsdc"]
+        pairs = [
+            # "cadcUsdc",
+            "gyenUsdc",
+            "usdceUsdc",
+        ]
         for label in pairs:
             receiver = ChildChainReceiver.deploy(
                 existing.read_addr("ccipRouter"),
@@ -74,4 +77,4 @@ def main():
                 existing.read_addr("ccipSenderEth"), {"from": DEPLOY_ACCT}
             )
             receiver.setOwner(existing.read_addr("multisig0"), {"from": DEPLOY_ACCT})
-            write_contract(INSTANCE_ID, f"{label}Receiver", receiver)
+            write_contract(INSTANCE_ID, f"{label}Receiver", receiver.address)

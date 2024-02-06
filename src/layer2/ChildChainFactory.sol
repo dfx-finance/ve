@@ -47,6 +47,7 @@ contract ChildChainFactory {
 
     /// @notice Constructor initializes the factory contract.
     /// @param _owner The address of the contract owner.
+    /// @param _streamerBytecode Hexadecimal bytecode of the Vyper streamer contract to deploy.
     constructor(address _owner, bytes memory _streamerBytecode) {
         owner = _owner;
         streamerBytecode = _streamerBytecode;
