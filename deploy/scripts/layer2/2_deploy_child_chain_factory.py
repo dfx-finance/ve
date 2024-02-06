@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from brownie import Contract
 from brownie import (
     ERC20LP,
     RewardsOnlyGauge,
@@ -76,10 +75,8 @@ def deploy_example_upgradeable_gauge(gauge_logic: RewardsOnlyGauge):
     )
 
 
-# deploy childchainreceiver
+# deploy childchainfactory
 def deploy_factory() -> ChildChainFactory:
-    print(VERIFY_CONTRACTS)
-
     print(f"--- Deploying ChildChainFactory contract to {connected_network} ---")
     factory = ChildChainFactory.deploy(
         DEPLOY_ACCT,
