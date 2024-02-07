@@ -17,9 +17,7 @@ deployed_mainnet = load_outputs(INSTANCE_ID, chain_id=1)
 
 
 def register_gauge(network_name, label):
-    # registry = ChildChainRegistry.at(deployed.read_addr("gaugeRegistry"))
-    registry = ChildChainRegistry.at("0x998814004f9d6AE314ec359B6B5149cD872A98b7")
-
+    registry = ChildChainRegistry.at(deployed.read_addr("gaugeRegistry"))
     root_gauge_label = label[0].upper() + label[1:]
     root_gauge = deployed_mainnet.read_addr(
         f"{network_name}{root_gauge_label}RootGauge"
