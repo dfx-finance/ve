@@ -29,13 +29,15 @@ def _load_json(fp: Path) -> JSONDict:
         return JSONDict(json.load(json_f))
 
 
-def load_inputs(name: str) -> JSONDict:
-    fp = INPUT_DIR / str(chain.id) / f"{name}.json"
+def load_inputs(name: str, chain_id=None) -> JSONDict:
+    _chain_id = str(chain_id) if chain_id else str(chain.id)
+    fp = INPUT_DIR / _chain_id / f"{name}.json"
     return _load_json(fp)
 
 
-def load_outputs(name: str) -> JSONDict:
-    fp = OUTPUT_DIR / str(chain.id) / f"{name}-latest.json"
+def load_outputs(name: str, chain_id=None) -> JSONDict:
+    _chain_id = str(chain_id) if chain_id else str(chain.id)
+    fp = OUTPUT_DIR / _chain_id / f"{name}-latest.json"
     return _load_json(fp)
 
 
