@@ -30,7 +30,7 @@ contract ChildChainRegistryTest is Test, Constants, Deploy, Setup {
         vm.expectRevert("Ownable: caller is not the owner");
         registry.setFactory(factory);
 
-        vm.expectEmit();
+        vm.expectEmit(true, false, false, false);
         emit ChildChainRegistry.RegisterFactory(factory);
 
         vm.prank(multisig0);
@@ -41,7 +41,7 @@ contract ChildChainRegistryTest is Test, Constants, Deploy, Setup {
         vm.expectRevert("Ownable: caller is not the owner or factory");
         registry.registerGaugeSet(rootGauge, receiver, streamer, childGauge);
 
-        vm.expectEmit();
+        vm.expectEmit(true, false, false, false);
         emit ChildChainRegistry.RegisterGaugeSet(rootGauge, receiver, streamer, childGauge, block.timestamp);
         vm.prank(multisig0);
         registry.registerGaugeSet(rootGauge, receiver, streamer, childGauge);
@@ -53,7 +53,7 @@ contract ChildChainRegistryTest is Test, Constants, Deploy, Setup {
         vm.prank(multisig0);
         registry.setFactory(factory);
 
-        vm.expectEmit();
+        vm.expectEmit(true, false, false, false);
         emit ChildChainRegistry.RegisterGaugeSet(rootGauge, receiver, streamer, childGauge, block.timestamp);
         vm.prank(factory);
         registry.registerGaugeSet(rootGauge, receiver, streamer, childGauge);
