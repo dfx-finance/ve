@@ -43,5 +43,5 @@ def main():
     # distributorLogic = DfxDistributor.at(deployed.read_addr("dfxDistributorLogic"))
     # DfxDistributor.publish_source(distributorLogic)
 
-    registry = ChildChainRegistry.at("0xd1Bb1F6d0C9134F2a421118F7389129480F2026D")
+    registry = ChildChainRegistry.at("0x7c7598F85C2DF093ed5972bc83CC99703Ea317C3")
     ChildChainRegistry.publish_source(registry)
